@@ -1,0 +1,15 @@
+# Ignorar archivos y carpetas generados por Python y Django
+__pycache__/
+*.py[cod]
+*.sqlite3
+*.log
+*.pot
+*.pyc
+*.pyo
+*.env
+venv/
+staticfiles/
+media/
+local_settings.py
+.env.local
+.env.*.local
