@@ -13,8 +13,8 @@ Promueve el acceso a la educación tecnológica, fomenta la ética profesional y
 ## Tecnologías usadas
 
 - Backend: Django + Django REST Framework
-- Frontend: React, Vite, Tailwind CSS
-- Infraestructura: Docker, CI/CD
+- Frontend: React +  Typescript + Vite + swc, Tailwind CSS
+- docs: Documentación
 
 ## Instalación y ejecución
 
