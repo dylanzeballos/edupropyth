@@ -1,0 +1,20 @@
+{
+  "name": "edupropyth",
+  "version": "1.0.0",
+  "description": "Laboratorio educativo para aprender Python",
+  "scripts": {
+    "prepare": "husky install",
+    "commitlint":"commitlint --edit",
+    "lint:all":"cd frontend && pnpm run lint && cd ../backend && flake8 .",
+    "test:all":"cd frontend && pnpm test && cd ../backend && pytest"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^17.6.7",
+    "@commitlint/config-conventional": "^17.6.7",
+    "husky": "^8.0.3"
+  },
+  "workspaces":[
+    "frontend",
+    "backend"
+  ]
+}

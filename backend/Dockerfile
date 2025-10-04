@@ -1,17 +1,18 @@
-FROM python:3.13-slim
+FROM python:3.13.7-slim-trixie
 
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y \
     gcc \
-    postgresql-dev \
+    postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
-COPY requirements/prod.txt .
-RUN pip install -r prod.txt
+COPY ./requirements ./requirements
+RUN pip install --no-cache-dir -r requirements/base.txt && \
+    pip install --no-cache-dir -r requirements/dev.txt
 
 COPY . .
 
 EXPOSE 8000
 
-CMD ["gunicorn", "src.core.wsgi:application", "--bind", "0.0.0.0:8000"]
+CMD ["python", "manage.py", "runserver", "--settings=config.settings.develop", "0.0.0.0:8000"]

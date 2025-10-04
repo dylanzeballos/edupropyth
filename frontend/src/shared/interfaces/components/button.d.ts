@@ -10,10 +10,10 @@ export interface ButtonProps {
     | 'variantText'
     | 'variantDeactivated';
   onClick?: () => void;
-  type?: 'button' | 'submit' | 'reset';
+  type?: 'button' | 'submit' | 'reset' ;
   disabled?: boolean;
-  loading?: boolean;
   className?: string;
+  loading?: boolean;
   loadingText?: string;
   size?: 'small' | 'medium' | 'large';
 }

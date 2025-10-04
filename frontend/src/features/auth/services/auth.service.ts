@@ -1,19 +1,21 @@
 import { postData } from "@/lib/api";
-import { UserFormData } from "@/features/auth/types/user.type";
+import { LoginResponse, LoginRequest, RegisterRequest, RegisterResponse } from '../types/login.type';
 
-export interface AuthResponse {
-    id: number;
-    email: string;
-    username: string;
-    first_name: string;
-    last_name: string;
-    full_name: string;
-    profile_role: string;
-    message?: string;
-}
 
 export const authService = {
-    register: async (data: UserFormData): Promise<AuthResponse> => {
-        return await postData('/api/users/', data);
+    login: async (data: LoginRequest): Promise<LoginResponse> => {
+        return await postData('/api/auth/login', data);
+    },
+
+    register: async (data: RegisterRequest): Promise<RegisterResponse> => {
+        return await postData('/api/users', data);
+    },
+
+    async logout(): Promise<void> {
+        await postData('/api/auth/logout', {});
+    },
+
+    async RefreshToken(): Promise<LoginResponse> {
+        return await postData('/api/auth/refresh-token', {});
     },
 }
