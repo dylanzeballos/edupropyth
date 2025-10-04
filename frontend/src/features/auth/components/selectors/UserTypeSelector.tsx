@@ -5,7 +5,7 @@ interface UserTypeSelectorProps {
     onChange: (userType: UserType) => void;
 }
 
-const UserTypeSelector = ({ userType, onChange }: UserTypeSelectorProps) => {
+export const UserTypeSelector = ({ userType, onChange }: UserTypeSelectorProps) => {
     return (
         <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -43,5 +43,3 @@ const UserTypeSelector = ({ userType, onChange }: UserTypeSelectorProps) => {
         </div>
     );
 };
-
-export default UserTypeSelector;
