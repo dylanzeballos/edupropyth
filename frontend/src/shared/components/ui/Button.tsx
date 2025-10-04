@@ -1,4 +1,4 @@
-import { ButtonProps } from '../../interfaces';
+import { ButtonProps } from '@/shared/interfaces';
 
 export const Button = ({
   type = 'button',
@@ -13,7 +13,7 @@ export const Button = ({
   loadingText = 'Cargando...',
 }: ButtonProps) => {
   const baseStyles =
-    'flex items-center justify-center font-medium rounded focus:outline-none transition duration-150 ease-in-out';
+    'button-lg rounded-[5px] h-10 pl-4 pr-5 text-center flex items-center whitespace-nowrap';
 
   const sizeStyles = {
     small: 'px-3 py-1.5 text-sm',
@@ -35,14 +35,16 @@ export const Button = ({
     variantDeactivated: 'bg-gray-200 text-gray-500 cursor-not-allowed',
   };
 
+  const currentVariantColorClasses = loading || disabled
+  ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+  : variantStyles[variantColor];
+
   return (
     <button
       type={type}
       onClick={onClick}
       disabled={disabled || loading}
-      className={`${baseStyles} ${sizeStyles.medium} ${
-        variantStyles[variantColor]
-      } ${className} ${loading ? 'cursor-wait' : ''}`}
+      className={`${baseStyles} ${sizeStyles.medium} ${currentVariantColorClasses} ${className} flex items-center justify-center transition-all duration-200`}
     >
       {loading ? (
         <>
@@ -52,7 +54,6 @@ export const Button = ({
       ) : (
         <>
           {Icon1 && <Icon1 className="mr-0" />}
-          <span>{label}</span>
           <p className="pl-1 text-center text-wrap">{label}</p>
           {Icon2 && <Icon2 className="mr-0" />}
         </>
