@@ -1,12 +1,18 @@
-export type UserType = 'student' | 'instructor';
+export interface User {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  userType: "Estudiante" | "Profesor" | "Admin";
+  isActive: boolean;
+  isApproved?: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
 
-export interface UserFormData {
-    username: string;
-    email: string;
-    first_name: string;
-    last_name: string;
-    password: string;
-    password_confirm: string;
-    bio?: string;
-    role: UserType;
+export interface AuthState {
+  user: User | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  token: string | null;
 }
