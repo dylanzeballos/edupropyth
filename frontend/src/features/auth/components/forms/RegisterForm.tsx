@@ -4,11 +4,12 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router';
 import { Button, InputText } from "@/shared/components/ui";
 import { registerUserSchema, RegisterFormData } from "../../validation/register.schema";
-import { useRegisterUser } from "../../hooks/use-register-user";
+import { useRegisterMutation } from "../../hooks/use-register-user";
 import { UserTypeSelector } from "../selectors/UserTypeSelector";
+import { GoogleLoginButton } from "../GoogleLoginButton";
 
 export const RegisterForm = () => {
-  const { mutate: registerUser, isPending } = useRegisterUser();
+  const { mutate: registerUser, isPending } = useRegisterMutation();
 
   const {
     register,
@@ -34,13 +35,11 @@ export const RegisterForm = () => {
       transition={{ duration: 0.5 }}
       className="space-y-6"
     >
-      <Button
-        type="button"
-        variantColor="primary"
-        className="w-full"
-        disabled={isPending}
-        label="Regístrate con Google"
+      <GoogleLoginButton
+        onSuccess={(user) => console.log("Google login successful:", user)}
+        onError={(error) => console.error("Google login error:", error)}
       />
+    
 
       <div className="relative">
         <div className="absolute inset-0 flex items-center">

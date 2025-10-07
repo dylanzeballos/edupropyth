@@ -64,9 +64,7 @@ export const AuthLayout = ({ children, type = 'login' }: AuthLayoutProps) => {
                     </div>
                 </motion.div>
 
-                {/* Formulario - Derecha en desktop, completo en móvil */}
                 <div className="flex flex-1 flex-col justify-center px-4 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
-                    {/* Imagen en móvil */}
                     <motion.div
                         initial={{ opacity: 0, y: -30 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -83,11 +81,10 @@ export const AuthLayout = ({ children, type = 'login' }: AuthLayoutProps) => {
                         </div>
                     </motion.div>
 
-                    {/* Contenedor del formulario con animación */}
                     <div className="mx-auto w-full max-w-md">
                         <AnimatePresence mode="wait">
                             <motion.div
-                                key={type} // Key para animar transiciones entre login/register
+                                key={type} 
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -20 }}
