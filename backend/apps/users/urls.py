@@ -1,4 +1,6 @@
 from django.urls import path, include
+from .views.auth_views import GoogleLogin, google_auth
+from .views.google_views import GoogleAuthView
 
 try:
     from .views.user_views import (
@@ -35,4 +37,7 @@ user_patterns = [
 urlpatterns = user_patterns + [
     path("profiles/<int:user_id>/", UserProfileDetailView.as_view(), name="profile-detail"),
     path("profiles/<int:user_id>/role/", update_role, name="update-role"),
+    path("auth/google/", GoogleLogin.as_view(), name="google-oauth-login"),
+    path("auth/google-login/", GoogleAuthView.as_view(), name="google-login"),
+    path("auth/google/callback/", google_auth, name="google-oauth"),
 ]
