@@ -7,3 +7,6 @@ drf-spectacular
 django-cors-headers
 dj_database-url
 Pillow
+django-allauth
+django-allauth[socialaccount]
+dj-rest-auth
