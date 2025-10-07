@@ -25,3 +25,14 @@ export interface RegisterResponse {
   token: string;
   message: string;
 }
+
+export interface AuthResponse {
+  id: number;
+  email: string;
+  username: string;
+  first_name: string;
+  last_name: string;
+  full_name: string;
+  profile_role: string;
+  message?: string;
+}

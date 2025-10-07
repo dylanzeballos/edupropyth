@@ -1,6 +1,10 @@
 import { postData } from "@/lib/api";
-import { LoginResponse, LoginRequest, RegisterRequest, RegisterResponse } from '../types/login.type';
+import { LoginResponse, LoginRequest, RegisterRequest, RegisterResponse, AuthResponse } from '../types/login.type';
 
+export interface GoogleAuthResponse extends AuthResponse {
+    access_token: string;
+    refresh_token: string;
+}
 
 export const authService = {
     login: async (data: LoginRequest): Promise<LoginResponse> => {
@@ -9,6 +13,12 @@ export const authService = {
 
     register: async (data: RegisterRequest): Promise<RegisterResponse> => {
         return await postData('/api/users', data);
+    },
+
+    googleAuth: async(idToken: string): Promise<GoogleAuthResponse> => {
+        return await postData('/api/users/auth/google-login/', {
+            id_token: idToken
+        });
     },
 
     async logout(): Promise<void> {

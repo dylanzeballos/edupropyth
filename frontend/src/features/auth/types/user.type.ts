@@ -9,10 +9,3 @@ export interface User {
   createdAt: string;
   updatedAt: string;
 }
-
-export interface AuthState {
-  user: User | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  token: string | null;
-}
