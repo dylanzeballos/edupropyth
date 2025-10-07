@@ -1,20 +1,28 @@
 {
   "name": "edupropyth",
   "version": "1.0.0",
-  "description": "Laboratorio educativo para aprender Python",
+  "description": "Este es un proyecto de la materia de generacion de software de la carrera de ingenieria de sistemas de la universidad mayor de san simon donde desarrollaremos un laboratorio de programacion en python aplicando buenas practicas de desarrollo y arquitectura de software",
+  "main": "commitlint.config.js",
+  "directories": {
+    "doc": "docs"
+  },
   "scripts": {
-    "prepare": "husky install",
-    "commitlint":"commitlint --edit",
-    "lint:all":"cd frontend && pnpm run lint && cd ../backend && flake8 .",
-    "test:all":"cd frontend && pnpm test && cd ../backend && pytest"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dylanzeballos/edupropyth.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/dylanzeballos/edupropyth/issues"
+  },
+  "homepage": "https://github.com/dylanzeballos/edupropyth#readme",
   "devDependencies": {
-    "@commitlint/cli": "^17.6.7",
-    "@commitlint/config-conventional": "^17.6.7",
-    "husky": "^8.0.3"
-  },
-  "workspaces":[
-    "frontend",
-    "backend"
-  ]
+    "husky": "^9.1.7"
+  }
 }
