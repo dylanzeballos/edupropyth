@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 import { toast } from 'sonner';
-import { authService } from '../services/auth.service';
-import { useAuthStore } from '../stores/auth.store';
+import { authService } from '../../services/auth.service';
+import { useAuthStore } from '../../stores/auth.store';
 
 interface GoogleLoginButtonProps {
     onSuccess?: (user: any) => void;
@@ -42,26 +42,26 @@ export const GoogleLoginButton = ({ onSuccess, onError }: GoogleLoginButtonProps
 
     return (
         <div className="w-full">
-            <div className="flex justify-center">
-                <GoogleLogin
-                    onSuccess={handleGoogleSuccess}
-                    onError={() => {
-                        const errorMessage = 'Error al iniciar sesión con Google';
-                        toast.error(errorMessage);
-                        onError?.(errorMessage);
-                    }}
-                    width="300px"
-                    theme="outline"
-                    text="signin_with"
-                    shape="rectangular"
-                    locale="es"
-                    useOneTap
-                />
-            </div>
+            <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={() => {
+                    const errorMessage = 'Error al iniciar sesión con Google';
+                    toast.error(errorMessage);
+                    onError?.(errorMessage);
+                }}
+                width="100%"
+                theme="outline"
+                text="signin_with"
+                shape="rectangular"
+                locale="es"
+                size="large"
+                logo_alignment="left"
+            />
             
             {loading && (
                 <div className="flex justify-center mt-2">
-                    <span className="text-sm text-gray-500">Procesando...</span>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                    <span className="text-sm text-gray-500 ml-2">Procesando...</span>
                 </div>
             )}
         </div>

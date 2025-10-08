@@ -5,7 +5,9 @@ import { Link } from 'react-router';
 import { Button, InputText } from "@/shared/components/ui";
 import { loginSchema, LoginFormData } from "../../validation/login.schema";
 import { useLoginMutation } from "../../hooks/use-login-user";
-import { GoogleLoginButton } from "../GoogleLoginButton";
+import { GoogleLoginButton } from "../buttons/GoogleLoginButton";
+import { GitHubLoginButton } from "../buttons/GitHubLoginButton";
+import { MicrosoftLoginButton } from "../buttons/MicrosoftLoginButton";
 
 export const LoginForm = () => {
     const { mutate: loginUser, isPending } = useLoginMutation();
@@ -31,6 +33,8 @@ export const LoginForm = () => {
             className="space-y-6"
         >
             <GoogleLoginButton />
+            <GitHubLoginButton />
+            <MicrosoftLoginButton />
 
             <div className="relative">
                 <div className="absolute inset-0 flex items-center">

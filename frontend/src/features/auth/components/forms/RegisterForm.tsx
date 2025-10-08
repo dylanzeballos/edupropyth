@@ -6,7 +6,7 @@ import { Button, InputText } from "@/shared/components/ui";
 import { registerUserSchema, RegisterFormData } from "../../validation/register.schema";
 import { useRegisterMutation } from "../../hooks/use-register-user";
 import { UserTypeSelector } from "../selectors/UserTypeSelector";
-import { GoogleLoginButton } from "../GoogleLoginButton";
+import { GoogleLoginButton } from "../buttons/GoogleLoginButton";
 
 export const RegisterForm = () => {
   const { mutate: registerUser, isPending } = useRegisterMutation();
