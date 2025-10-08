@@ -36,29 +36,6 @@ SECURE_CROSS_ORIGIN_OPENER_POLICY = None  # Disable COOP for development
 CORS_ALLOW_CREDENTIALS = True
 CORS_EXPOSE_HEADERS = ['Content-Type', 'X-CSRFToken']
 
-ACCOUNT_EMAIL_VERIFICATION = "none"  
-
-GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "your-google-client-id.apps.googleusercontent.com")
-GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", "your-google-client-secret")
-
-# Update the SOCIALACCOUNT_PROVIDERS setting with the correct client ID
-SOCIALACCOUNT_PROVIDERS = {
-    "google": {
-        "APP": {
-            "client_id": GOOGLE_CLIENT_ID,
-            "secret": GOOGLE_CLIENT_SECRET,
-            "key": ""
-        },
-        "SCOPE": [
-            "profile",
-            "email",
-        ],
-        "AUTH_PARAMS": {
-            "access_type": "online",
-        }
-    }
-}
-
 # Add this to your develop.py settings
 
 # Add detailed logging

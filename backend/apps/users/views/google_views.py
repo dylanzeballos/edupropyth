@@ -7,6 +7,9 @@ import requests
 import logging
 from django.conf import settings
 from rest_framework.permissions import AllowAny
+from environ import Env
+env = Env()
+env.read_env()
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
@@ -37,9 +40,8 @@ class GoogleAuthView(APIView):
             google_data = google_response.json()
             
             token_aud = google_data.get('aud')
-            our_client_id = settings.GOOGLE_CLIENT_ID
-            
-            
+            our_client_id = env('GOOGLE_CLIENT_ID')
+
             if token_aud != our_client_id:
                 return Response(
                     {"error": "Token not issued for this application"}, 
