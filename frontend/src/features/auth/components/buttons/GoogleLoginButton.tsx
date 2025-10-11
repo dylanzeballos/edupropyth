@@ -51,11 +51,11 @@ export const GoogleLoginButton = ({ onSuccess, onError }: GoogleLoginButtonProps
                 }}
                 width="100%"
                 theme="outline"
-                text="signin_with"
+                text="continuar con Google"
                 shape="rectangular"
                 locale="es"
                 size="large"
-                logo_alignment="left"
+                logo_alignment="center"
             />
             
             {loading && (

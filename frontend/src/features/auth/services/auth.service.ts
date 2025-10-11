@@ -21,6 +21,14 @@ export const authService = {
         });
     },
 
+    githubLogin: async(code: string): Promise<AuthResponse> =>{
+       return await postData('/api/users/auth/github-login/', {code}) 
+    },
+
+    microsoftLogin: async(code: string): Promise<AuthResponse> =>{
+        return await postData('/api/users/auth/microsoft-login/', {code});
+    },
+
     async logout(): Promise<void> {
         await postData('/api/auth/logout', {});
     },
