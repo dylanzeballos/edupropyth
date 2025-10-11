@@ -4,30 +4,51 @@ import { toast } from 'sonner';
 import { authService } from '../services/auth.service';
 import { useAuthStore } from '../stores/auth.store';
 import { RegisterFormData } from '../validation/register.schema';
+import { RegisterRequest } from '../types/login.type';
 
-export const useRegisterMutation = () => {
+export const useRegisterUser = () => {
   const navigate = useNavigate();
   const { setLoading } = useAuthStore();
 
-  return useMutation({
+  const mutation = useMutation({
     mutationFn: (data: RegisterRequest) => authService.register(data),
     onMutate: () => {
       setLoading(true);
     },
     onSuccess: (response) => {
       toast.success('¡Registro exitoso!', {
-        description: 'Tu cuenta ha sido creada correctamente. Por favor inicia sesión.'
+        description:
+          'Tu cuenta ha sido creada correctamente. Por favor inicia sesión.',
       });
-      navigate('/signin', { replace: true });
+      navigate('/login', { replace: true });
     },
     onError: (error: any) => {
       const message = error?.response?.data?.message || 'Error al registrarse';
       toast.error('Error de registro', {
-        description: message
+        description: message,
       });
     },
     onSettled: () => {
       setLoading(false);
-    }
+    },
   });
+  const handleSubmit = (formData: RegisterFormData) => {
+    const registerData: RegisterRequest = {
+      email: formData.email,
+      username: formData.username,
+      first_name: formData.first_name,
+      last_name: formData.last_name,
+      password: formData.password,
+      password_confirm: formData.password_confirm,
+    };
+
+    mutation.mutate(registerData);
+  };
+
+  return {
+    handleSubmit,
+    isPending: mutation.isPending,
+    isError: mutation.isError,
+    error: mutation.error,
+  };
 };

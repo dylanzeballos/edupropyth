@@ -4,29 +4,22 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router';
 import { Button, InputText } from "@/shared/components/ui";
 import { registerUserSchema, RegisterFormData } from "../../validation/register.schema";
-import { useRegisterMutation } from "../../hooks/use-register-user";
-import { UserTypeSelector } from "../selectors/UserTypeSelector";
 import { GoogleLoginButton } from "../buttons/GoogleLoginButton";
 
-export const RegisterForm = () => {
-  const { mutate: registerUser, isPending } = useRegisterMutation();
+interface RegisterFormProps {
+  onSubmit: (data: RegisterFormData) => void;
+  isPending?: boolean;
+}
 
+export const RegisterForm = ({ onSubmit, isPending = false }: RegisterFormProps) => {
   const {
     register,
     handleSubmit,
-    watch,
-    setValue,
     formState: { errors },
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerUserSchema),
     mode: "onChange",
   });
-
-  const userType = watch("userType");
-
-  const onSubmit = (data: RegisterFormData) => {
-    registerUser(data);
-  };
 
   return (
     <motion.div
@@ -39,7 +32,6 @@ export const RegisterForm = () => {
         onSuccess={(user) => console.log("Google login successful:", user)}
         onError={(error) => console.error("Google login error:", error)}
       />
-    
 
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
@@ -53,6 +45,24 @@ export const RegisterForm = () => {
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <InputText
+          label="Correo Electrónico"
+          name="email"
+          type="email"
+          placeholder="ejemplo@correo.com"
+          register={register}
+          errors={errors.email}
+        />
+
+        <InputText
+          label="Nombre de Usuario"
+          name="username"
+          type="text"
+          placeholder="mi_usuario"
+          register={register}
+          errors={errors.username}
+        />
+
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <InputText
             label="Nombre"
@@ -74,15 +84,6 @@ export const RegisterForm = () => {
         </div>
 
         <InputText
-          label="Correo Electrónico"
-          name="email"
-          type="email"
-          placeholder="ejemplo@correo.com"
-          register={register}
-          errors={errors.email}
-        />
-
-        <InputText
           label="Contraseña"
           name="password"
           type="password"
@@ -98,11 +99,6 @@ export const RegisterForm = () => {
           placeholder="••••••••"
           register={register}
           errors={errors.password_confirm}
-        />
-
-        <UserTypeSelector
-          userType={userType}
-          onChange={(value) => setValue("userType", value)}
         />
 
         <div className="flex items-start">
@@ -145,7 +141,6 @@ export const RegisterForm = () => {
           label="Crear cuenta"
           loadingText="Creando cuenta..."
         />
-
       </form>
 
       <p className="text-center text-sm text-gray-600 dark:text-gray-400">

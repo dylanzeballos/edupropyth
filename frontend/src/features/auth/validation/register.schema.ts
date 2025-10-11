@@ -5,6 +5,11 @@ export const registerUserSchema = z.object({
         .string()
         .min(1, "El email es requerido")
         .regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "El email no es válido"),
+    username: z
+        .string()
+        .min(3, "El nombre de usuario debe tener al menos 3 caracteres")
+        .max(30, "El nombre de usuario no puede tener más de 30 caracteres")
+        .regex(/^[a-zA-Z0-9_]+$/, "El nombre de usuario solo puede contener letras, números y guiones bajos"),
     first_name: z
         .string()
         .min(1, "El nombre es requerido")
@@ -21,9 +26,6 @@ export const registerUserSchema = z.object({
     password_confirm: z
         .string()
         .min(1, "Confirma tu contraseña"),
-    userType: z.enum(["estudiante", "profesor"], {
-        required_error: "El tipo de usuario es requerido",
-    }),
     acceptTerms: z.boolean().refine((val) => val === true, {
         message: "Debes aceptar los términos y condiciones",
     }),
