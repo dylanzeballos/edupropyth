@@ -1,68 +1,76 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { persist, createJSONStorage } from "zustand/middleware";
 import { User } from "../types/user.type";
 
 interface AuthState {
     user: User | null;
+    accessToken: string | null;
+    refreshToken: string | null;
     isAuthenticated: boolean;
     isLoading: boolean;
-    token: string | null;
 }
 
 interface AuthActions {
-    login: (user: User, token: string) => void;
-    logout: () => void;
-    setLoading: (Loading: boolean) => void;
-    setUser: (user: User) => void;
+    setAuth: (user: User, accessToken: string, refreshToken: string) => void;
+    clearAuth: () => void;
+    setLoading: (loading: boolean) => void;
     updateUser: (user: Partial<User>) => void;
 }
 
-export const useAuthStore = create<AuthState & AuthActions>()(
+type AuthStore = AuthState & AuthActions;
+
+export const useAuthStore = create<AuthStore>()(
     persist(
         (set, get) => ({
             user: null,
+            accessToken: null,
+            refreshToken: null,
             isAuthenticated: false,
             isLoading: false,
-            token: null,
 
-            login: (user: User, token: string) => {
+            setAuth: (user, accessToken, refreshToken) => {
                 set({
                     user,
-                    token,
+                    accessToken,
+                    refreshToken,
                     isAuthenticated: true,
                     isLoading: false
                 });
             },
 
-            logout: () => {
+            clearAuth: () => {
                 set({
                     user: null,
-                    token: null,
+                    accessToken: null,
+                    refreshToken: null,
                     isAuthenticated: false,
                     isLoading: false
                 });
+
+                localStorage.removeItem('access_token');
+                localStorage.removeItem('refresh_token');
             },
 
-            setLoading: (Loading: boolean) => {
-                set({ isLoading: Loading });
+            setLoading: (loading) => {
+                set({ isLoading: loading });
             },
-            setUser: (user: User) => {
-                set({ user });
-            },
-            updateUser: (user: Partial<User>) => {
+
+            updateUser: (userData) => {
                 const currentUser = get().user;
                 if (currentUser) {
                     set({
-                        user: { ...currentUser, ...user }
+                        user: { ...currentUser, ...userData }
                     });
                 }
             },
         }),
         {
             name: "auth-storage",
+            storage: createJSONStorage(() => localStorage),
             partialize: (state) => ({
                 user: state.user,
-                token: state.token,
+                accessToken: state.accessToken,
+                refreshToken: state.refreshToken,
                 isAuthenticated: state.isAuthenticated,
             }),
         }

@@ -4,10 +4,13 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router';
 import { Button, InputText } from "@/shared/components/ui";
 import { loginSchema, LoginFormData } from "../../validation/login.schema";
-import { UseLoginUser } from "../../hooks/use-login-user";
+import { useLoginMutation } from "../../hooks/use-login-user";
+import { GoogleLoginButton } from "../buttons/GoogleLoginButton";
+import { GitHubLoginButton } from "../buttons/GitHubLoginButton";
+import { MicrosoftLoginButton } from "../buttons/MicrosoftLoginButton";
 
 export const LoginForm = () => {
-    const { mutate: loginUser, isPending } = UseLoginUser();
+    const { mutate: loginUser, isPending } = useLoginMutation();
 
     const {
         register,
@@ -29,13 +32,9 @@ export const LoginForm = () => {
             transition={{ duration: 0.5 }}
             className="space-y-6"
         >
-            <Button
-                type="button"
-                variantColor="secondary"
-                disabled={isPending}
-                label="Continuar con Google"
-                className="w-full"
-            />
+            <GoogleLoginButton />
+            <GitHubLoginButton />
+            <MicrosoftLoginButton />
 
             <div className="relative">
                 <div className="absolute inset-0 flex items-center">
@@ -95,6 +94,7 @@ export const LoginForm = () => {
                     label="Iniciar sesión"
                     loadingText="Iniciando sesión..."
                 />
+
             </form>
 
             <p className="text-center text-sm text-gray-600 dark:text-gray-400">

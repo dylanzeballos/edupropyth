@@ -13,15 +13,31 @@ export interface LoginResponse {
 }
 
 export interface RegisterRequest {
-  firstName: string;
-  lastName: string;
   email: string;
+  username: string;
+  first_name: string;
+  last_name: string;
   password: string;
-  userType: "estudiante" | "profesor";
+  password_confirm: string;
 }
 
 export interface RegisterResponse {
   user: User;
   token: string;
   message: string;
+}
+
+export interface AuthResponse {
+  access_token: string;
+  refresh_token: string;
+  user: {
+    id: number;
+    email: string;
+    username: string;
+    first_name: string;
+    last_name: string;
+    full_name: string;
+    profile_role: string;
+  };
+  message?: string;
 }

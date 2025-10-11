@@ -1,5 +1,7 @@
 from django.urls import path, include
-
+from .views.google_views import GoogleAuthView
+from .views.github_views import GitHubAuthView
+from .views.microsoft_views import MicrosoftAuthView, microsoft_callback
 try:
     from .views.user_views import (
         UserListCreateView,
@@ -7,6 +9,8 @@ try:
         user_stats,
         current_user,
     )
+    from .views.auth_views import CustomLoginView
+    from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
     from .views.profile_views import UserProfileDetailView, update_role
 except ImportError:
     from django.http import JsonResponse
@@ -33,6 +37,12 @@ user_patterns = [
 ]
 
 urlpatterns = user_patterns + [
+    path("auth/login/", CustomLoginView.as_view(), name="token-obtain-pair"),
+    path("auth/refresh/", TokenRefreshView.as_view(), name="token-refresh"),
     path("profiles/<int:user_id>/", UserProfileDetailView.as_view(), name="profile-detail"),
     path("profiles/<int:user_id>/role/", update_role, name="update-role"),
+    path("auth/google-login/", GoogleAuthView.as_view(), name="google-login"),
+    path("auth/github-login/", GitHubAuthView.as_view(), name="github-login"),
+    path("auth/microsoft-login/", MicrosoftAuthView.as_view(), name="microsoft-login"),
+    path("auth/microsoft/callback/", microsoft_callback, name="microsoft-oauth"),
 ]
