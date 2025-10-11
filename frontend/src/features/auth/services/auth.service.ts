@@ -8,11 +8,11 @@ export interface GoogleAuthResponse extends AuthResponse {
 
 export const authService = {
     login: async (data: LoginRequest): Promise<LoginResponse> => {
-        return await postData('/api/auth/login', data);
+        return await postData('/api/users/auth/login/', data);
     },
 
     register: async (data: RegisterRequest): Promise<RegisterResponse> => {
-        return await postData('/api/users', data);
+        return await postData('/api/users/', data);
     },
 
     googleAuth: async(idToken: string): Promise<GoogleAuthResponse> => {
@@ -34,6 +34,6 @@ export const authService = {
     },
 
     async RefreshToken(): Promise<LoginResponse> {
-        return await postData('/api/auth/refresh-token', {});
+        return await postData('/api/auth/refresh', {});
     },
 }

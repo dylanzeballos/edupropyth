@@ -13,11 +13,12 @@ export interface LoginResponse {
 }
 
 export interface RegisterRequest {
-  firstName: string;
-  lastName: string;
   email: string;
+  username: string;
+  first_name: string;
+  last_name: string;
   password: string;
-  userType: "estudiante" | "profesor";
+  password_confirm: string;
 }
 
 export interface RegisterResponse {
