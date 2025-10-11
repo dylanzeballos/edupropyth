@@ -27,12 +27,16 @@ export interface RegisterResponse {
 }
 
 export interface AuthResponse {
-  id: number;
-  email: string;
-  username: string;
-  first_name: string;
-  last_name: string;
-  full_name: string;
-  profile_role: string;
+  access_token: string;
+  refresh_token: string;
+  user: {
+    id: number;
+    email: string;
+    username: string;
+    first_name: string;
+    last_name: string;
+    full_name: string;
+    profile_role: string;
+  };
   message?: string;
 }
