@@ -1,15 +1,13 @@
-FROM node:20-alpine3.21
+FROM node:20-alpine3.20
 
 WORKDIR /frontend
 
-RUN npm install -g pnpm
+COPY package.json package-lock.json ./
 
-COPY package.json pnpm-lock.yaml ./
-
-RUN pnpm install
+RUN npm install
 
 COPY . .
 
 EXPOSE 5173
 
-CMD [ "pnpm", "run", "dev", "--host" ]
+CMD [ "npm", "run", "dev", "--host" ]
