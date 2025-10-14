@@ -8,7 +8,11 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prepare": "husky"
+    "prepare": "husky",
+    "lint:frontend": "cd frontend && npm run lint",
+    "lint:frontend:staged":"cd frontend && npm run lint:staged",
+    "lint:backend": "cd backend && flake8",
+    "lint": "npm run lint:frontend && npm run lint:backend"
   },
   "repository": {
     "type": "git",
@@ -23,6 +27,15 @@
   },
   "homepage": "https://github.com/dylanzeballos/edupropyth#readme",
   "devDependencies": {
-    "husky": "^9.1.7"
+    "husky": "^9.1.7",
+    "lint-staged": "^15.2.10"
+  },
+  "lint-staged": {
+    "frontend/src/**/*.{js,jsx,ts,tsx}": [
+      "cd frontend && npm run lint:staged"
+    ],
+    "backend/**/*.py": [
+      "cd backend && flake8"
+    ]
   }
 }
