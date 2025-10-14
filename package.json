@@ -10,8 +10,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepare": "husky",
     "lint:frontend": "cd frontend && npm run lint",
-    "lint:frontend:staged":"cd frontend && npm run lint:staged",
+    "lint:frontend:staged": "cd frontend && npx eslint --fix",
     "lint:backend": "cd backend && flake8",
+    "lint:backend:staged": "cd backend && flake8",
     "lint": "npm run lint:frontend && npm run lint:backend"
   },
   "repository": {
@@ -32,10 +33,10 @@
   },
   "lint-staged": {
     "frontend/src/**/*.{js,jsx,ts,tsx}": [
-      "cd frontend && npm run lint:staged"
+      "scripts/lint-frontend.bat"
     ],
     "backend/**/*.py": [
-      "cd backend && flake8"
+      "scripts/lint-backend.bat"
     ]
   }
 }
