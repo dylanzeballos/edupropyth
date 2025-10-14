@@ -1,15 +1,14 @@
 FROM node:20-alpine3.21
 
-WORKDIR /frontend
+WORKDIR /app
 
-RUN npm install -g pnpm
+COPY package.json package-lock.json ./
 
-COPY package.json pnpm-lock.yaml ./
-
-RUN pnpm install
+RUN npm ci \
+  && npm install --no-save @rollup/rollup-linux-x64-musl
 
 COPY . .
 
 EXPOSE 5173
 
-CMD [ "pnpm", "run", "dev", "--host" ]
+CMD ["npm", "run", "dev"]
