@@ -1,14 +1,13 @@
-FROM node:20-alpine3.21
+FROM node:20-alpine3.20
 
 WORKDIR /app
 
 COPY package.json package-lock.json ./
 
-RUN npm ci \
-  && npm install --no-save @rollup/rollup-linux-x64-musl
+RUN npm install
 
 COPY . .
 
 EXPOSE 5173
 
-CMD ["npm", "run", "dev"]
+CMD [ "npm", "run", "dev", "--host" ]
