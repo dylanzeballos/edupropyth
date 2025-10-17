@@ -6,11 +6,16 @@
   "scripts": {
     "dev": "vite --host",
     "build": "tsc -b && vite build",
+    "build:ci": "vite build --mode development",
     "lint": "eslint \"src/**/*.{ts,tsx,js,jsx}\" --max-warnings=0",
+    "lint:fix": "eslint \"src/**/*.{ts,tsx,js,jsx}\" --fix",
     "lint:staged": "eslint --fix",
     "type-check": "tsc --noEmit",
+    "type-check:ci": "tsc --noEmit --skipLibCheck",
     "test": "vitest --config vitest.config.ts",
+    "test:ci": "vitest run --config vitest.config.ts",
     "test:coverage": "vitest --config vitest.config.ts --coverage",
+    "test:coverage:ci": "vitest run --config vitest.config.ts --coverage",
     "preview": "vite preview"
   },
   "dependencies": {
