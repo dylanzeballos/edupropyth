@@ -160,7 +160,6 @@ ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USER_MODEL_USERNAME_FIELD = "username"
 ACCOUNT_USER_MODEL_EMAIL_FIELD = "email"
 ACCOUNT_LOGIN_METHODS = {"email"}
-ACCOUNT_USERNAME_REQUIRED = False
 SOCIALACCOUNT_LOGIN_ON_GET = True
 SOCIALACCOUNT_AUTO_SIGNUP = True
 SOCIALACCOUNT_EMAIL_AUTHENTICATION = True
@@ -173,8 +172,8 @@ SOCIALACCOUNT_ADAPTER = "apps.users.adapters.SocialAccountAdapter"
 SOCIALACCOUNT_PROVIDERS = {
     "google": {
         "APP": {
-            "client_id": env("GOOGLE_CLIENT_ID"),
-            "secret": env("GOOGLE_CLIENT_SECRET"),
+            "client_id": env("GOOGLE_CLIENT_ID", default="fake-google-client-id"),
+            "secret": env("GOOGLE_CLIENT_SECRET", default="fake-google-secret"),
             "key": "",
         },
         "SCOPE": [
@@ -187,8 +186,8 @@ SOCIALACCOUNT_PROVIDERS = {
     },
     "github": {
         "APP": {
-            "client_id": env("GITHUB_CLIENT_ID"),
-            "secret": env("GITHUB_CLIENT_SECRET"),
+            "client_id": env("GITHUB_CLIENT_ID", default="fake-github-client-id"),
+            "secret": env("GITHUB_CLIENT_SECRET", default="fake-github-secret"),
             "key": "",
         },
         "AUTH_PARAMS": {
@@ -197,8 +196,8 @@ SOCIALACCOUNT_PROVIDERS = {
     },
     "microsoft": {
         "APP": {
-            "client_id": env("MICROSOFT_CLIENT_ID"),
-            "secret": env("MICROSOFT_CLIENT_SECRET"),
+            "client_id": env("MICROSOFT_CLIENT_ID", default="fake-microsoft-client-id"),
+            "secret": env("MICROSOFT_CLIENT_SECRET", default="fake-microsoft-secret"),
             "key": "",
         },
         "SCOPE": [

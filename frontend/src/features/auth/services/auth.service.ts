@@ -1,39 +1,45 @@
-import { postData } from "@/lib/api";
-import { LoginResponse, LoginRequest, RegisterRequest, RegisterResponse, AuthResponse } from '../types/login.type';
+import { postData } from '@/lib/api';
+import {
+  LoginResponse,
+  LoginRequest,
+  RegisterRequest,
+  RegisterResponse,
+  AuthResponse,
+} from '../types/login.types';
 
 export interface GoogleAuthResponse extends AuthResponse {
-    access_token: string;
-    refresh_token: string;
+  access_token: string;
+  refresh_token: string;
 }
 
 export const authService = {
-    login: async (data: LoginRequest): Promise<LoginResponse> => {
-        return await postData('/api/users/auth/login/', data);
-    },
+  login: async (data: LoginRequest): Promise<LoginResponse> => {
+    return await postData('/api/users/auth/login/', data);
+  },
 
-    register: async (data: RegisterRequest): Promise<RegisterResponse> => {
-        return await postData('/api/users/', data);
-    },
+  register: async (data: RegisterRequest): Promise<RegisterResponse> => {
+    return await postData('/api/users/', data);
+  },
 
-    googleAuth: async(idToken: string): Promise<GoogleAuthResponse> => {
-        return await postData('/api/users/auth/google-login/', {
-            id_token: idToken
-        });
-    },
+  googleAuth: async (idToken: string): Promise<GoogleAuthResponse> => {
+    return await postData('/api/users/auth/google-login/', {
+      id_token: idToken,
+    });
+  },
 
-    githubLogin: async(code: string): Promise<AuthResponse> =>{
-       return await postData('/api/users/auth/github-login/', {code}) 
-    },
+  githubLogin: async (code: string): Promise<AuthResponse> => {
+    return await postData('/api/users/auth/github-login/', { code });
+  },
 
-    microsoftLogin: async(code: string): Promise<AuthResponse> =>{
-        return await postData('/api/users/auth/microsoft-login/', {code});
-    },
+  microsoftLogin: async (code: string): Promise<AuthResponse> => {
+    return await postData('/api/users/auth/microsoft-login/', { code });
+  },
 
-    async logout(): Promise<void> {
-        await postData('/api/auth/logout', {});
-    },
+  async logout(): Promise<void> {
+    await postData('/api/auth/logout', {});
+  },
 
-    async RefreshToken(): Promise<LoginResponse> {
-        return await postData('/api/auth/refresh', {});
-    },
-}
+  async RefreshToken(): Promise<LoginResponse> {
+    return await postData('/api/auth/refresh', {});
+  },
+};

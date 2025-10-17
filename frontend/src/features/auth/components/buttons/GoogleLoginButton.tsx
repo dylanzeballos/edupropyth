@@ -59,7 +59,6 @@ export const GoogleLoginButton = ({
         }}
         width="100%"
         theme="outline"
-        text="continuar con Google"
         shape="rectangular"
         locale="es"
         size="large"

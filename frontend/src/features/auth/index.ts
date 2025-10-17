@@ -4,7 +4,7 @@ export { default as PublicOnlyRoutes } from './components/PublicOnlyRoutes';
 // export { default as AuthLayout } from './components/AuthLayout';
 // export { default as GoogleLoginButton } from './components/GoogleLoginButton';
 
-// Forms 
+// Forms
 // export { default as LoginForm } from './components/forms/LoginForm';
 // export { default as RegisterForm } from './components/forms/RegisterForm';
 
@@ -27,7 +27,7 @@ export { useAuthStore } from './stores/auth.store';
 
 // Types
 export type { User } from './types/user.type';
-export type { LoginRequest, LoginResponse } from './types/login.type';
+export type { LoginRequest, LoginResponse } from './types/login.types';
 
 // Services
 export * from './services/auth.service';

@@ -124,6 +124,12 @@ EOF
         print_warning "Backend .env created with default values. Please update with your configurations."
     fi
 
+    # Copy testing environment if it doesn't exist
+    if [ ! -f ".env.testing" ]; then
+        print_status "Creating backend .env.testing file..."
+        cp .env.testing.template .env.testing 2>/dev/null || print_warning ".env.testing template not found"
+    fi
+
     # Run migrations
     print_status "Running database migrations..."
     python manage.py migrate
