@@ -6,3 +6,6 @@ flake8
 black
 isort
 factory-boy
+safety
+bandit
+pre-commit

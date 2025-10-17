@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import { authService } from '../services/auth.service';
 import { useAuthStore } from '../stores/auth.store';
 import { RegisterFormData } from '../validation/register.schema';
-import { RegisterRequest } from '../types/login.type';
+import { RegisterRequest } from '../types/login.types';
 
 export const useRegisterUser = () => {
   const navigate = useNavigate();
@@ -15,15 +15,19 @@ export const useRegisterUser = () => {
     onMutate: () => {
       setLoading(true);
     },
-    onSuccess: (response) => {
+    onSuccess: () => {
       toast.success('¡Registro exitoso!', {
         description:
           'Tu cuenta ha sido creada correctamente. Por favor inicia sesión.',
       });
       navigate('/login', { replace: true });
     },
-    onError: (error: any) => {
-      const message = error?.response?.data?.message || 'Error al registrarse';
+    onError: (error: unknown) => {
+      const axiosError = error as {
+        response?: { data?: { message?: string } };
+      };
+      const message =
+        axiosError?.response?.data?.message || 'Error al registrarse';
       toast.error('Error de registro', {
         description: message,
       });

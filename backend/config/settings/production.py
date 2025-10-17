@@ -1,7 +1,8 @@
-from .base import *
 import dj_database_url
 
-SECRET_KEY = os.environ.get('SECRET_KEY')
+from .base import *
+
+SECRET_KEY = os.environ.get("SECRET_KEY")
 DEBUG = False
 
 ALLOWED_HOSTS = []
@@ -9,14 +10,18 @@ RENDER_EXTERNAL_HOSTNAME = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
-ALLOWED_HOSTS.extend([
-    "edupro.onrender.com",
-])
+ALLOWED_HOSTS.extend(
+    [
+        "edupro.onrender.com",
+    ]
+)
 
 DATABASE_URL = os.environ.get("DATABASE_URL")
 if DATABASE_URL:
     DATABASES = {
-        "default": dj_database_url.config(default=DATABASE_URL, conn_max_age=600, conn_health_checks=True)
+        "default": dj_database_url.config(
+            default=DATABASE_URL, conn_max_age=600, conn_health_checks=True
+        )
     }
 else:
     DATABASES = {
@@ -27,14 +32,12 @@ else:
             "PASSWORD": os.getenv("DB_PASSWORD"),
             "HOST": os.getenv("DB_HOST"),
             "PORT": os.getenv("DB_PORT"),
-            "OPTIONS":{
-            "sslmode": "require"
+            "OPTIONS": {"sslmode": "require"},
         }
     }
-}
-    
+
     CORS_ALLOWED_ORIGINS = [
-    "http://edupro.onrender.com",#frontend url
+        "http://edupro.onrender.com",  # frontend url
     ]
 
     SECURE_BROWSER_XSS_FILTER = True

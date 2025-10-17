@@ -1,5 +1,5 @@
 from rest_framework import permissions
-from django.utils import timezone
+
 
 class IsAdminUser(permissions.BasePermission):
     """
@@ -7,13 +7,14 @@ class IsAdminUser(permissions.BasePermission):
     """
 
     def has_permission(self, request, view):
-        return(
+        return (
             request.user
             and request.user.is_authenticated
             and hasattr(request.user, "profile")
             and request.user.profile.is_admin
         )
-    
+
+
 class IsInstructorOrAdmin(permissions.BasePermission):
     """
     Permiso personalizado para permitir solo a los instructores o administradores.
@@ -24,14 +25,15 @@ class IsInstructorOrAdmin(permissions.BasePermission):
             return False
         if not hasattr(request.user, "profile"):
             return False
-        
+
         profile = request.user.profile
 
         if profile.is_admin:
             return True
-        
+
         return profile.has_valid_instructor_permissions
-    
+
+
 class CanEditCourses(permissions.BasePermission):
     """
     Permiso personalizado para permitir solo a los usuarios que pueden editar cursos.
@@ -40,20 +42,18 @@ class CanEditCourses(permissions.BasePermission):
     def has_permission(self, request, view):
         if not request.user or not request.user.is_authenticated:
             return False
-        
+
         if not hasattr(request.user, "profile"):
             return False
-        
+
         profile = request.user.profile
 
         if profile.is_admin:
             return True
-        
-        return(
-            profile.has_valid_instructor_permissions
-            and profile.can_edit_courses
-        )
-    
+
+        return profile.has_valid_instructor_permissions and profile.can_edit_courses
+
+
 class CanGradeAssignments(permissions.BasePermission):
     """
     Permiso personalizado para permitir solo a los usuarios que pueden calificar tareas.
@@ -62,16 +62,13 @@ class CanGradeAssignments(permissions.BasePermission):
     def has_permission(self, request, view):
         if not request.user or not request.user.is_authenticated:
             return False
-            
+
         if not hasattr(request.user, "profile"):
             return False
-            
+
         profile = request.user.profile
 
         if profile.is_admin:
             return True
 
-        return (
-            profile.has_valid_instructor_permissions
-            and profile.can_grade
-        )
+        return profile.has_valid_instructor_permissions and profile.can_grade

@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import transaction
+
 from ..models.profile import UserProfile
 
 User = get_user_model()

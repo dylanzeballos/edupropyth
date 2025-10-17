@@ -1,5 +1,3 @@
-from django.urls import path
-
 # Placeholder patterns until views are implemented
 urlpatterns = [
     # Add your course URLs here

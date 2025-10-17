@@ -1,20 +1,24 @@
-from django.urls import path, include
-from .views.google_views import GoogleAuthView
+from django.urls import path
+
 from .views.github_views import GitHubAuthView
+from .views.google_views import GoogleAuthView
 from .views.microsoft_views import MicrosoftAuthView, microsoft_callback
+
 try:
-    from .views.user_views import (
-        UserListCreateView,
-        UserDetailView,
-        user_stats,
-        current_user,
-    )
+    from rest_framework_simplejwt.views import TokenRefreshView
+
     from .views.auth_views import CustomLoginView
-    from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
     from .views.profile_views import UserProfileDetailView, update_role
+    from .views.user_views import (
+        UserDetailView,
+        UserListCreateView,
+        current_user,
+        user_stats,
+    )
 except ImportError:
-    from django.http import JsonResponse
     from rest_framework.decorators import api_view
+
+    from django.http import JsonResponse
 
     @api_view(["GET"])
     def placeholder_view(request):
@@ -39,7 +43,11 @@ user_patterns = [
 urlpatterns = user_patterns + [
     path("auth/login/", CustomLoginView.as_view(), name="token-obtain-pair"),
     path("auth/refresh/", TokenRefreshView.as_view(), name="token-refresh"),
-    path("profiles/<int:user_id>/", UserProfileDetailView.as_view(), name="profile-detail"),
+    path(
+        "profiles/<int:user_id>/",
+        UserProfileDetailView.as_view(),
+        name="profile-detail",
+    ),
     path("profiles/<int:user_id>/role/", update_role, name="update-role"),
     path("auth/google-login/", GoogleAuthView.as_view(), name="google-login"),
     path("auth/github-login/", GitHubAuthView.as_view(), name="github-login"),

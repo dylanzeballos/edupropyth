@@ -20,7 +20,9 @@ class Course(models.Model):
 
     title = models.CharField(max_length=150, unique=True)
     slug = models.SlugField(unique=True, max_length=160)
-    description = models.TextField(help_text="Short overview of what the course covers.")
+    description = models.TextField(
+        help_text="Short overview of what the course covers."
+    )
     summary = models.CharField(
         max_length=255,
         blank=True,
@@ -153,9 +155,7 @@ class CourseEdition(models.Model):
             "edition": {
                 "id": self.id,
                 "name": self.name,
-                "start_date": self.start_date.isoformat()
-                if self.start_date
-                else None,
+                "start_date": self.start_date.isoformat() if self.start_date else None,
                 "end_date": self.end_date.isoformat() if self.end_date else None,
             },
             "instructors": instructors,

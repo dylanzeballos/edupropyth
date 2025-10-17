@@ -4,9 +4,9 @@ from .base import *
 DEBUG = True
 
 # Hosts permitidos para desarrollo
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 
-SECRET_KEY='admin123'
+SECRET_KEY = "admin123"
 # Database - Local para desarrollo
 DATABASES = {
     "default": {
@@ -43,21 +43,21 @@ ACCOUNT_LOGOUT_REDIRECT_URL = f"{FRONTEND_URL}/auth/login"
 
 # Social Auth providers
 SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'SCOPE': [
-            'profile',
-            'email',
+    "google": {
+        "SCOPE": [
+            "profile",
+            "email",
         ],
-        'AUTH_PARAMS': {
-            'access_type': 'online',
+        "AUTH_PARAMS": {
+            "access_type": "online",
         },
-        'REDIRECT_URI': 'http://localhost:8000/accounts/google/login/callback/',
+        "REDIRECT_URI": "http://localhost:8000/accounts/google/login/callback/",
     },
-    'github': {
-        'SCOPE': [
-            'user',
-            'user:email',
+    "github": {
+        "SCOPE": [
+            "user",
+            "user:email",
         ],
-        'REDIRECT_URI': 'http://localhost:8000/accounts/github/login/callback/',
+        "REDIRECT_URI": "http://localhost:8000/accounts/github/login/callback/",
     },
 }

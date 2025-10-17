@@ -2,6 +2,7 @@ from django.conf import settings
 from django.db import models
 from django.utils import timezone
 
+
 class UserProfile(models.Model):
     """Extensión del modelo de usuario para perfiles adicionales"""
 
@@ -21,25 +22,26 @@ class UserProfile(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="profile",
-        verbose_name="User"
+        verbose_name="User",
     )
     role = models.CharField(
-        max_length=20,
-        choices=ROLE_CHOICES,
-        default=STUDENT,
-        verbose_name="Role"
+        max_length=20, choices=ROLE_CHOICES, default=STUDENT, verbose_name="Role"
     )
 
     instructor_permissions_until = models.DateTimeField(
-        null=True,
-        blank=True,
-        verbose_name="Instructor permissions valid until"
+        null=True, blank=True, verbose_name="Instructor permissions valid until"
     )
 
     can_grade = models.BooleanField(default=False, verbose_name="Can grade assignments")
-    can_edit_courses = models.BooleanField(default=False, verbose_name="Can edit courses")
-    can_create_courses = models.BooleanField(default=False, verbose_name="Can create courses")
-    can_delete_submissions = models.BooleanField(default=False, verbose_name="Can delete submissions")
+    can_edit_courses = models.BooleanField(
+        default=False, verbose_name="Can edit courses"
+    )
+    can_create_courses = models.BooleanField(
+        default=False, verbose_name="Can create courses"
+    )
+    can_delete_submissions = models.BooleanField(
+        default=False, verbose_name="Can delete submissions"
+    )
 
     student_id = models.CharField(
         max_length=20, blank=True, null=True, verbose_name="Student ID"
@@ -72,7 +74,7 @@ class UserProfile(models.Model):
     @property
     def is_instructor(self):
         return self.role in [self.INSTRUCTOR_VIEWER, self.INSTRUCTOR_EDITOR]
-    
+
     @property
     def has_valid_instructor_permissions(self):
         if not self.is_instructor:

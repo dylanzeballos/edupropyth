@@ -1,7 +1,8 @@
-from pathlib import Path
-import os
 from datetime import timedelta
+from pathlib import Path
+
 from environ import Env
+
 env = Env()
 env.read_env()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -10,8 +11,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env("SECRET_KEY", default="your-secret-key")
 
-#ALLOWED_HOSTS = []
-#DEBUG = True
+# ALLOWED_HOSTS = []
+# DEBUG = True
 # Application definition
 
 INSTALLED_APPS = [
@@ -31,8 +32,8 @@ INSTALLED_APPS = [
     "allauth.account",
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
-    'allauth.socialaccount.providers.github',
-    'allauth.socialaccount.providers.microsoft',
+    "allauth.socialaccount.providers.github",
+    "allauth.socialaccount.providers.microsoft",
     "dj_rest_auth",
     "dj_rest_auth.registration",
     "apps.users",
@@ -146,35 +147,35 @@ SPECTACULAR_SETTINGS = {
 
 # Allauth settings
 AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
-    'allauth.account.auth_backends.AuthenticationBackend',
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
 ]
 SITE_ID = 1
 
 # Configuración de Allauth
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = True
-ACCOUNT_EMAIL_VERIFICATION = 'optional'
+ACCOUNT_EMAIL_VERIFICATION = "optional"
 ACCOUNT_UNIQUE_EMAIL = True
-ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
-ACCOUNT_USER_MODEL_EMAIL_FIELD = 'email'
-ACCOUNT_LOGIN_METHODS = {'email'}
+ACCOUNT_USER_MODEL_USERNAME_FIELD = "username"
+ACCOUNT_USER_MODEL_EMAIL_FIELD = "email"
+ACCOUNT_LOGIN_METHODS = {"email"}
 ACCOUNT_USERNAME_REQUIRED = False
 SOCIALACCOUNT_LOGIN_ON_GET = True
 SOCIALACCOUNT_AUTO_SIGNUP = True
 SOCIALACCOUNT_EMAIL_AUTHENTICATION = True
 SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
-SOCIALACCOUNT_EMAIL_VERIFICATION = 'none'
+SOCIALACCOUNT_EMAIL_VERIFICATION = "none"
 
 # Configuración para API
-SOCIALACCOUNT_ADAPTER = 'apps.users.adapters.SocialAccountAdapter'
+SOCIALACCOUNT_ADAPTER = "apps.users.adapters.SocialAccountAdapter"
 
 SOCIALACCOUNT_PROVIDERS = {
     "google": {
         "APP": {
-            "client_id": env('GOOGLE_CLIENT_ID'),
-            "secret": env('GOOGLE_CLIENT_SECRET'),
-            "key": ""
+            "client_id": env("GOOGLE_CLIENT_ID"),
+            "secret": env("GOOGLE_CLIENT_SECRET"),
+            "key": "",
         },
         "SCOPE": [
             "profile",
@@ -182,23 +183,23 @@ SOCIALACCOUNT_PROVIDERS = {
         ],
         "AUTH_PARAMS": {
             "access_type": "online",
-        }
+        },
     },
     "github": {
         "APP": {
-            "client_id": env('GITHUB_CLIENT_ID'),
-            "secret": env('GITHUB_CLIENT_SECRET'),
-            "key": ""
+            "client_id": env("GITHUB_CLIENT_ID"),
+            "secret": env("GITHUB_CLIENT_SECRET"),
+            "key": "",
         },
         "AUTH_PARAMS": {
-            'prompt': 'consent',
+            "prompt": "consent",
         },
     },
     "microsoft": {
         "APP": {
-            "client_id": env('MICROSOFT_CLIENT_ID'),
-            "secret": env('MICROSOFT_CLIENT_SECRET'),
-            "key": ""
+            "client_id": env("MICROSOFT_CLIENT_ID"),
+            "secret": env("MICROSOFT_CLIENT_SECRET"),
+            "key": "",
         },
         "SCOPE": [
             "User.Read",
