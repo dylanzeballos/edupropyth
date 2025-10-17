@@ -22,7 +22,7 @@ install:
 
 # Run tests with coverage
 test:
-	pytest --cov=src --cov=apps --cov-report=xml --cov-report=term-missing
+	python -m pytest --cov=apps --cov=config --cov-report=xml --cov-report=term-missing -v
 
 # Run linting
 lint:

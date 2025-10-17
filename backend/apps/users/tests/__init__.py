@@ -1,4 +1,2 @@
-from .test_api import UserAPITest
-from .test_models import UserModelTest
-
-__all__ = ["UserModelTest", "UserAPITest"]
+# Test package for users app
+# This file should be empty to avoid importing test classes during collection

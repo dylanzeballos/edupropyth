@@ -34,19 +34,26 @@ sections = ["FUTURE", "STDLIB", "THIRDPARTY", "DJANGO", "FIRSTPARTY", "LOCALFOLD
 skip_glob = ["*/migrations/*", "*/venv/*", "*/.venv/*"]
 
 [tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE = "config.settings.develop"
+DJANGO_SETTINGS_MODULE = "config.settings.test"
 python_files = ["tests.py", "test_*.py", "*_tests.py"]
-testpaths = ["tests", "apps"]
+python_classes = ["Test*", "*Tests"]
+python_functions = ["test_*"]
+testpaths = ["apps", "tests"]
 addopts = [
     "--tb=short",
     "--strict-markers",
-    "--disable-warnings",
     "--reuse-db",
+    "--nomigrations",
 ]
 markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
     "integration: marks tests as integration tests",
     "unit: marks tests as unit tests",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
+    "ignore::UserWarning",
 ]
 
 [tool.coverage.run]

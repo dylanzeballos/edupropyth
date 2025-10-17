@@ -52,20 +52,7 @@ verify_backend() {
     source venv/bin/activate
 
     # Set environment variables for testing
-    export DJANGO_SETTINGS_MODULE=config.settings.develop
-    export DEBUG=True
-    export SECRET_KEY=test-secret-key-for-verification
-    export DB_NAME=edupropyth_test
-    export DB_USER=postgres
-    export DB_PASSWORD=postgres
-    export DB_HOST=localhost
-    export DB_PORT=5432
-    export GOOGLE_CLIENT_ID=fake-google-client-id
-    export GOOGLE_CLIENT_SECRET=fake-google-secret
-    export GITHUB_CLIENT_ID=fake-github-client-id
-    export GITHUB_CLIENT_SECRET=fake-github-secret
-    export MICROSOFT_CLIENT_ID=fake-microsoft-client-id
-    export MICROSOFT_CLIENT_SECRET=fake-microsoft-secret
+    export DJANGO_SETTINGS_MODULE=config.settings.test
 
     local backend_result=0
 

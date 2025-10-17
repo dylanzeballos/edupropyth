@@ -167,21 +167,9 @@ jobs:
           MICROSOFT_CLIENT_SECRET: fake-microsoft-secret-for-ci
 
       - name: Run backend tests with coverage
-        run: pytest --cov=src --cov=apps --cov-report=xml --cov-report=term-missing
+        run: python -m pytest --cov=apps --cov=config --cov-report=xml --cov-report=term-missing -v
         env:
-          DEBUG: True
-          SECRET_KEY: test-secret-key-for-ci
-          DB_NAME: edupropyth_test
-          DB_USER: postgres
-          DB_PASSWORD: postgres
-          DB_HOST: localhost
-          DB_PORT: 5432
-          GOOGLE_CLIENT_ID: fake-google-client-id-for-ci
-          GOOGLE_CLIENT_SECRET: fake-google-secret-for-ci
-          GITHUB_CLIENT_ID: fake-github-client-id-for-ci
-          GITHUB_CLIENT_SECRET: fake-github-secret-for-ci
-          MICROSOFT_CLIENT_ID: fake-microsoft-client-id-for-ci
-          MICROSOFT_CLIENT_SECRET: fake-microsoft-secret-for-ci
+          DJANGO_SETTINGS_MODULE: config.settings.test
 
       - name: Upload backend coverage to Codecov
         uses: codecov/codecov-action@v4
