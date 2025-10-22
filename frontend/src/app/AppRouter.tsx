@@ -1,18 +1,60 @@
 import { createBrowserRouter, RouterProvider } from 'react-router';
-import MainLayout from '@/layout/MainLayout';
+import AppLayout from '@/layout/AppLayout';
 import { SignInPage } from '@/features/auth/pages/SignInPage';
 import { SignUpPage } from '@/features/auth/pages/SignUpPage';
-import { DashboardPage } from '@/features/auth/pages/DashboardPage';
+import { DashboardPage } from '@/features/dashboard/pages/DashboardPage';
 import { GoogleCallbackPage } from '@/features/auth/pages/GoogleCallbackPage';
 import { ProtectedRoutes } from '@/features/auth/components/ProtectedRoutes';
 import { PublicOnlyRoutes } from '@/features/auth/components/PublicOnlyRoutes';
 import GitHubCallbackPage from '@/features/auth/pages/GitHubCallbackPage';
 import MicrosoftCallbackPage from '@/features/auth/pages/MicrosoftCallbackPage';
+import { HomePage } from '@/features/courses/pages/HomePage';
+import { TopicDetailPage } from '@/features/courses/pages/TopicDetailPage';
+import { TopicsPage } from '@/features/courses/pages/TopicsPage';
+import { NotFoundPage } from '@/shared/pages/NotFoundPage';
 
 const AppRouter = createBrowserRouter([
   {
     path: '/',
-    element: <MainLayout />,
+    element: <AppLayout />,
+    children: [
+      {
+        index: true,
+        element: <HomePage />,
+      },
+      {
+        path: 'dashboard',
+        element: (
+          <ProtectedRoutes>
+            <DashboardPage />
+          </ProtectedRoutes>
+        ),
+      },
+      {
+        path: 'course',
+        element: (
+          <ProtectedRoutes>
+            <HomePage />
+          </ProtectedRoutes>
+        ),
+      },
+      {
+        path: 'topics',
+        element: (
+          <ProtectedRoutes>
+            <TopicsPage />
+          </ProtectedRoutes>
+        ),
+      },
+      {
+        path: 'topics/:topicId',
+        element: (
+          <ProtectedRoutes>
+            <TopicDetailPage />
+          </ProtectedRoutes>
+        ),
+      },
+    ],
   },
   {
     path: '/login',
@@ -31,14 +73,6 @@ const AppRouter = createBrowserRouter([
     ),
   },
   {
-    path: '/dashboard',
-    element: (
-      <ProtectedRoutes>
-        <DashboardPage />
-      </ProtectedRoutes>
-    ),
-  },
-  {
     path: '/auth/google/callback',
     element: <GoogleCallbackPage />,
   },
@@ -50,15 +84,10 @@ const AppRouter = createBrowserRouter([
     path: '/auth/microsoft/callback',
     element: <MicrosoftCallbackPage />,
   },
-  // Aquí puedes agregar más rutas protegidas
-  // {
-  //   path: '/courses',
-  //   element: (
-  //     <ProtectedRoutes>
-  //       <CoursesPage />
-  //     </ProtectedRoutes>
-  //   ),
-  // },
+  {
+    path: '*',
+    element: <NotFoundPage />,
+  },
 ]);
 
 export const AppRouterProvider = () => {
