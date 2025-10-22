@@ -14,8 +14,6 @@ export { default as PublicOnlyRoutes } from './components/PublicOnlyRoutes';
 // Pages
 export { SignInPage } from './pages/SignInPage';
 export { SignUpPage } from './pages/SignUpPage';
-export { default as DashboardPage } from './pages/DashboardPage';
-
 // Hooks
 //export { default as useGoogle } from './hooks/use-google';
 //export { default as useLoginUser } from './hooks/use-login-user';
