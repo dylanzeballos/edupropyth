@@ -28,6 +28,7 @@ class CourseViewSet(
     viewsets.GenericViewSet,
 ):
     """ViewSet to list, retrieve and create courses."""
+
     queryset = Course.objects.all().prefetch_related(
         "editions",
         "editions__instructors",
@@ -55,15 +56,14 @@ class CourseEditionViewSet(
     viewsets.GenericViewSet,
 ):
     """Manage course editions nested under a course."""
+
     lookup_field = "slug"
     lookup_url_kwarg = "edition_slug"
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def get_course(self):
         if not hasattr(self, "_course"):
-            self._course = get_object_or_404(
-                Course, slug=self.kwargs["course_slug"]
-            )
+            self._course = get_object_or_404(Course, slug=self.kwargs["course_slug"])
         return self._course
 
     def get_queryset(self):
@@ -71,7 +71,9 @@ class CourseEditionViewSet(
         return (
             CourseEdition.objects.filter(course=course)
             .select_related("course", "archived_by")
-            .prefetch_related("instructors", "enrollments__student", "enrollments__instructor")
+            .prefetch_related(
+                "instructors", "enrollments__student", "enrollments__instructor"
+            )
         )
 
     def get_serializer_class(self):
@@ -94,6 +96,7 @@ class CourseEditionViewSet(
 
 class CourseEditionArchiveView(APIView):
     """Endpoint to archive a course edition."""
+
     permission_classes = [CanEditCourses]
 
     def post(self, request, course_slug, edition_slug):
@@ -111,12 +114,15 @@ class CourseEditionArchiveView(APIView):
         notes = request.data.get("notes")
         edition.archive(by_user=request.user, notes=notes)
         edition.refresh_from_db()
-        serializer = CourseEditionDetailSerializer(edition, context={"request": request})
+        serializer = CourseEditionDetailSerializer(
+            edition, context={"request": request}
+        )
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class CourseEditionEnrollmentListCreateView(generics.ListCreateAPIView):
     """List and create enrollments for a specific course edition."""
+
     permission_classes = [IsInstructorOrAdmin]
 
     def get_edition(self):

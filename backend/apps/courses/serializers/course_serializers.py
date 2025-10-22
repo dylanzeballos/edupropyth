@@ -66,9 +66,7 @@ class CourseDetailSerializer(CourseListSerializer):
         representation = super().to_representation(instance)
         # Include only the most recent 3 editions for a concise overview.
         if "latest_editions" in representation:
-            queryset = (
-                instance.editions.order_by("-start_date", "-created_at")[:3]
-            )
+            queryset = instance.editions.order_by("-start_date", "-created_at")[:3]
             representation["latest_editions"] = CourseEditionSummarySerializer(
                 queryset, many=True
             ).data

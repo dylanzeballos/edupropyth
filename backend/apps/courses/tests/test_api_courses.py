@@ -98,9 +98,7 @@ def test_course_create_with_permission(api_client, instructor_user):
     assert created.level == Course.LEVEL_INTERMEDIATE
 
 
-def test_course_edition_creation_and_listing(
-    api_client, instructor_user, course
-):
+def test_course_edition_creation_and_listing(api_client, instructor_user, course):
     api_client.force_authenticate(user=instructor_user)
     edition_payload = {
         "name": "2025-I",
@@ -121,9 +119,7 @@ def test_course_edition_creation_and_listing(
     assert list_response.data["results"][0]["name"] == "2025-I"
 
 
-def test_course_edition_archive_flow(
-    api_client, instructor_user, student_user, course
-):
+def test_course_edition_archive_flow(api_client, instructor_user, student_user, course):
     edition = CourseEdition.objects.create(
         course=course,
         name="2025-I",
@@ -195,6 +191,4 @@ def test_course_edition_enrollment_create_and_list(
     list_resp = api_client.get(enroll_url)
     assert list_resp.status_code == 200
     assert len(list_resp.data["results"]) == 1
-    assert (
-        list_resp.data["results"][0]["student"]["id"] == student_user.id
-    )
+    assert list_resp.data["results"][0]["student"]["id"] == student_user.id
