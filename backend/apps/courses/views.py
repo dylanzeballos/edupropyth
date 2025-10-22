@@ -19,6 +19,7 @@ from apps.users.permissions.admin_permissions import (
     CanEditCourses,
     IsInstructorOrAdmin,
 )
+
 class CourseViewSet(
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
@@ -32,16 +33,19 @@ class CourseViewSet(
     )
     lookup_field = "slug"
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
     def get_serializer_class(self):
         if self.action == "list":
             return CourseListSerializer
         if self.action == "retrieve":
             return CourseDetailSerializer
         return CourseCreateSerializer
+    
     def get_permissions(self):
         if self.action in {"create", "update", "partial_update", "destroy"}:
             return [CanEditCourses()]
         return super().get_permissions()
+    
 class CourseEditionViewSet(
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
@@ -52,12 +56,14 @@ class CourseEditionViewSet(
     lookup_field = "slug"
     lookup_url_kwarg = "edition_slug"
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
     def get_course(self):
         if not hasattr(self, "_course"):
             self._course = get_object_or_404(
                 Course, slug=self.kwargs["course_slug"]
             )
         return self._course
+    
     def get_queryset(self):
         course = self.get_course()
         return (
@@ -65,23 +71,28 @@ class CourseEditionViewSet(
             .select_related("course", "archived_by")
             .prefetch_related("instructors", "enrollments__student", "enrollments__instructor")
         )
+    
     def get_serializer_class(self):
         if self.action == "list":
             return CourseEditionListSerializer
         if self.action == "retrieve":
             return CourseEditionDetailSerializer
         return CourseEditionWriteSerializer
+    
     def get_serializer_context(self):
         context = super().get_serializer_context()
         context["course"] = self.get_course()
         return context
+    
     def get_permissions(self):
         if self.action in {"create", "update", "partial_update", "destroy"}:
             return [CanEditCourses()]
         return super().get_permissions()
+    
 class CourseEditionArchiveView(APIView):
     """Endpoint to archive a course edition."""
     permission_classes = [CanEditCourses]
+
     def post(self, request, course_slug, edition_slug):
         course = get_object_or_404(Course, slug=course_slug)
         edition = get_object_or_404(
@@ -99,14 +110,17 @@ class CourseEditionArchiveView(APIView):
         edition.refresh_from_db()
         serializer = CourseEditionDetailSerializer(edition, context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
 class CourseEditionEnrollmentListCreateView(generics.ListCreateAPIView):
     """List and create enrollments for a specific course edition."""
     permission_classes = [IsInstructorOrAdmin]
+    
     def get_edition(self):
         course = get_object_or_404(Course, slug=self.kwargs["course_slug"])
         return get_object_or_404(
             CourseEdition, course=course, slug=self.kwargs["edition_slug"]
         )
+    
     def get_queryset(self):
         edition = self.get_edition()
         return (
@@ -114,10 +128,12 @@ class CourseEditionEnrollmentListCreateView(generics.ListCreateAPIView):
             .select_related("student", "instructor")
             .order_by("created_at")
         )
+    
     def get_serializer_class(self):
         if self.request.method == "POST":
             return EnrollmentCreateSerializer
         return EnrollmentSerializer
+    
     def get_serializer_context(self):
         context = super().get_serializer_context()
         context["edition"] = self.get_edition()
