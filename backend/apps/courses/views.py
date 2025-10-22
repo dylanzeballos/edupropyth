@@ -1,8 +1,9 @@
 # Create your views here.
-from django.shortcuts import get_object_or_404
 from rest_framework import generics, mixins, permissions, status, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from django.shortcuts import get_object_or_404
 
 from apps.courses.models import Course, CourseEdition, Enrollment
 from apps.courses.serializers import (
@@ -15,10 +16,7 @@ from apps.courses.serializers import (
     EnrollmentCreateSerializer,
     EnrollmentSerializer,
 )
-from apps.users.permissions.admin_permissions import (
-    CanEditCourses,
-    IsInstructorOrAdmin,
-)
+from apps.users.permissions.admin_permissions import CanEditCourses, IsInstructorOrAdmin
 
 
 class CourseViewSet(

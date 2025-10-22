@@ -1,9 +1,10 @@
 from datetime import date, timedelta
 
 import pytest
+from rest_framework.test import APIClient
+
 from django.contrib.auth import get_user_model
 from django.urls import reverse
-from rest_framework.test import APIClient
 
 from apps.courses.models import Course, CourseEdition, Enrollment
 from apps.users.models import UserProfile

@@ -1,5 +1,6 @@
-from django.contrib.auth import get_user_model
 from rest_framework import serializers
+
+from django.contrib.auth import get_user_model
 
 from apps.courses.models import Course, CourseEdition
 from apps.users.serializers.user_serializers import UserSummarySerializer
