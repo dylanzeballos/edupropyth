@@ -165,7 +165,7 @@ def test_course_edition_enrollments_requires_permission(api_client, course):
     )
 
     response = api_client.get(enroll_url)
-    assert response.status_code == 403
+    assert response.status_code == 401
 
 
 def test_course_edition_enrollment_create_and_list(
