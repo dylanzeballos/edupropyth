@@ -38,7 +38,7 @@ services:
 
   frontend:
     build: ./frontend
-    command: pnpm run dev --host
+    command: npm run dev --host
     volumes:
       - ./frontend:/app
     ports:

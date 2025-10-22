@@ -1,10 +1,12 @@
 from rest_framework import generics, permissions, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
+
 from django.contrib.auth import get_user_model
+
 from ..serializers.user_serializers import (
-    UserSerializer,
     UserCreateSerializer,
+    UserSerializer,
     UserSummarySerializer,
 )
 from ..services.user_service import UserService

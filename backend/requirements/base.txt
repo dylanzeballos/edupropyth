@@ -1,9 +1,12 @@
 Django
 djangorestframework
 djangorestframework-simplejwt
-python-dotenv
 psycopg2-binary
 drf-spectacular
 django-cors-headers
-dj_database-url
+dj_database_url
 Pillow
+django-allauth
+django-allauth[socialaccount]
+dj-rest-auth
+django-environ

@@ -1,66 +1,68 @@
-import { createBrowserRouter } from 'react-router';
+import { createBrowserRouter, RouterProvider } from 'react-router';
 import MainLayout from '@/layout/MainLayout';
+import { SignInPage } from '@/features/auth/pages/SignInPage';
+import { SignUpPage } from '@/features/auth/pages/SignUpPage';
+import { DashboardPage } from '@/features/auth/pages/DashboardPage';
+import { GoogleCallbackPage } from '@/features/auth/pages/GoogleCallbackPage';
+import { ProtectedRoutes } from '@/features/auth/components/ProtectedRoutes';
+import { PublicOnlyRoutes } from '@/features/auth/components/PublicOnlyRoutes';
+import GitHubCallbackPage from '@/features/auth/pages/GitHubCallbackPage';
+import MicrosoftCallbackPage from '@/features/auth/pages/MicrosoftCallbackPage';
 
 const AppRouter = createBrowserRouter([
   {
     path: '/',
-    Component: MainLayout,
-    /* children: [
-      {
-        index: true,
-        lazy: () =>
-          import('../features/landing/presentation/pages/LandingPage'),
-      },
-      {
-        path: 'dashboard',
-        lazy: () => import('../features/dashboard/presentation/pages/HomePage'),
-      },
-      {
-        path: 'auth',
-        children: [
-          {
-            path: 'login',
-            lazy: () => import('../features/auth/presentation/pages/LoginPage'),
-          },
-          {
-            path: 'register',
-            lazy: () =>
-              import('../features/auth/presentation/pages/RegisterPage'),
-          },
-        ],
-      },
-      {
-        path: 'courses',
-        children: [
-          {
-            index: true,
-            lazy: () =>
-              import('../features/courses/presentation/pages/CoursesPage'),
-          },
-          {
-            path: ':id',
-            lazy: () =>
-              import('../features/courses/presentation/pages/CourseDetailPage'),
-          },
-        ],
-      },
-      {
-        path: 'profile',
-        children: [
-          {
-            index: true,
-            lazy: () =>
-              import('../features/users/presentation/pages/ProfilePage'),
-          },
-          {
-            path: 'edit',
-            lazy: () =>
-              import('../features/users/presentation/pages/EditProfilePage'),
-          },
-        ],
-      },
-    ], */
+    element: <MainLayout />,
   },
+  {
+    path: '/login',
+    element: (
+      <PublicOnlyRoutes>
+        <SignInPage />
+      </PublicOnlyRoutes>
+    ),
+  },
+  {
+    path: '/register',
+    element: (
+      <PublicOnlyRoutes>
+        <SignUpPage />
+      </PublicOnlyRoutes>
+    ),
+  },
+  {
+    path: '/dashboard',
+    element: (
+      <ProtectedRoutes>
+        <DashboardPage />
+      </ProtectedRoutes>
+    ),
+  },
+  {
+    path: '/auth/google/callback',
+    element: <GoogleCallbackPage />,
+  },
+  {
+    path: '/auth/github/callback',
+    element: <GitHubCallbackPage />,
+  },
+  {
+    path: '/auth/microsoft/callback',
+    element: <MicrosoftCallbackPage />,
+  },
+  // Aquí puedes agregar más rutas protegidas
+  // {
+  //   path: '/courses',
+  //   element: (
+  //     <ProtectedRoutes>
+  //       <CoursesPage />
+  //     </ProtectedRoutes>
+  //   ),
+  // },
 ]);
+
+export const AppRouterProvider = () => {
+  return <RouterProvider router={AppRouter} />;
+};
 
 export default AppRouter;

@@ -1,44 +1,58 @@
-import { useState } from "react";
-import { toast } from "sonner";
-import { authService } from "@/features/auth/services/auth.service";
-import { UserType, UserFormData } from "@/features/auth/types/user.type";
+import { useMutation } from '@tanstack/react-query';
+import { useNavigate } from 'react-router';
+import { toast } from 'sonner';
+import { authService } from '../services/auth.service';
+import { useAuthStore } from '../stores/auth.store';
+import { RegisterFormData } from '../validation/register.schema';
+import { RegisterRequest } from '../types/login.types';
 
-export const useSignUp = () => {
-    const [userType, setUserType] = useState<UserType>('student');
-    const [loading, setLoading] = useState(false);
+export const useRegisterUser = () => {
+  const navigate = useNavigate();
+  const { setLoading } = useAuthStore();
 
-    const handleSubmit = async (data: UserFormData) => {
-        setLoading(true);
-
-        try {
-            // Add the selected user type to the form data
-            const submitData = {
-                ...data,
-                role: userType
-            };
-
-            const result = await authService.register(submitData);
-
-            toast.success("¡Registro exitoso!", {
-                description: `Bienvenido ${result.full_name}. Tu cuenta como ${userType === 'student' ? 'estudiante' : 'instructor'} ha sido creada.`
-            });
-
-            return result;
-        } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : "Error en el registro";
-            toast.error("Error en el registro", {
-                description: errorMessage
-            });
-            throw error;
-        } finally {
-            setLoading(false);
-        }
+  const mutation = useMutation({
+    mutationFn: (data: RegisterRequest) => authService.register(data),
+    onMutate: () => {
+      setLoading(true);
+    },
+    onSuccess: () => {
+      toast.success('¡Registro exitoso!', {
+        description:
+          'Tu cuenta ha sido creada correctamente. Por favor inicia sesión.',
+      });
+      navigate('/login', { replace: true });
+    },
+    onError: (error: unknown) => {
+      const axiosError = error as {
+        response?: { data?: { message?: string } };
+      };
+      const message =
+        axiosError?.response?.data?.message || 'Error al registrarse';
+      toast.error('Error de registro', {
+        description: message,
+      });
+    },
+    onSettled: () => {
+      setLoading(false);
+    },
+  });
+  const handleSubmit = (formData: RegisterFormData) => {
+    const registerData: RegisterRequest = {
+      email: formData.email,
+      username: formData.username,
+      first_name: formData.first_name,
+      last_name: formData.last_name,
+      password: formData.password,
+      password_confirm: formData.password_confirm,
     };
 
-    return {
-        handleSubmit,
-        loading,
-        userType,
-        setUserType
-    };
+    mutation.mutate(registerData);
+  };
+
+  return {
+    handleSubmit,
+    isPending: mutation.isPending,
+    isError: mutation.isError,
+    error: mutation.error,
+  };
 };

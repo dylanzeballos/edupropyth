@@ -9,12 +9,43 @@ const apiClient = axios.create({
   },
 });
 
+apiClient.interceptors.request.use(
+  (config) => {
+    const publicRoutes = [
+      '/api/auth/login',
+      '/api/users',
+      '/api/users/auth/google-login/',
+      '/api/users/auth/github-login/',
+      '/api/users/auth/microsoft-login/',
+    ];
+
+    const isPublicRoute = publicRoutes.some((route) =>
+      config.url?.includes(route),
+    );
+
+    if (!isPublicRoute) {
+      const token = localStorage.getItem('access_token');
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    }
+
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  },
+);
+
 export const postData = async (endpoint: string, data: object) => {
   try {
     const response = await apiClient.post(endpoint, data);
     return response.data;
-  } catch (error: any) {
-    throw new Error(error.response?.data || error.message);
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.message || error.message);
+    }
+    throw error;
   }
 };
 
@@ -22,8 +53,11 @@ export const getData = async (endpoint: string) => {
   try {
     const response = await apiClient.get(endpoint);
     return response.data;
-  } catch (error: any) {
-    throw new Error(error.response?.data || error.message);
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.message || error.message);
+    }
+    throw error;
   }
 };
 
@@ -31,8 +65,11 @@ export const putData = async (endpoint: string, data: object) => {
   try {
     const response = await apiClient.put(endpoint, data);
     return response.data;
-  } catch (error: any) {
-    throw new Error(error.response?.data || error.message);
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.message || error.message);
+    }
+    throw error;
   }
 };
 
@@ -40,7 +77,10 @@ export const deleteData = async (endpoint: string) => {
   try {
     const response = await apiClient.delete(endpoint);
     return response.data;
-  } catch (error: any) {
-    throw new Error(error.response?.data || error.message);
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.message || error.message);
+    }
+    throw error;
   }
 };

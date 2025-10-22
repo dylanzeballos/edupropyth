@@ -1,4 +1,5 @@
 from rest_framework import serializers
+
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -27,24 +28,27 @@ class UserCreateSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         if attrs["password"] != attrs["password_confirm"]:
             raise serializers.ValidationError("Passwords don't match")
-        
+
         # Validate role
         valid_roles = ["student", "instructor"]
         role = attrs.get("role", "student")
         if role not in valid_roles:
-            raise serializers.ValidationError(f"Role must be one of: {', '.join(valid_roles)}")
-        
+            raise serializers.ValidationError(
+                f"Role must be one of: {', '.join(valid_roles)}"
+            )
+
         return attrs
 
     def create(self, validated_data):
         role = validated_data.pop("role", "student")
         validated_data.pop("password_confirm")
         user = User.objects.create_user(**validated_data)
-        
+
         # Create profile with the specified role
         from ..services.user_service import UserService
+
         UserService.create_user_profile(user, role=role)
-        
+
         return user
 
 

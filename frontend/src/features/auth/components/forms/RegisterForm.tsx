@@ -1,128 +1,157 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { RegisterData, registerUserSchema } from "@/features/auth/validation";
-import { UserType } from "@/features/auth/types/user.type";
-import { InputText, Button } from "@/shared/components/ui";
-import UserTypeSelector from "@/features/auth/components/selectors/UserTypeSelector";
+import { motion } from 'framer-motion';
+import { Link } from 'react-router';
+import { Button, InputText } from "@/shared/components/ui";
+import { registerUserSchema, RegisterFormData } from "../../validation/register.schema";
+import { GoogleLoginButton } from "../buttons/GoogleLoginButton";
 
-interface FormSignUpProps {
-  userType: UserType;
-  setUserType: (userType: UserType) => void;
-  isLoading: boolean;
-  onSubmit: (data: RegisterData) => void;
+interface RegisterFormProps {
+  onSubmit: (data: RegisterFormData) => void;
+  isPending?: boolean;
 }
 
-export default function RegisterForm({
-  userType,
-  setUserType,
-  isLoading,
-  onSubmit,
-}: FormSignUpProps) {
+export const RegisterForm = ({ onSubmit, isPending = false }: RegisterFormProps) => {
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<RegisterData>({
+    formState: { errors },
+  } = useForm<RegisterFormData>({
     resolver: zodResolver(registerUserSchema),
-    mode: "onBlur",
+    mode: "onChange",
   });
 
   return (
-    <div className="w-full max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold text-center mb-6 text-gray-900">
-        Crear Cuenta
-      </h2>
-
-      <UserTypeSelector
-        userType={userType}
-        onChange={setUserType}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="space-y-6"
+    >
+      <GoogleLoginButton
+        onSuccess={(user) => console.log("Google login successful:", user)}
+        onError={(error) => console.error("Google login error:", error)}
       />
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <InputText<RegisterData>
-          label="Usuario"
-          name="username"
-          placeholder="Tu usuario"
-          register={register}
-          errors={errors}
-          isRequired
-        />
+      <div className="relative">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-gray-300 dark:border-gray-600" />
+        </div>
+        <div className="relative flex justify-center text-sm">
+          <span className="bg-white dark:bg-gray-800 px-2 text-gray-500 dark:text-gray-400">
+            O crea tu cuenta
+          </span>
+        </div>
+      </div>
 
-        <InputText<RegisterData>
-          label="Email"
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <InputText
+          label="Correo Electrónico"
           name="email"
           type="email"
-          placeholder="correo@ejemplo.com"
+          placeholder="ejemplo@correo.com"
           register={register}
-          errors={errors}
-          isRequired
+          errors={errors.email}
         />
 
-        <div className="grid grid-cols-2 gap-4">
-          <InputText<RegisterData>
+        <InputText
+          label="Nombre de Usuario"
+          name="username"
+          type="text"
+          placeholder="mi_usuario"
+          register={register}
+          errors={errors.username}
+        />
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <InputText
             label="Nombre"
             name="first_name"
-            placeholder="Tu nombre"
+            type="text"
+            placeholder="Juan"
             register={register}
-            errors={errors}
-            isRequired
+            errors={errors.first_name}
           />
 
-          <InputText<RegisterData>
+          <InputText
             label="Apellido"
             name="last_name"
-            placeholder="Tu apellido"
+            type="text"
+            placeholder="Pérez"
             register={register}
-            errors={errors}
-            isRequired
+            errors={errors.last_name}
           />
         </div>
 
-        <InputText<RegisterData>
-          label="Biografía (Opcional)"
-          name="bio"
-          placeholder="Cuéntanos sobre ti..."
-          register={register}
-          errors={errors}
-        />
-
-        <InputText<RegisterData>
+        <InputText
           label="Contraseña"
           name="password"
           type="password"
-          placeholder="********"
+          placeholder="••••••••"
           register={register}
-          errors={errors}
-          isRequired
+          errors={errors.password}
         />
 
-        <InputText<RegisterData>
+        <InputText
           label="Confirmar Contraseña"
           name="password_confirm"
           type="password"
-          placeholder="********"
+          placeholder="••••••••"
           register={register}
-          errors={errors}
-          isRequired
+          errors={errors.password_confirm}
         />
+
+        <div className="flex items-start">
+          <input
+            type="checkbox"
+            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mt-0.5"
+            {...register("acceptTerms")}
+          />
+          <div className="ml-3">
+            <label className="text-sm text-gray-600 dark:text-gray-400">
+              Acepto los{' '}
+              <Link
+                to="/terms"
+                className="text-blue-600 hover:text-blue-500 dark:text-blue-400 hover:underline"
+              >
+                términos y condiciones
+              </Link>
+              {' '}y la{' '}
+              <Link
+                to="/privacy"
+                className="text-blue-600 hover:text-blue-500 dark:text-blue-400 hover:underline"
+              >
+                política de privacidad
+              </Link>
+            </label>
+            {errors.acceptTerms && (
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                {errors.acceptTerms.message}
+              </p>
+            )}
+          </div>
+        </div>
 
         <Button
           type="submit"
-          label={
-            isLoading
-              ? 'Registrando...'
-              : `Registrarse como ${userType === 'student' ? 'Estudiante' : 'Instructor'}`
-          }
           variantColor="primary"
-          disabled={isSubmitting || isLoading}
-          className={`w-full ${isLoading
-              ? 'bg-gray-400 cursor-not-allowed hover:bg-gray-400'
-              : userType === 'student'
-                ? 'bg-blue-500 hover:bg-blue-600'
-                : 'bg-green-500 hover:bg-green-600'
-            }`}
+          disabled={isPending}
+          className="w-full"
+          loading={isPending}
+          label="Crear cuenta"
+          loadingText="Creando cuenta..."
         />
       </form>
-    </div>
+
+      <p className="text-center text-sm text-gray-600 dark:text-gray-400">
+        ¿Ya tienes una cuenta?{' '}
+        <Link
+          to="/login"
+          className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 hover:underline"
+        >
+          Inicia sesión
+        </Link>
+      </p>
+    </motion.div>
   );
 };
