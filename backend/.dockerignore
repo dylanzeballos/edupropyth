@@ -9,8 +9,6 @@ pnpm-debug.log*
 coverage
 *.lcov
 .nyc_output
-test-results
-playwright-report
 
 # Build
 dist
@@ -52,7 +50,6 @@ docs
 Dockerfile
 docker-compose*.yml
 .dockerignore
-nginx.conf
 
 # Logs
 logs
@@ -67,16 +64,12 @@ temp
 Thumbs.db
 .DS_Store
 
-# Vite
-.vite
-vite.config.ts.timestamp-*
-
 # Misc
 .editorconfig
 .prettierrc
 .prettierignore
-.eslintrc.cjs
+.eslintrc.js
 .eslintignore
+nest-cli.json
 tsconfig.json
-tsconfig.node.json
-vitest.config.ts
+tsconfig.build.json

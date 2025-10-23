@@ -1,8 +1,10 @@
-version: '3.8'
+version: "3.8"
 
 services:
   db:
-    image: postgres:16
+    image: postgres:16-alpine
+    container_name: edupropyth-db
+    restart: unless-stopped
     environment:
       POSTGRES_DB: edupropyth
       POSTGRES_USER: postgres
@@ -13,40 +15,133 @@ services:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - edupropyth-network
 
   backend:
-    build: ./backend
-    command: python manage.py runserver --settings=config.settings.develop 0.0.0.0:8000
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: development
+    container_name: edupropyth-backend
+    restart: unless-stopped
+    command: npm run start:dev
     volumes:
       - ./backend:/app
+      - /app/node_modules
     ports:
-      - "8000:8000" 
+      - "3000:3000"
     environment:
-      - DJANGO_ENVIRONMENT=develop
-      - DB_NAME=edupropyth
-      - DB_USER=postgres
-      - DB_PASSWORD=postgres
+      - NODE_ENV=development
+      - PORT=3000
+
+      # Database
       - DB_HOST=db
       - DB_PORT=5432
-      - DEBUG=1
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - DB_DATABASE=edupropyth
+
+      # JWT
+      - JWT_SECRET=dev-secret-key-change-in-production
+      - JWT_EXPIRATION=7d
+      - JWT_REFRESH_SECRET=dev-refresh-secret-change-in-production
+      - JWT_REFRESH_EXPIRATION=30d
+
+      # OAuth (optional for local development)
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:-}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET:-}
+      - GOOGLE_CALLBACK_URL=http://localhost:3000/api/auth/google/callback
+      - GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID:-}
+      - GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET:-}
+      - GITHUB_CALLBACK_URL=http://localhost:3000/api/auth/github/callback
+
+      # Frontend URL
+      - FRONTEND_URL=http://localhost:5173
     depends_on:
       db:
         condition: service_healthy
+    networks:
+      - edupropyth-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   frontend:
-    build: ./frontend
-    command: npm run dev --host
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: development
+    container_name: edupropyth-frontend
+    restart: unless-stopped
+    command: npm run dev
     volumes:
       - ./frontend:/app
+      - /app/node_modules
     ports:
       - "5173:5173"
     environment:
-      - VITE_API_URL=http://backend:8000/api
+      - NODE_ENV=development
+      - VITE_API_BASE_URL=http://localhost:3000/api
+      - VITE_GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:-}
     depends_on:
       - backend
+    networks:
+      - edupropyth-network
+
+  # Redis para caché y sesiones (opcional, para futuro)
+  redis:
+    image: redis:7-alpine
+    container_name: edupropyth-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - edupropyth-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    profiles:
+      - cache
+
+  # PgAdmin para administración de base de datos (opcional)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: edupropyth-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@edupropyth.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - db
+    networks:
+      - edupropyth-network
+    profiles:
+      - tools
+
+networks:
+  edupropyth-network:
+    driver: bridge
 
 volumes:
   postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  pgadmin_data:
+    driver: local
