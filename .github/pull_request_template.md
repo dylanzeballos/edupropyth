@@ -46,7 +46,7 @@ Closes #<!-- issue number -->
 ### 🌐 Browser Testing
 <!-- Mark browsers where you've tested -->
 - [ ] Chrome
-- [ ] Firefox  
+- [ ] Firefox
 - [ ] Safari
 - [ ] Edge
 
@@ -139,11 +139,3 @@ Closes #<!-- issue number -->
 - [ ] No new dependencies added OR new dependencies justified and documented
 - [ ] All dependencies are up to date
 - [ ] License compatibility checked
-
----
-
-**By submitting this PR, I confirm that:**
-- [ ] I have read and agree to the contributing guidelines
-- [ ] My code is properly tested and documented
-- [ ] I have performed adequate self-review
-- [ ] This PR is ready for review
