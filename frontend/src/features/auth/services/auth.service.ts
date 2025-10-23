@@ -14,32 +14,32 @@ export interface GoogleAuthResponse extends AuthResponse {
 
 export const authService = {
   login: async (data: LoginRequest): Promise<LoginResponse> => {
-    return await postData('/api/users/auth/login/', data);
+    return await postData('/auth/login', data);
   },
 
   register: async (data: RegisterRequest): Promise<RegisterResponse> => {
-    return await postData('/api/users/', data);
+    return await postData('/auth/register', data);
   },
 
   googleAuth: async (idToken: string): Promise<GoogleAuthResponse> => {
-    return await postData('/api/users/auth/google-login/', {
+    return await postData('/auth/google-login', {
       id_token: idToken,
     });
   },
 
   githubLogin: async (code: string): Promise<AuthResponse> => {
-    return await postData('/api/users/auth/github-login/', { code });
+    return await postData('/auth/github-login', { code });
   },
 
   microsoftLogin: async (code: string): Promise<AuthResponse> => {
-    return await postData('/api/users/auth/microsoft-login/', { code });
+    return await postData('/auth/microsoft-login', { code });
   },
 
   async logout(): Promise<void> {
-    await postData('/api/auth/logout', {});
+    await postData('/auth/logout', {});
   },
 
   async RefreshToken(): Promise<LoginResponse> {
-    return await postData('/api/auth/refresh', {});
+    return await postData('/auth/refresh', {});
   },
 };

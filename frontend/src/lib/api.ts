@@ -12,11 +12,11 @@ const apiClient = axios.create({
 apiClient.interceptors.request.use(
   (config) => {
     const publicRoutes = [
-      '/api/auth/login',
-      '/api/users',
-      '/api/users/auth/google-login/',
-      '/api/users/auth/github-login/',
-      '/api/users/auth/microsoft-login/',
+      '/auth/login',
+      '/auth/register',
+      '/auth/google-login/',
+      '/auth/github-login/',
+      '/auth/microsoft-login/',
     ];
 
     const isPublicRoute = publicRoutes.some((route) =>

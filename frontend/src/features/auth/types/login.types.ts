@@ -1,9 +1,8 @@
-import { User } from "./user.type";
+import { User } from './user.type';
 
 export interface LoginRequest {
   email: string;
   password: string;
-  rememberMe?: boolean;
 }
 
 export interface LoginResponse {
