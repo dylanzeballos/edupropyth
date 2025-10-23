@@ -4,79 +4,71 @@ on:
   push:
     branches: [main, develop]
   pull_request:
-    branches: [main]
+    branches: [main, develop]
 
 env:
-  PYTHON_VERSION: "3.11"
   NODE_VERSION: "20"
 
 jobs:
-  lint:
+  lint-backend:
+    name: Lint Backend (NestJS)
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-          cache: "pip"
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: "npm"
-          cache-dependency-path: |
-            package-lock.json
-            frontend/package-lock.json
+          cache-dependency-path: ./backend/package-lock.json
 
-      - name: Cache Python dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements/dev.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-
-      - name: Install Python dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r backend/requirements/dev.txt
-
-      - name: Install Node.js dependencies (root)
+      - name: Install dependencies
         run: npm ci
 
-      - name: Install Node.js dependencies (frontend)
-        run: cd frontend && npm ci
+      - name: Run ESLint
+        run: npm run lint
 
-      - name: Lint backend with flake8
-        run: |
-          cd backend
-          flake8 .
+      - name: Check code formatting with Prettier
+        run: npm run format
 
-      - name: Check backend code formatting with black
-        run: |
-          cd backend
-          black --check .
+      - name: Type check
+        run: npm run build
 
-      - name: Check backend import sorting with isort
-        run: |
-          cd backend
-          isort --check-only .
+  lint-frontend:
+    name: Lint Frontend (React)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend
 
-      - name: Lint frontend with ESLint
-        run: |
-          cd frontend
-          npm run lint || echo "ESLint issues found but continuing"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Type check frontend
-        run: |
-          cd frontend
-          npm run type-check:ci || echo "Type check issues found but continuing"
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+          cache-dependency-path: ./frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Type check
+        run: npm run type-check:ci
 
   commitlint:
+    name: Validate Commit Messages
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
     steps:
@@ -91,22 +83,23 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: "npm"
 
-      - name: Install commitlint dependencies
-        run: npm install @commitlint/cli @commitlint/config-conventional
+      - name: Install root dependencies
+        run: npm ci
 
       - name: Validate commit messages
         run: npx commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose
 
-  backend-test:
+  test-backend:
+    name: Test Backend (NestJS)
     runs-on: ubuntu-latest
-    needs: lint
+    needs: lint-backend
     defaults:
       run:
         working-directory: ./backend
 
     services:
       postgres:
-        image: postgres:15-alpine
+        image: postgres:16-alpine
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
@@ -123,24 +116,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
-          python-version: ${{ env.PYTHON_VERSION }}
-          cache: "pip"
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+          cache-dependency-path: ./backend/package-lock.json
 
-      - name: Cache Python dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements/dev.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-
-      - name: Install Python dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements/dev.txt
+      - name: Install dependencies
+        run: npm ci
 
       - name: Wait for PostgreSQL
         run: |
@@ -149,39 +133,47 @@ jobs:
             sleep 2
           done
 
-      - name: Run Django migrations
-        run: python manage.py migrate
+      - name: Run unit tests with coverage
+        run: npm run test:cov
         env:
-          DEBUG: True
-          SECRET_KEY: test-secret-key-for-ci
-          DB_NAME: edupropyth_test
-          DB_USER: postgres
-          DB_PASSWORD: postgres
+          NODE_ENV: test
           DB_HOST: localhost
           DB_PORT: 5432
-          GOOGLE_CLIENT_ID: fake-google-client-id-for-ci
-          GOOGLE_CLIENT_SECRET: fake-google-secret-for-ci
-          GITHUB_CLIENT_ID: fake-github-client-id-for-ci
-          GITHUB_CLIENT_SECRET: fake-github-secret-for-ci
-          MICROSOFT_CLIENT_ID: fake-microsoft-client-id-for-ci
-          MICROSOFT_CLIENT_SECRET: fake-microsoft-secret-for-ci
+          DB_USERNAME: postgres
+          DB_PASSWORD: postgres
+          DB_DATABASE: edupropyth_test
+          JWT_SECRET: test-secret-key-for-ci
+          JWT_EXPIRATION: 7d
+          JWT_REFRESH_SECRET: test-refresh-secret-for-ci
+          JWT_REFRESH_EXPIRATION: 30d
 
-      - name: Run backend tests with coverage
-        run: python -m pytest --cov=apps --cov=config --cov-report=xml --cov-report=term-missing -v
+      - name: Run E2E tests
+        run: npm run test:e2e
         env:
-          DJANGO_SETTINGS_MODULE: config.settings.test
+          NODE_ENV: test
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USERNAME: postgres
+          DB_PASSWORD: postgres
+          DB_DATABASE: edupropyth_test
+          JWT_SECRET: test-secret-key-for-ci
+          JWT_EXPIRATION: 7d
+          JWT_REFRESH_SECRET: test-refresh-secret-for-ci
+          JWT_REFRESH_EXPIRATION: 30d
 
       - name: Upload backend coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
-          file: ./backend/coverage.xml
+          file: ./backend/coverage/lcov.info
           flags: backend
           name: backend-coverage
           fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
 
-  frontend-test:
+  test-frontend:
+    name: Test Frontend (React)
     runs-on: ubuntu-latest
-    needs: lint
+    needs: lint-frontend
     defaults:
       run:
         working-directory: ./frontend
@@ -201,10 +193,10 @@ jobs:
         run: npm ci
 
       - name: Build frontend (test compilation)
-        run: npm run build:ci || echo "Build failed, but continuing with tests"
+        run: npm run build:ci
 
       - name: Run frontend tests with coverage
-        run: npm run test:coverage:ci || echo "Tests not available, skipping"
+        run: npm run test:coverage:ci
 
       - name: Upload frontend coverage to Codecov
         uses: codecov/codecov-action@v4
@@ -214,46 +206,42 @@ jobs:
           flags: frontend
           name: frontend-coverage
           fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   security-scan:
+    name: Security Scan
     runs-on: ubuntu-latest
-    needs: lint
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-
-      - name: Install security scanning tools
-        run: |
-          pip install safety bandit
-
-      - name: Run safety check for Python dependencies
-        run: |
-          cd backend
-          safety check -r requirements/base.txt
-
-      - name: Run bandit security scan
-        run: |
-          cd backend
-          bandit -r apps/ config/ -f json -o bandit-report.json || true
-
-      - name: Set up Node.js for frontend security scan
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
+
+      - name: Run npm audit for backend
+        run: |
+          cd backend
+          npm audit --audit-level moderate || echo "npm audit completed with warnings"
 
       - name: Run npm audit for frontend
         run: |
           cd frontend
           npm audit --audit-level moderate || echo "npm audit completed with warnings"
 
+      - name: Run Snyk security scan (if configured)
+        uses: snyk/actions/node@master
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --all-projects --severity-threshold=high
+
   docker-build-test:
+    name: Docker Build Test
     runs-on: ubuntu-latest
-    needs: [backend-test]
+    needs: [test-backend, test-frontend]
     if: github.event_name == 'pull_request'
     steps:
       - name: Checkout code
@@ -268,9 +256,11 @@ jobs:
           context: ./backend
           file: ./backend/Dockerfile
           push: false
-          tags: test-backend:latest
+          tags: edupropyth-backend:test
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          build-args: |
+            NODE_ENV=production
 
       - name: Test frontend Docker build
         uses: docker/build-push-action@v5
@@ -278,6 +268,26 @@ jobs:
           context: ./frontend
           file: ./frontend/Dockerfile
           push: false
-          tags: test-frontend:latest
+          tags: edupropyth-frontend:test
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          build-args: |
+            NODE_ENV=production
+
+  all-checks-passed:
+    name: All Checks Passed
+    runs-on: ubuntu-latest
+    needs:
+      [lint-backend, lint-frontend, test-backend, test-frontend, security-scan]
+    if: always()
+    steps:
+      - name: Check if all jobs succeeded
+        run: |
+          if [ "${{ needs.lint-backend.result }}" != "success" ] || \
+             [ "${{ needs.lint-frontend.result }}" != "success" ] || \
+             [ "${{ needs.test-backend.result }}" != "success" ] || \
+             [ "${{ needs.test-frontend.result }}" != "success" ]; then
+            echo "Some checks failed"
+            exit 1
+          fi
+          echo "All checks passed successfully!"
