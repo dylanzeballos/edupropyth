@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
 import { authService } from '@/features/auth/services/auth.service';
 import { useAuthStore } from '@/features/auth/stores/auth.store';
+import { getUserFullName } from '../types/user.type';
+import { getErrorMessage } from '@/shared/utils/error-handler';
 
 import { LoginRequest } from '../types/login.types';
 
@@ -17,10 +19,10 @@ export const useLoginMutation = () => {
       setLoading(true);
     },
     onSuccess: (response) => {
-      setAuth(response.user, response.access_token, response.refresh_token);
+      setAuth(response.user, response.accessToken, response.refreshToken);
 
       toast.success('¡Inicio de sesión exitoso!', {
-        description: `Bienvenido ${response.user.full_name || response.user.email}`,
+        description: `Bienvenido ${getUserFullName(response.user) || response.user.email}`,
       });
 
       queryClient.invalidateQueries({ queryKey: ['user'] });
@@ -29,11 +31,7 @@ export const useLoginMutation = () => {
     },
     onError: (error: unknown) => {
       setLoading(false);
-      const axiosError = error as {
-        response?: { data?: { message?: string } };
-      };
-      const message =
-        axiosError?.response?.data?.message || 'Error al iniciar sesión';
+      const message = getErrorMessage(error);
       toast.error('Error de autenticación', {
         description: message,
       });

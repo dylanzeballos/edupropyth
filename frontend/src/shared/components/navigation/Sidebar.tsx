@@ -5,28 +5,31 @@ import {
   Trophy,
   BarChart3,
   Settings,
-  User,
   LogOut,
   Home,
   FileText,
   Code2,
   ChevronLeft,
   ChevronRight,
-  Flame,
   Users,
+  Edit3,
+  FolderOpen,
 } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router';
 import { ThemeToggle } from '../ui/ThemeToggle';
 import { useAuthStore } from '@/features/auth';
-import { canEditCourse } from '@/shared/utils/permissions';
+import { Permission } from '@/shared/utils/permissions';
+import { usePermissions } from '@/features/auth';
+import { getRoleDisplayName } from '@/features/auth/types/user.type';
+import { LucideIcon } from 'lucide-react';
 
 interface SidebarItem {
   id: string;
   label: string;
-  icon: any;
+  icon: LucideIcon;
   badge?: number;
   path: string;
-  requiresPermission?: boolean;
+  permission?: Permission;
 }
 
 interface SidebarProps {
@@ -36,33 +39,88 @@ interface SidebarProps {
   onToggleCollapse: () => void;
 }
 
-const mainItems: SidebarItem[] = [
-  { id: 'dashboard', label: 'Tablero', icon: Home, path: '/dashboard' },
+const allMainItems: SidebarItem[] = [
+  {
+    id: 'dashboard',
+    label: 'Tablero',
+    icon: Home,
+    path: '/dashboard',
+    permission: Permission.VIEW_COURSES,
+  },
   {
     id: 'topics',
     label: 'Topicos',
     icon: BookOpen,
     badge: 25,
     path: '/topics',
+    permission: Permission.VIEW_TOPICS,
   },
-  { id: 'editor', label: 'Editor de Código', icon: Code2, path: '/editor' },
-  { id: 'progress', label: 'Progreso', icon: BarChart3, path: '/progress' },
+  {
+    id: 'courses',
+    label: 'Mis cursos',
+    icon: FolderOpen,
+    path: '/courses',
+    permission: Permission.VIEW_COURSES,
+  },
+  {
+    id: 'editor',
+    label: 'Editor de Código',
+    icon: Code2,
+    path: '/editor',
+    permission: Permission.EXECUTE_COURSE,
+  },
+  {
+    id: 'progress',
+    label: 'Mi Progreso',
+    icon: BarChart3,
+    path: '/progress',
+    permission: Permission.VIEW_OWN_PROGRESS,
+  },
 ];
 
-const toolItems: SidebarItem[] = [
+const allToolItems: SidebarItem[] = [
+  {
+    id: 'course-management',
+    label: 'Gestión de Cursos',
+    icon: Edit3,
+    path: '/course-management',
+    permission: Permission.EDIT_COURSE,
+  },
+  {
+    id: 'users',
+    label: 'Usuarios',
+    icon: Users,
+    path: '/users',
+    permission: Permission.MANAGE_USERS,
+  },
+  {
+    id: 'all-progress',
+    label: 'Progreso Global',
+    icon: BarChart3,
+    path: '/all-progress',
+    permission: Permission.VIEW_ALL_PROGRESS,
+  },
   {
     id: 'leaderboard',
     label: 'Clasificación',
     icon: Trophy,
     path: '/leaderboard',
+    permission: Permission.VIEW_COURSES,
   },
   {
     id: 'documentation',
     label: 'Documentación',
     icon: FileText,
     path: '/documentation',
+    permission: Permission.VIEW_TOPICS,
   },
-  { id: 'settings', label: 'Configuración', icon: Settings, path: '/settings' },
+  {
+    id: 'settings',
+    label: 'Configuración',
+    icon: Settings,
+    path: '/settings',
+    permission: Permission.VIEW_SETTINGS,
+  },
 ];
 
 export const Sidebar = ({
@@ -75,8 +133,15 @@ export const Sidebar = ({
   const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState(false);
   const { user, clearAuth } = useAuthStore();
+  const { hasPermission } = usePermissions();
 
-  const hasEditPermissions = canEditCourse(user);
+  const mainItems = allMainItems.filter(
+    (item) => !item.permission || hasPermission(item.permission),
+  );
+
+  const toolItems = allToolItems.filter(
+    (item) => !item.permission || hasPermission(item.permission),
+  );
 
   useEffect(() => {
     const checkMobile = () => {
@@ -99,13 +164,6 @@ export const Sidebar = ({
     if (isMobile) onClose();
   };
 
-  const filteredToolItems = toolItems.filter((item) => {
-    if (item.requiresPermission) {
-      return hasEditPermissions;
-    }
-    return true;
-  });
-
   const getUserInitials = () => {
     if (user?.firstName && user?.lastName) {
       return `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`;
@@ -123,7 +181,14 @@ export const Sidebar = ({
     if (user?.email) {
       return user.email;
     }
-    return 'User';
+    return 'Usuario';
+  };
+
+  const getUserRole = () => {
+    if (user?.role) {
+      return getRoleDisplayName(user.role);
+    }
+    return 'Usuario';
   };
 
   return (
@@ -169,7 +234,7 @@ export const Sidebar = ({
                     Python Lab
                   </h1>
                   <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                    Código • Aprende • Crece
+                    Código • Aprende
                   </p>
                 </div>
               </motion.div>
@@ -305,17 +370,16 @@ export const Sidebar = ({
             <>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center flex-shrink-0">
-                  <User className="w-5 h-5 text-white" />
+                  <span className="text-sm font-bold text-white">
+                    {getUserInitials()}
+                  </span>
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                    {getUserInitials()}
+                    {getUserDisplayName()}
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
-                    340 pts
-                    <span className="flex items-center gap-1 ml-1">
-                      <Flame className="w-3 h-3 text-orange-500" />3
-                    </span>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                    {getUserRole()}
                   </p>
                 </div>
               </div>
@@ -338,7 +402,9 @@ export const Sidebar = ({
           ) : (
             <div className="flex flex-col items-center gap-3">
               <div className="w-10 h-10 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center">
-                <User className="w-5 h-5 text-white" />
+                <span className="text-sm font-bold text-white">
+                  {getUserInitials()}
+                </span>
               </div>
               <motion.button
                 whileHover={{ scale: 1.1 }}

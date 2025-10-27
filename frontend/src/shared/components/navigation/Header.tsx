@@ -13,7 +13,6 @@ interface HeaderProps {
 
 export const Header = ({
   sidebarWidth,
-  userName,
   onMenuClick,
   isMobile,
 }: HeaderProps) => {

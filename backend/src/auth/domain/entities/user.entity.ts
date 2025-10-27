@@ -11,7 +11,8 @@ import * as bcrypt from 'bcrypt';
 
 export enum UserRole {
   ADMIN = 'admin',
-  TEACHER = 'teacher',
+  TEACHER_EXECUTOR = 'teacher_executor',
+  TEACHER_EDITOR = 'teacher_editor',
   STUDENT = 'student',
 }
 
