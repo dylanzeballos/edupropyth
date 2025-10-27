@@ -144,15 +144,6 @@ jobs:
           JWT_REFRESH_SECRET: test-refresh-secret-for-ci
           JWT_REFRESH_EXPIRATION: 30d
 
-      - name: Upload backend coverage to Codecov
-        uses: codecov/codecov-action@v4
-        with:
-          file: ./backend/coverage/lcov.info
-          flags: backend
-          name: backend-coverage
-          fail_ci_if_error: false
-          token: ${{ secrets.CODECOV_TOKEN }}
-
   test-frontend:
     name: Test Frontend (React)
     runs-on: ubuntu-latest
@@ -180,16 +171,6 @@ jobs:
 
       - name: Run frontend tests with coverage
         run: npm run test:coverage:ci
-
-      - name: Upload frontend coverage to Codecov
-        uses: codecov/codecov-action@v4
-        if: always()
-        with:
-          file: ./frontend/coverage/lcov.info
-          flags: frontend
-          name: frontend-coverage
-          fail_ci_if_error: false
-          token: ${{ secrets.CODECOV_TOKEN }}
 
   security-scan:
     name: Security Scan
@@ -223,14 +204,6 @@ jobs:
           cd frontend
           npm audit --audit-level moderate || echo "npm audit completed with warnings"
 
-      - name: Run Snyk security scan (if configured)
-        uses: snyk/actions/node@master
-        continue-on-error: true
-        if: ${{ secrets.SNYK_TOKEN != '' }}
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          args: --all-projects --severity-threshold=high
 
   docker-build-test:
     name: Docker Build Test
