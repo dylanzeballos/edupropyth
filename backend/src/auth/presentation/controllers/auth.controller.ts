@@ -9,8 +9,8 @@ import {
 } from '@nestjs/common';
 import { RegisterUseCase } from '../../application/use-cases/register.use-case';
 import { LoginUseCase } from '../../application/use-cases/login.use-case';
-import { GoogleLoginUseCase } from 'src/auth/application/use-cases/google.use-case';
-import { MicrosoftLoginUseCase } from 'src/auth/application/use-cases/microsoft.use-case';
+import { GoogleLoginUseCase } from '../../application/use-cases/google.use-case';
+import { MicrosoftLoginUseCase } from '../../application/use-cases/microsoft.use-case';
 import { RegisterDto } from '../dto/register.dto';
 import { LoginDto } from '../dto/login.dto';
 import { GoogleLoginDto, MicrosoftLoginDto } from '../dto/oauth.dto';

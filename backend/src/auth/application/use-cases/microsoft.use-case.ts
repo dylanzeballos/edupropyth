@@ -3,11 +3,11 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
-import type { IAuthRepository } from 'src/auth/domain/interfaces/auth-repository.interface';
-import { AUTH_REPOSITORY } from 'src/auth/domain/interfaces/auth-repository.interface';
-import { AuthResponseDto } from 'src/auth/presentation/dto/auth-response.dto';
-import { JwtPayload } from 'src/auth/domain/interfaces/jwt-payload.interface';
-import { UserRole } from 'src/auth/domain/entities/user.entity';
+import type { IAuthRepository } from '../../domain/interfaces/auth-repository.interface';
+import { AUTH_REPOSITORY } from '../../domain/interfaces/auth-repository.interface';
+import { AuthResponseDto } from '../../presentation/dto/auth-response.dto';
+import { JwtPayload } from '../../domain/interfaces/jwt-payload.interface';
+import { UserRole } from '../../domain/entities/user.entity';
 
 interface MicrosoftTokenResponse {
   access_token: string;

@@ -1,11 +1,11 @@
 import { Injectable, Inject, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import type { IAuthRepository } from 'src/auth/domain/interfaces/auth-repository.interface';
-import { AUTH_REPOSITORY } from 'src/auth/domain/interfaces/auth-repository.interface';
-import { LoginDto } from 'src/auth/presentation/dto/login.dto';
-import { AuthResponseDto } from 'src/auth/presentation/dto/auth-response.dto';
-import { JwtPayload } from 'src/auth/domain/interfaces/jwt-payload.interface';
+import type { IAuthRepository } from '../../domain/interfaces/auth-repository.interface';
+import { AUTH_REPOSITORY } from '../../domain/interfaces/auth-repository.interface';
+import { LoginDto } from '../../presentation/dto/login.dto';
+import { AuthResponseDto } from '../../presentation/dto/auth-response.dto';
+import { JwtPayload } from '../../domain/interfaces/jwt-payload.interface';
 
 @Injectable()
 export class LoginUseCase {

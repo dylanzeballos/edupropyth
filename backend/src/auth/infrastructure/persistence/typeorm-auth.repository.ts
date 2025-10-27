@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { IAuthRepository } from 'src/auth/domain/interfaces/auth-repository.interface';
-import { User } from 'src/auth/domain/entities/user.entity';
+import { IAuthRepository } from '../../domain/interfaces/auth-repository.interface';
+import { User } from '../../domain/entities/user.entity';
 
 @Injectable()
 export class TypeOrmAuthRepository implements IAuthRepository {

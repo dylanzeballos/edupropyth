@@ -1,8 +1,8 @@
 import { Injectable, Inject, ConflictException } from '@nestjs/common';
-import type { IAuthRepository } from 'src/auth/domain/interfaces/auth-repository.interface';
-import { AUTH_REPOSITORY } from 'src/auth/domain/interfaces/auth-repository.interface';
-import { RegisterDto } from 'src/auth/presentation/dto/register.dto';
-import { User, UserRole } from 'src/auth/domain/entities/user.entity';
+import type { IAuthRepository } from '../../domain/interfaces/auth-repository.interface';
+import { AUTH_REPOSITORY } from '../../domain/interfaces/auth-repository.interface';
+import { RegisterDto } from '../../presentation/dto/register.dto';
+import { User, UserRole } from '../../domain/entities/user.entity';
 
 @Injectable()
 export class RegisterUseCase {
