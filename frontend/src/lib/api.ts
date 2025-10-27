@@ -14,9 +14,9 @@ apiClient.interceptors.request.use(
     const publicRoutes = [
       '/auth/login',
       '/auth/register',
-      '/auth/google-login/',
-      '/auth/github-login/',
-      '/auth/microsoft-login/',
+      '/auth/google-login',
+      '/auth/github-login',
+      '/auth/microsoft-login',
     ];
 
     const isPublicRoute = publicRoutes.some((route) =>
