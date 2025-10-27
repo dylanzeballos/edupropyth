@@ -31,3 +31,6 @@ export type { LoginRequest, LoginResponse } from './types/login.types';
 
 // Services
 export * from './services/auth.service';
+export * from './components/PermissionGuard';
+export * from './components/RoleGuard';
+export * from './hooks/use-permissions';
