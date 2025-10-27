@@ -56,7 +56,6 @@ class ApiClient {
       },
     );
 
-    // Response Interceptor
     this.client.interceptors.response.use(
       (response) => response,
       async (error: AxiosError) => {
@@ -64,29 +63,24 @@ class ApiClient {
           _retry?: boolean;
         };
 
-        // Si el error NO es 401, rechazar directamente
         if (error.response?.status !== 401) {
           return Promise.reject(error);
         }
 
-        // Si no hay originalRequest, rechazar
         if (!originalRequest) {
           return Promise.reject(error);
         }
 
-        // Si ya se intentó refrescar este request, fallar
         if (originalRequest._retry) {
           this.handleAuthFailure();
           return Promise.reject(error);
         }
 
-        // Si es un endpoint de refresh que falló, cerrar sesión
         if (originalRequest.url?.includes('/auth/refresh')) {
           this.handleAuthFailure();
           return Promise.reject(error);
         }
 
-        // Si ya estamos refrescando el token, agregar a la cola
         if (this.isRefreshing) {
           return new Promise((resolve, reject) => {
             this.failedQueue.push({ resolve, reject });
@@ -103,7 +97,6 @@ class ApiClient {
             });
         }
 
-        // Marcar que estamos refrescando
         originalRequest._retry = true;
         this.isRefreshing = true;
 
@@ -114,7 +107,6 @@ class ApiClient {
             throw new Error('No refresh token available');
           }
 
-          // Intentar refrescar el token
           const response = await this.client.post('/auth/refresh', {
             refreshToken: refreshToken,
           });
@@ -122,21 +114,17 @@ class ApiClient {
           const { accessToken, refreshToken: newRefreshToken } =
             response.data;
 
-          // Guardar los nuevos tokens
           localStorage.setItem('access_token', accessToken);
           if (newRefreshToken) {
             localStorage.setItem('refresh_token', newRefreshToken);
           }
 
-          // Actualizar el header de la petición original
           if (originalRequest.headers) {
             originalRequest.headers.Authorization = `Bearer ${accessToken}`;
           }
 
-          // Procesar la cola de peticiones fallidas
           this.processQueue(null);
 
-          // Reintentar la petición original
           return this.client(originalRequest);
         } catch (refreshError) {
           this.processQueue(refreshError);
@@ -162,12 +150,10 @@ class ApiClient {
   }
 
   private handleAuthFailure() {
-    // Limpiar tokens
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
     localStorage.removeItem('auth-storage');
 
-    // Solo redirigir si no estamos ya en login
     const currentPath = window.location.pathname;
     if (
       currentPath !== '/login' &&
@@ -180,7 +166,6 @@ class ApiClient {
 
   private formatError(error: AxiosError): Error {
     if (error.response) {
-      // El servidor respondió con un código de estado fuera del rango 2xx
       const data = error.response.data as { message?: string; error?: string };
       const message =
         data?.message || data?.error || 'Ha ocurrido un error en el servidor';
@@ -191,17 +176,14 @@ class ApiClient {
 
       return formattedError;
     } else if (error.request) {
-      // La petición se hizo pero no se recibió respuesta
       return new Error(
         'No se pudo conectar con el servidor. Por favor, verifica tu conexión a internet.',
       );
     } else {
-      // Algo sucedió al configurar la petición
       return new Error(error.message || 'Ha ocurrido un error inesperado');
     }
   }
 
-  // Métodos públicos
   get instance(): AxiosInstance {
     return this.client;
   }
@@ -233,7 +215,6 @@ class ApiClient {
 
 export const apiClient = new ApiClient();
 
-// Mantener compatibilidad con código antiguo
 export const postData = async (endpoint: string, data: unknown) => {
   try {
     const response = await apiClient.post(endpoint, data);
