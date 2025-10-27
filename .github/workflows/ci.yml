@@ -116,6 +116,11 @@ jobs:
             sleep 2
           done
 
+      - name: Create test database
+        run: |
+          PGPASSWORD=postgres psql -h localhost -U postgres -c "CREATE DATABASE edupropyth_test;"
+        continue-on-error: true
+
       - name: Run unit tests with coverage
         run: npm run test:cov
         env:
