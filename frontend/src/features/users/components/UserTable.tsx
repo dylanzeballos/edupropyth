@@ -9,7 +9,7 @@ import {
   TableRow,
 } from '@/shared/components/ui/table';
 import { Badge } from '@/shared/components/ui/badge';
-import { Button } from '@/shared/components/ui/button';
+import { Button } from '@/shared/components/ui/Button';
 import {
   DropdownMenu,
   DropdownMenuContent,

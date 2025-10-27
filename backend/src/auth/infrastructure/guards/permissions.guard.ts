@@ -3,8 +3,8 @@ import { Reflector } from '@nestjs/core';
 import {
   Permission,
   ROLE_PERMISSIONS,
-} from 'src/auth/domain/enums/permissions.enum';
-import { User } from 'src/auth/domain/entities/user.entity';
+} from '../../domain/enums/permissions.enum';
+import { User } from '../../domain/entities/user.entity';
 import { PERMISSIONS_KEY } from '../decorators/permissions.decorator';
 
 @Injectable()

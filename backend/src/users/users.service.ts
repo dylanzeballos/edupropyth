@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User, UserRole } from 'src/auth/domain/entities/user.entity';
+import { User, UserRole } from '../auth/domain/entities/user.entity';
 import { UpdateUserRoleDto } from './dto/update-user-role.dto';
 import { UpdateUserStatusDto } from './dto/update-role-status.dto';
 import { UserResponseDto } from './dto/user-response.dto';

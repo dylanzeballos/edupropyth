@@ -1,14 +1,14 @@
 import { Controller, Get, Patch, Body, Param, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { JwtAuthGuard } from 'src/auth/infrastructure/guards';
-import { RolesGuard, PermissionsGuard } from 'src/auth/infrastructure/guards';
+import { JwtAuthGuard } from '../auth/infrastructure/guards';
+import { RolesGuard, PermissionsGuard } from '../auth/infrastructure/guards';
 import {
   Roles,
   RequirePermissions,
   CurrentUser,
-} from 'src/auth/infrastructure/decorators';
-import { UserRole, User } from 'src/auth/domain/entities/user.entity';
-import { Permission } from 'src/auth/domain/enums/permissions.enum';
+} from '../auth/infrastructure/decorators';
+import { UserRole, User } from '../auth/domain/entities/user.entity';
+import { Permission } from '../auth/domain/enums/permissions.enum';
 import { UpdateUserRoleDto } from './dto/update-user-role.dto';
 import { UpdateUserStatusDto } from './dto/update-role-status.dto';
 import { UserResponseDto } from './dto/user-response.dto';
