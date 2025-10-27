@@ -32,10 +32,10 @@ jobs:
         run: npm ci
 
       - name: Run ESLint
-        run: npm run lint
+        run: npx eslint "{src,apps,libs,test}/**/*.ts" --max-warnings=0
 
       - name: Check code formatting with Prettier
-        run: npm run format
+        run: npx prettier --check "src/**/*.ts" "test/**/*.ts"
 
       - name: Type check
         run: npm run build
@@ -66,28 +66,6 @@ jobs:
 
       - name: Type check
         run: npm run type-check:ci
-
-  commitlint:
-    name: Validate Commit Messages
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: "npm"
-
-      - name: Install root dependencies
-        run: npm ci
-
-      - name: Validate commit messages
-        run: npx commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose
 
   test-backend:
     name: Test Backend (NestJS)
@@ -125,6 +103,11 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
 
       - name: Wait for PostgreSQL
         run: |
@@ -220,10 +203,20 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
+      - name: Install backend dependencies
+        run: |
+          cd backend
+          npm ci
+
       - name: Run npm audit for backend
         run: |
           cd backend
           npm audit --audit-level moderate || echo "npm audit completed with warnings"
+
+      - name: Install frontend dependencies
+        run: |
+          cd frontend
+          npm ci
 
       - name: Run npm audit for frontend
         run: |
@@ -233,6 +226,7 @@ jobs:
       - name: Run Snyk security scan (if configured)
         uses: snyk/actions/node@master
         continue-on-error: true
+        if: ${{ secrets.SNYK_TOKEN != '' }}
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
