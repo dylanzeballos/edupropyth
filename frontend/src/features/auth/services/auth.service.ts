@@ -1,4 +1,4 @@
-import { postData } from '@/lib/api';
+import { apiClient } from '@/lib/api';
 import {
   LoginResponse,
   LoginRequest,
@@ -7,39 +7,75 @@ import {
   AuthResponse,
 } from '../types/login.types';
 
-export interface GoogleAuthResponse extends AuthResponse {
-  access_token: string;
-  refresh_token: string;
-}
-
 export const authService = {
+  /**
+   * Inicia sesión con email y password
+   */
   login: async (data: LoginRequest): Promise<LoginResponse> => {
-    return await postData('/auth/login', data);
+    const response = await apiClient.post<LoginResponse>('/auth/login', data);
+    return response.data;
   },
 
+  /**
+   * Registra un nuevo usuario
+   */
   register: async (data: RegisterRequest): Promise<RegisterResponse> => {
-    return await postData('/auth/register', data);
+    const response = await apiClient.post<RegisterResponse>(
+      '/auth/register',
+      data,
+    );
+    return response.data;
   },
 
-  googleAuth: async (idToken: string): Promise<GoogleAuthResponse> => {
-    return await postData('/auth/google-login', {
-      id_token: idToken,
-    });
+  /**
+   * Autenticación con Google
+   */
+  googleAuth: async (idToken: string): Promise<AuthResponse> => {
+    const response = await apiClient.post<AuthResponse>(
+      '/auth/google-login',
+      {
+        id_token: idToken,
+      },
+    );
+    return response.data;
   },
 
-  githubLogin: async (code: string): Promise<AuthResponse> => {
-    return await postData('/auth/github-login', { code });
-  },
-
+  /**
+   * Autenticación con Microsoft
+   */
   microsoftLogin: async (code: string): Promise<AuthResponse> => {
-    return await postData('/auth/microsoft-login', { code });
+    const response = await apiClient.post<AuthResponse>(
+      '/auth/microsoft-login',
+      {
+        code,
+      },
+    );
+    return response.data;
   },
 
-  async logout(): Promise<void> {
-    await postData('/auth/logout', {});
+  /**
+   * Cierra la sesión del usuario
+   */
+  logout: async (): Promise<void> => {
+    try {
+      await apiClient.post('/auth/logout', {});
+    } catch (error) {
+      console.error('Error during logout:', error);
+    } finally {
+      // Limpiar tokens localmente independientemente del resultado
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+    }
   },
 
-  async RefreshToken(): Promise<LoginResponse> {
-    return await postData('/auth/refresh', {});
+  /**
+   * Refresca el token de acceso
+   */
+  refreshToken: async (): Promise<LoginResponse> => {
+    const refreshToken = localStorage.getItem('refresh_token');
+    const response = await apiClient.post<LoginResponse>('/auth/refresh', {
+      refreshToken: refreshToken,
+    });
+    return response.data;
   },
 };
