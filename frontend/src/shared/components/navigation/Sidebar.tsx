@@ -12,7 +12,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Users,
-  Edit3,
   FolderOpen,
 } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router';
@@ -82,7 +81,7 @@ const allToolItems: SidebarItem[] = [
   {
     id: 'course-management',
     label: 'Gestión de Cursos',
-    icon: Edit3,
+    icon: BookOpen,
     path: '/course-management',
     permission: Permission.EDIT_COURSE,
   },
