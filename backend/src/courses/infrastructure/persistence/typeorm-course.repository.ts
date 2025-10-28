@@ -12,13 +12,16 @@ export class TypeOrmCourseRepository implements ICourseRepository {
   ) {}
 
   async findOne(): Promise<Course | null> {
-    return await this.courseRepository.findOne({ where: {} });
+    const courses = await this.courseRepository.find({ take: 1 });
+    return courses.length > 0 ? courses[0] : null;
   }
 
   async findOneWithTopics(): Promise<Course | null> {
-    return await this.courseRepository.findOne({
+    const courses = await this.courseRepository.find({
       relations: ['topics'],
+      take: 1,
     });
+    return courses.length > 0 ? courses[0] : null;
   }
 
   async create(courseData: Partial<Course>): Promise<Course> {
