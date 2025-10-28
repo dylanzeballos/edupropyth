@@ -3,6 +3,8 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { CoursesService } from './courses.service';
 import { Course } from './entities/course.entity';
 import { CourseEdition } from './entities/course-edition.entity';
+import { EditionInstructor } from './entities/edition-instructor.entity';
+import { Enrollment } from './entities/enrollment.entity';
 
 describe('CoursesService', () => {
   let service: CoursesService;
@@ -17,6 +19,14 @@ describe('CoursesService', () => {
         },
         {
           provide: getRepositoryToken(CourseEdition),
+          useValue: {},
+        },
+        {
+          provide: getRepositoryToken(EditionInstructor),
+          useValue: {},
+        },
+        {
+          provide: getRepositoryToken(Enrollment),
           useValue: {},
         },
       ],
