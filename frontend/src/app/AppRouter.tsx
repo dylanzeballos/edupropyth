@@ -9,6 +9,7 @@ import { RoleGuard } from '@/features/auth';
 import MicrosoftCallbackPage from '@/features/auth/pages/MicrosoftCallbackPage';
 import { NotFoundPage } from '@/shared/pages/NotFoundPage';
 import { UsersManagementPage } from '@/features/users';
+import { CoursePage } from '@/features/courses';
 import { UserRole } from '@/features/auth/types/user.type';
 
 const AppRouter = createBrowserRouter([
@@ -54,11 +55,7 @@ const AppRouter = createBrowserRouter([
       },
       {
         path: 'course-management',
-        element: (
-          <RoleGuard roles={[UserRole.ADMIN, UserRole.TEACHER_EDITOR]}>
-            <div>Course Management (Por implementar)</div>
-          </RoleGuard>
-        ),
+        element: <CoursePage />,
       },
       {
         path: 'all-progress',
