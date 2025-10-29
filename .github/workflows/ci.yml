@@ -137,11 +137,11 @@ jobs:
         run: npm run test:cov
         env:
           NODE_ENV: test
-          DB_HOST: localhost
-          DB_PORT: 5432
-          DB_USERNAME: postgres
-          DB_PASSWORD: postgres
-          DB_DATABASE: edupropyth_test
+          DATABASE_HOST: localhost
+          DATABASE_PORT: 5432
+          DATABASE_USERNAME: postgres
+          DATABASE_PASSWORD: postgres
+          DATABASE_NAME: edupropyth_test
           JWT_SECRET: test-secret-key-for-ci
           JWT_EXPIRATION: 7d
           JWT_REFRESH_SECRET: test-refresh-secret-for-ci
@@ -151,11 +151,11 @@ jobs:
         run: npm run test:e2e
         env:
           NODE_ENV: test
-          DB_HOST: localhost
-          DB_PORT: 5432
-          DB_USERNAME: postgres
-          DB_PASSWORD: postgres
-          DB_DATABASE: edupropyth_test
+          DATABASE_HOST: localhost
+          DATABASE_PORT: 5432
+          DATABASE_USERNAME: postgres
+          DATABASE_PASSWORD: postgres
+          DATABASE_NAME: edupropyth_test
           JWT_SECRET: test-secret-key-for-ci
           JWT_EXPIRATION: 7d
           JWT_REFRESH_SECRET: test-refresh-secret-for-ci
