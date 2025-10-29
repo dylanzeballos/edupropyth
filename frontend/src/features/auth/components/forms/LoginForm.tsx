@@ -6,7 +6,6 @@ import { Button, InputText } from '@/shared/components/ui';
 import { loginSchema, LoginFormData } from '../../validation/login.schema';
 import { useLoginMutation } from '../../hooks/use-login-user';
 import { GoogleLoginButton } from '../buttons/GoogleLoginButton';
-import { GitHubLoginButton } from '../buttons/GitHubLoginButton';
 import { MicrosoftLoginButton } from '../buttons/MicrosoftLoginButton';
 
 export const LoginForm = () => {
@@ -33,7 +32,6 @@ export const LoginForm = () => {
       className="space-y-6"
     >
       <GoogleLoginButton />
-      <GitHubLoginButton />
       <MicrosoftLoginButton />
 
       <div className="relative">

@@ -1,12 +1,4 @@
-import {
-  IsEmail,
-  IsString,
-  MinLength,
-  MaxLength,
-  IsEnum,
-  IsOptional,
-} from 'class-validator';
-import { UserRole } from '../../domain/entities/user.entity';
+import { IsEmail, IsString, MinLength, MaxLength } from 'class-validator';
 
 export class RegisterDto {
   @IsEmail({}, { message: 'El email debe ser válido' })
@@ -28,8 +20,4 @@ export class RegisterDto {
   @MinLength(2, { message: 'El apellido debe tener al menos 2 caracteres' })
   @MaxLength(50, { message: 'El apellido no puede tener más de 50 caracteres' })
   lastName: string;
-
-  @IsEnum(UserRole, { message: 'El rol debe ser student, teacher o admin' })
-  @IsOptional()
-  role?: UserRole = UserRole.STUDENT;
 }

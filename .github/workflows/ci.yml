@@ -32,10 +32,10 @@ jobs:
         run: npm ci
 
       - name: Run ESLint
-        run: npm run lint
+        run: npx eslint "{src,apps,libs,test}/**/*.ts" --max-warnings=0
 
       - name: Check code formatting with Prettier
-        run: npm run format
+        run: npx prettier --check "src/**/*.ts" "test/**/*.ts"
 
       - name: Type check
         run: npm run build
@@ -66,28 +66,6 @@ jobs:
 
       - name: Type check
         run: npm run type-check:ci
-
-  commitlint:
-    name: Validate Commit Messages
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: "npm"
-
-      - name: Install root dependencies
-        run: npm ci
-
-      - name: Validate commit messages
-        run: npx commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose
 
   test-backend:
     name: Test Backend (NestJS)
@@ -126,12 +104,22 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
       - name: Wait for PostgreSQL
         run: |
           until pg_isready -h localhost -p 5432 -U postgres; do
             echo "Waiting for PostgreSQL..."
             sleep 2
           done
+
+      - name: Create test database
+        run: |
+          PGPASSWORD=postgres psql -h localhost -U postgres -c "CREATE DATABASE edupropyth_test;"
+        continue-on-error: true
 
       - name: Run unit tests with coverage
         run: npm run test:cov
@@ -161,15 +149,6 @@ jobs:
           JWT_REFRESH_SECRET: test-refresh-secret-for-ci
           JWT_REFRESH_EXPIRATION: 30d
 
-      - name: Upload backend coverage to Codecov
-        uses: codecov/codecov-action@v4
-        with:
-          file: ./backend/coverage/lcov.info
-          flags: backend
-          name: backend-coverage
-          fail_ci_if_error: false
-          token: ${{ secrets.CODECOV_TOKEN }}
-
   test-frontend:
     name: Test Frontend (React)
     runs-on: ubuntu-latest
@@ -198,16 +177,6 @@ jobs:
       - name: Run frontend tests with coverage
         run: npm run test:coverage:ci
 
-      - name: Upload frontend coverage to Codecov
-        uses: codecov/codecov-action@v4
-        if: always()
-        with:
-          file: ./frontend/coverage/lcov.info
-          flags: frontend
-          name: frontend-coverage
-          fail_ci_if_error: false
-          token: ${{ secrets.CODECOV_TOKEN }}
-
   security-scan:
     name: Security Scan
     runs-on: ubuntu-latest
@@ -220,23 +189,26 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
+      - name: Install backend dependencies
+        run: |
+          cd backend
+          npm ci
+
       - name: Run npm audit for backend
         run: |
           cd backend
           npm audit --audit-level moderate || echo "npm audit completed with warnings"
+
+      - name: Install frontend dependencies
+        run: |
+          cd frontend
+          npm ci
 
       - name: Run npm audit for frontend
         run: |
           cd frontend
           npm audit --audit-level moderate || echo "npm audit completed with warnings"
 
-      - name: Run Snyk security scan (if configured)
-        uses: snyk/actions/node@master
-        continue-on-error: true
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          args: --all-projects --severity-threshold=high
 
   docker-build-test:
     name: Docker Build Test

@@ -1,18 +1,86 @@
-import { createBrowserRouter, RouterProvider } from 'react-router';
-import MainLayout from '@/layout/MainLayout';
+import { createBrowserRouter, RouterProvider, Navigate } from 'react-router';
+import AppLayout from '@/layout/AppLayout';
 import { SignInPage } from '@/features/auth/pages/SignInPage';
 import { SignUpPage } from '@/features/auth/pages/SignUpPage';
-import { DashboardPage } from '@/features/auth/pages/DashboardPage';
 import { GoogleCallbackPage } from '@/features/auth/pages/GoogleCallbackPage';
 import { ProtectedRoutes } from '@/features/auth/components/ProtectedRoutes';
 import { PublicOnlyRoutes } from '@/features/auth/components/PublicOnlyRoutes';
-import GitHubCallbackPage from '@/features/auth/pages/GitHubCallbackPage';
+import { RoleGuard } from '@/features/auth';
 import MicrosoftCallbackPage from '@/features/auth/pages/MicrosoftCallbackPage';
+import { NotFoundPage } from '@/shared/pages/NotFoundPage';
+import { UsersManagementPage } from '@/features/users';
+import { UserRole } from '@/features/auth/types/user.type';
 
 const AppRouter = createBrowserRouter([
   {
     path: '/',
-    element: <MainLayout />,
+    element: (
+      <ProtectedRoutes>
+        <AppLayout />
+      </ProtectedRoutes>
+    ),
+    children: [
+      {
+        index: true,
+        element: <Navigate to="/dashboard" replace />,
+      },
+      {
+        path: 'dashboard',
+        element: <div>Dashboard (Por implementar)</div>,
+      },
+      {
+        path: 'users',
+        element: (
+          <RoleGuard role={UserRole.ADMIN}>
+            <UsersManagementPage />
+          </RoleGuard>
+        ),
+      },
+      {
+        path: 'topics',
+        element: <div>Topics (Por implementar)</div>,
+      },
+      {
+        path: 'courses',
+        element: <div>Courses (Por implementar)</div>,
+      },
+      {
+        path: 'editor',
+        element: <div>Editor (Por implementar)</div>,
+      },
+      {
+        path: 'progress',
+        element: <div>Progress (Por implementar)</div>,
+      },
+      {
+        path: 'course-management',
+        element: (
+          <RoleGuard roles={[UserRole.ADMIN, UserRole.TEACHER_EDITOR]}>
+            <div>Course Management (Por implementar)</div>
+          </RoleGuard>
+        ),
+      },
+      {
+        path: 'all-progress',
+        element: (
+          <RoleGuard roles={[UserRole.ADMIN, UserRole.TEACHER_EDITOR]}>
+            <div>All Progress (Por implementar)</div>
+          </RoleGuard>
+        ),
+      },
+      {
+        path: 'leaderboard',
+        element: <div>Leaderboard (Por implementar)</div>,
+      },
+      {
+        path: 'documentation',
+        element: <div>Documentation (Por implementar)</div>,
+      },
+      {
+        path: 'settings',
+        element: <div>Settings (Por implementar)</div>,
+      },
+    ],
   },
   {
     path: '/login',
@@ -31,34 +99,17 @@ const AppRouter = createBrowserRouter([
     ),
   },
   {
-    path: '/dashboard',
-    element: (
-      <ProtectedRoutes>
-        <DashboardPage />
-      </ProtectedRoutes>
-    ),
-  },
-  {
     path: '/auth/google/callback',
     element: <GoogleCallbackPage />,
-  },
-  {
-    path: '/auth/github/callback',
-    element: <GitHubCallbackPage />,
   },
   {
     path: '/auth/microsoft/callback',
     element: <MicrosoftCallbackPage />,
   },
-  // Aquí puedes agregar más rutas protegidas
-  // {
-  //   path: '/courses',
-  //   element: (
-  //     <ProtectedRoutes>
-  //       <CoursesPage />
-  //     </ProtectedRoutes>
-  //   ),
-  // },
+  {
+    path: '*',
+    element: <NotFoundPage />,
+  },
 ]);
 
 export const AppRouterProvider = () => {

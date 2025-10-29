@@ -6,37 +6,43 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
-  user: User;
-  token: string;
+  accessToken: string;
   refreshToken: string;
+  user: User;
 }
 
 export interface RegisterRequest {
   email: string;
-  username: string;
-  first_name: string;
-  last_name: string;
+  firstName: string;
+  lastName: string;
   password: string;
-  password_confirm: string;
 }
 
 export interface RegisterResponse {
   user: User;
-  token: string;
   message: string;
 }
 
 export interface AuthResponse {
-  access_token: string;
-  refresh_token: string;
-  user: {
-    id: number;
-    email: string;
-    username: string;
-    first_name: string;
-    last_name: string;
-    full_name: string;
-    profile_role: string;
-  };
+  accessToken: string;
+  refreshToken: string;
+  user: User;
   message?: string;
+}
+
+export interface RefreshTokenRequest {
+  refreshToken: string;
+}
+
+export interface RefreshTokenResponse {
+  accessToken: string;
+  refreshToken: string;
+}
+
+export interface GoogleLoginRequest {
+  id_token: string;
+}
+
+export interface MicrosoftLoginRequest {
+  code: string;
 }

@@ -3,6 +3,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { HttpModule } from '@nestjs/axios';
 
 // Domain
 import { User } from './domain/entities/user.entity';
@@ -16,6 +17,8 @@ import { JwtStrategy } from './infrastructure/strategies/jwt.strategy';
 import { RegisterUseCase } from './application/use-cases/register.use-case';
 import { LoginUseCase } from './application/use-cases/login.use-case';
 import { ValidateUserUseCase } from './application/use-cases/validate-user.use-case';
+import { GoogleLoginUseCase } from './application/use-cases/google.use-case';
+import { MicrosoftLoginUseCase } from './application/use-cases/microsoft.use-case';
 
 // Presentation
 import { AuthController } from './presentation/controllers/auth.controller';
@@ -24,6 +27,7 @@ import { AuthController } from './presentation/controllers/auth.controller';
   imports: [
     TypeOrmModule.forFeature([User]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
+    HttpModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -49,6 +53,8 @@ import { AuthController } from './presentation/controllers/auth.controller';
     RegisterUseCase,
     LoginUseCase,
     ValidateUserUseCase,
+    GoogleLoginUseCase,
+    MicrosoftLoginUseCase,
     // Strategies
     JwtStrategy,
   ],

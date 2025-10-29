@@ -5,6 +5,7 @@ import { authService } from '../services/auth.service';
 import { useAuthStore } from '../stores/auth.store';
 import { RegisterFormData } from '../validation/register.schema';
 import { RegisterRequest } from '../types/login.types';
+import { getErrorMessage } from '@/shared/utils/error-handler';
 
 export const useRegisterUser = () => {
   const navigate = useNavigate();
@@ -23,11 +24,7 @@ export const useRegisterUser = () => {
       navigate('/login', { replace: true });
     },
     onError: (error: unknown) => {
-      const axiosError = error as {
-        response?: { data?: { message?: string } };
-      };
-      const message =
-        axiosError?.response?.data?.message || 'Error al registrarse';
+      const message = getErrorMessage(error);
       toast.error('Error de registro', {
         description: message,
       });
@@ -39,11 +36,9 @@ export const useRegisterUser = () => {
   const handleSubmit = (formData: RegisterFormData) => {
     const registerData: RegisterRequest = {
       email: formData.email,
-      username: formData.username,
-      first_name: formData.first_name,
-      last_name: formData.last_name,
+      firstName: formData.firstName,
+      lastName: formData.lastName,
       password: formData.password,
-      password_confirm: formData.password_confirm,
     };
 
     mutation.mutate(registerData);

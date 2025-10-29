@@ -1,24 +1,29 @@
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router';
-import { Button, InputText } from "@/shared/components/ui";
-import { registerUserSchema, RegisterFormData } from "../../validation/register.schema";
-import { GoogleLoginButton } from "../buttons/GoogleLoginButton";
+import { Button, InputText } from '@/shared/components/ui';
+import {
+  registerUserSchema,
+  RegisterFormData,
+} from '../../validation/register.schema';
 
 interface RegisterFormProps {
   onSubmit: (data: RegisterFormData) => void;
   isPending?: boolean;
 }
 
-export const RegisterForm = ({ onSubmit, isPending = false }: RegisterFormProps) => {
+export const RegisterForm = ({
+  onSubmit,
+  isPending = false,
+}: RegisterFormProps) => {
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerUserSchema),
-    mode: "onChange",
+    mode: 'onChange',
   });
 
   return (
@@ -28,22 +33,6 @@ export const RegisterForm = ({ onSubmit, isPending = false }: RegisterFormProps)
       transition={{ duration: 0.5 }}
       className="space-y-6"
     >
-      <GoogleLoginButton
-        onSuccess={(user) => console.log("Google login successful:", user)}
-        onError={(error) => console.error("Google login error:", error)}
-      />
-
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-gray-300 dark:border-gray-600" />
-        </div>
-        <div className="relative flex justify-center text-sm">
-          <span className="bg-white dark:bg-gray-800 px-2 text-gray-500 dark:text-gray-400">
-            O crea tu cuenta
-          </span>
-        </div>
-      </div>
-
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <InputText
           label="Correo Electrónico"
@@ -54,32 +43,23 @@ export const RegisterForm = ({ onSubmit, isPending = false }: RegisterFormProps)
           errors={errors.email}
         />
 
-        <InputText
-          label="Nombre de Usuario"
-          name="username"
-          type="text"
-          placeholder="mi_usuario"
-          register={register}
-          errors={errors.username}
-        />
-
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <InputText
             label="Nombre"
-            name="first_name"
+            name="firstName"
             type="text"
             placeholder="Juan"
             register={register}
-            errors={errors.first_name}
+            errors={errors.firstName}
           />
 
           <InputText
             label="Apellido"
-            name="last_name"
+            name="lastName"
             type="text"
             placeholder="Pérez"
             register={register}
-            errors={errors.last_name}
+            errors={errors.lastName}
           />
         </div>
 
@@ -94,18 +74,18 @@ export const RegisterForm = ({ onSubmit, isPending = false }: RegisterFormProps)
 
         <InputText
           label="Confirmar Contraseña"
-          name="password_confirm"
+          name="passwordConfirm"
           type="password"
           placeholder="••••••••"
           register={register}
-          errors={errors.password_confirm}
+          errors={errors.passwordConfirm}
         />
 
         <div className="flex items-start">
           <input
             type="checkbox"
             className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mt-0.5"
-            {...register("acceptTerms")}
+            {...register('acceptTerms')}
           />
           <div className="ml-3">
             <label className="text-sm text-gray-600 dark:text-gray-400">
@@ -115,8 +95,8 @@ export const RegisterForm = ({ onSubmit, isPending = false }: RegisterFormProps)
                 className="text-blue-600 hover:text-blue-500 dark:text-blue-400 hover:underline"
               >
                 términos y condiciones
-              </Link>
-              {' '}y la{' '}
+              </Link>{' '}
+              y la{' '}
               <Link
                 to="/privacy"
                 className="text-blue-600 hover:text-blue-500 dark:text-blue-400 hover:underline"

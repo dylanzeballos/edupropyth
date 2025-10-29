@@ -11,9 +11,10 @@
     "prepare": "husky",
     "lint:frontend": "cd frontend && npm run lint",
     "lint:frontend:staged": "cd frontend && npx eslint --fix",
-    "lint:backend": "cd backend && flake8",
-    "lint:backend:staged": "cd backend && flake8",
-    "lint": "npm run lint:frontend && npm run lint:backend"
+    "lint:backend": "cd backend && npx eslint \"{src,apps,libs,test}/**/*.ts\" --max-warnings=0",
+    "lint:backend:staged": "cd backend && npm run lint",
+    "lint": "npm run lint:frontend && npm run lint:backend",
+    "test:ci": "pwsh -ExecutionPolicy Bypass -File ./scripts/test-ci-local.ps1"
   },
   "repository": {
     "type": "git",
