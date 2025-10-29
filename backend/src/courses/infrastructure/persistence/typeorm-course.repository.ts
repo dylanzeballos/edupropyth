@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ICourseRepository } from 'src/courses/domain/interfaces/course-repository.interface';
-import { Course } from 'src/courses/domain/entities/course.entity';
+import { ICourseRepository } from '../../domain/interfaces/course-repository.interface';
+import { Course } from '../../domain/entities/course.entity';
 
 @Injectable()
 export class TypeOrmCourseRepository implements ICourseRepository {

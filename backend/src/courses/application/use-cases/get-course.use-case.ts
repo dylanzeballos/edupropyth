@@ -1,7 +1,7 @@
 import { Injectable, Inject, NotFoundException } from '@nestjs/common';
-import { COURSE_REPOSITORY } from 'src/courses/domain/interfaces/course-repository.interface';
-import type { ICourseRepository } from 'src/courses/domain/interfaces/course-repository.interface';
-import { CourseResponseDto } from 'src/courses/presentation/dto/course-response.dto';
+import { COURSE_REPOSITORY } from '../../domain/interfaces/course-repository.interface';
+import type { ICourseRepository } from '../../domain/interfaces/course-repository.interface';
+import { CourseResponseDto } from '../../presentation/dto/course-response.dto';
 
 @Injectable()
 export class GetCourseUseCase {

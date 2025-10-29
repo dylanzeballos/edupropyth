@@ -1,4 +1,4 @@
-import { Course } from 'src/courses/domain/entities/course.entity';
+import { Course } from '../../domain/entities/course.entity';
 import { TopicResponseDto } from './topic-response.dto';
 
 export class CourseResponseDto {

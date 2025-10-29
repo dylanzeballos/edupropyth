@@ -1,4 +1,4 @@
-import { Topic } from 'src/courses/domain/entities/topic.entity';
+import { Topic } from '../../domain/entities/topic.entity';
 
 export class TopicResponseDto {
   id: string;
