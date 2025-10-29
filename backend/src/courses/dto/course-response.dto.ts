@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { CourseEditionStatus } from '../entities/course-edition.entity';
+import { EnrollmentDto } from './enrollment-response.dto';
 
 export class PaginationMetaDto {
   @ApiProperty({ description: 'Total number of records' })
@@ -178,6 +179,22 @@ export class PaginatedCourseEditionsResponseDto {
   meta!: PaginationMetaDto;
 
   constructor(partial?: Partial<PaginatedCourseEditionsResponseDto>) {
+    Object.assign(this, partial);
+  }
+}
+
+export class PaginatedEnrollmentsResponseDto {
+  @ApiProperty({
+    description: 'List of enrollments',
+    type: () => EnrollmentDto,
+    isArray: true,
+  })
+  data!: EnrollmentDto[];
+
+  @ApiProperty({ description: 'Pagination metadata', type: () => PaginationMetaDto })
+  meta!: PaginationMetaDto;
+
+  constructor(partial?: Partial<PaginatedEnrollmentsResponseDto>) {
     Object.assign(this, partial);
   }
 }
