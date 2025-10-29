@@ -17,9 +17,17 @@ export const useCourse = () => {
   return useQuery({
     queryKey: COURSE_QUERY_KEYS.course,
     queryFn: courseService.getCourse,
-    retry: (failureCount, error: any) => {
+    retry: (failureCount, error: unknown) => {
       // No reintentar si es 404 (curso no creado aún)
-      if (error?.response?.status === 404) {
+      if (
+        error &&
+        typeof error === 'object' &&
+        'response' in error &&
+        error.response &&
+        typeof error.response === 'object' &&
+        'status' in error.response &&
+        error.response.status === 404
+      ) {
         return false;
       }
       return failureCount < 3;
@@ -40,9 +48,20 @@ export const useCreateCourse = () => {
       queryClient.invalidateQueries({ queryKey: COURSE_QUERY_KEYS.course });
       toast.success('Curso creado exitosamente');
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       const message =
-        error?.response?.data?.message || 'Error al crear el curso';
+        error &&
+        typeof error === 'object' &&
+        'response' in error &&
+        error.response &&
+        typeof error.response === 'object' &&
+        'data' in error.response &&
+        error.response.data &&
+        typeof error.response.data === 'object' &&
+        'message' in error.response.data &&
+        typeof error.response.data.message === 'string'
+          ? error.response.data.message
+          : 'Error al crear el curso';
       toast.error(message);
     },
   });
@@ -61,9 +80,20 @@ export const useUpdateCourse = () => {
       queryClient.invalidateQueries({ queryKey: COURSE_QUERY_KEYS.course });
       toast.success('Curso actualizado exitosamente');
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       const message =
-        error?.response?.data?.message || 'Error al actualizar el curso';
+        error &&
+        typeof error === 'object' &&
+        'response' in error &&
+        error.response &&
+        typeof error.response === 'object' &&
+        'data' in error.response &&
+        error.response.data &&
+        typeof error.response.data === 'object' &&
+        'message' in error.response.data &&
+        typeof error.response.data.message === 'string'
+          ? error.response.data.message
+          : 'Error al actualizar el curso';
       toast.error(message);
     },
   });

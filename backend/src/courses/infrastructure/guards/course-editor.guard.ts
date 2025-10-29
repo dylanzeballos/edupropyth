@@ -4,19 +4,20 @@ import {
   ExecutionContext,
   ForbiddenException,
 } from '@nestjs/common';
-import { UserRole } from 'src/auth/domain/entities/user.entity';
+import { UserRole, User } from '../../../auth/domain/entities/user.entity';
 
 @Injectable()
 export class CourseEditorGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
-    const request = context.switchToHttp().getRequest();
+    const request = context.switchToHttp().getRequest<{ user: User }>();
     const user = request.user;
 
     if (!user) {
       throw new ForbiddenException('Usuario no autenticado');
     }
 
-    if (![UserRole.ADMIN, UserRole.TEACHER_EDITOR].includes(user.role)) {
+    const allowedRoles: UserRole[] = [UserRole.ADMIN, UserRole.TEACHER_EDITOR];
+    if (!allowedRoles.includes(user.role)) {
       throw new ForbiddenException(
         'Solo los administradores y profesores editores pueden realizar esta acción',
       );

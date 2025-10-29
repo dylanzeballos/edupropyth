@@ -14,7 +14,8 @@ export class UpdateCourseUseCase {
 
   async execute(
     updateCourseDto: UpdateCourseDto,
-    user: IUserContext,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _user: IUserContext,
   ): Promise<CourseResponseDto> {
     const course = await this.courseRepository.update(updateCourseDto);
     return CourseResponseDto.fromCourse(course);
