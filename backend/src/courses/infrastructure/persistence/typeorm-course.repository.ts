@@ -11,17 +11,32 @@ export class TypeOrmCourseRepository implements ICourseRepository {
     private readonly courseRepository: Repository<Course>,
   ) {}
 
-  async findOne(): Promise<Course | null> {
-    const courses = await this.courseRepository.find({ take: 1 });
-    return courses.length > 0 ? courses[0] : null;
+  async findById(id: string): Promise<Course | null> {
+    return this.courseRepository.findOne({ where: { id } });
   }
 
-  async findOneWithTopics(): Promise<Course | null> {
-    const courses = await this.courseRepository.find({
-      relations: ['topics'],
-      take: 1,
+  async findOne(id: string): Promise<Course | null> {
+    return this.findById(id);
+  }
+
+  async findOneWithTopics(id: string): Promise<Course | null> {
+    return this.courseRepository.findOne({
+      where: { id },
+      relations: ['topics', 'topics.resources', 'topics.activities'],
+      order: {
+        topics: {
+          order: 'ASC',
+          resources: { order: 'ASC' },
+          activities: { order: 'ASC' },
+        },
+      },
     });
-    return courses.length > 0 ? courses[0] : null;
+  }
+
+  async findAll(): Promise<Course[]> {
+    return this.courseRepository.find({
+      order: { createdAt: 'DESC' },
+    });
   }
 
   async create(courseData: Partial<Course>): Promise<Course> {
@@ -29,26 +44,29 @@ export class TypeOrmCourseRepository implements ICourseRepository {
     return await this.courseRepository.save(course);
   }
 
-  async update(courseData: Partial<Course>): Promise<Course> {
-    const course = await this.findOne();
+  async update(id: string, courseData: Partial<Course>): Promise<Course> {
+    const course = await this.findById(id);
 
-    if (!course)
-      throw new NotFoundException('No se ha creado ningún curso aún');
+    if (!course) {
+      throw new NotFoundException(`Course with ID ${id} not found`);
+    }
+
     Object.assign(course, courseData);
     return await this.courseRepository.save(course);
   }
 
-  async delete(): Promise<void> {
-    const course = await this.findOne();
+  async delete(id: string): Promise<void> {
+    const course = await this.findById(id);
 
     if (!course) {
-      throw new NotFoundException('No se ha creado ningún curso aún');
+      throw new NotFoundException(`Course with ID ${id} not found`);
     }
+
     await this.courseRepository.remove(course);
   }
 
-  async exists(): Promise<boolean> {
-    const count = await this.courseRepository.count();
+  async exists(id: string): Promise<boolean> {
+    const count = await this.courseRepository.count({ where: { id } });
     return count > 0;
   }
 }

@@ -58,7 +58,7 @@ const allMainItems: SidebarItem[] = [
     id: 'courses',
     label: 'Mis cursos',
     icon: FolderOpen,
-    path: '/courses',
+    path: '/my-courses',
     permission: Permission.VIEW_COURSES,
   },
   {

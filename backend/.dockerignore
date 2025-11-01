@@ -70,6 +70,6 @@ Thumbs.db
 .prettierignore
 .eslintrc.js
 .eslintignore
-nest-cli.json
-tsconfig.json
-tsconfig.build.json
+# nest-cli.json - REQUIRED for build
+# tsconfig.json - REQUIRED for build
+# tsconfig.build.json - REQUIRED for build

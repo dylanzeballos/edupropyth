@@ -1,29 +1,31 @@
 import { UserRole, User } from '@/features/auth/types/user.type';
 
-export enum Permission {
+export const Permission = {
   // Course permissions
-  VIEW_COURSES = 'view_courses',
-  CREATE_COURSE = 'create_course',
-  EDIT_COURSE = 'edit_course',
-  DELETE_COURSE = 'delete_course',
-  EXECUTE_COURSE = 'execute_course',
+  VIEW_COURSES: 'view_courses',
+  CREATE_COURSE: 'create_course',
+  EDIT_COURSE: 'edit_course',
+  DELETE_COURSE: 'delete_course',
+  EXECUTE_COURSE: 'execute_course',
 
   // User management
-  VIEW_USERS = 'view_users',
-  MANAGE_USERS = 'manage_users',
+  VIEW_USERS: 'view_users',
+  MANAGE_USERS: 'manage_users',
 
   // Content permissions
-  VIEW_TOPICS = 'view_topics',
-  EDIT_TOPICS = 'edit_topics',
+  VIEW_TOPICS: 'view_topics',
+  EDIT_TOPICS: 'edit_topics',
 
   // Progress and stats
-  VIEW_OWN_PROGRESS = 'view_own_progress',
-  VIEW_ALL_PROGRESS = 'view_all_progress',
+  VIEW_OWN_PROGRESS: 'view_own_progress',
+  VIEW_ALL_PROGRESS: 'view_all_progress',
 
   // Settings
-  VIEW_SETTINGS = 'view_settings',
-  EDIT_SYSTEM_SETTINGS = 'edit_system_settings',
-}
+  VIEW_SETTINGS: 'view_settings',
+  EDIT_SYSTEM_SETTINGS: 'edit_system_settings',
+} as const;
+
+export type Permission = (typeof Permission)[keyof typeof Permission];
 
 // Mapa de permisos por rol
 const rolePermissions: Record<UserRole, Permission[]> = {

@@ -52,7 +52,7 @@ docs
 Dockerfile
 docker-compose*.yml
 .dockerignore
-nginx.conf
+# nginx.conf - REQUIRED for production nginx configuration
 
 # Logs
 logs
@@ -77,6 +77,7 @@ vite.config.ts.timestamp-*
 .prettierignore
 .eslintrc.cjs
 .eslintignore
-tsconfig.json
-tsconfig.node.json
+# tsconfig.json - REQUIRED for build
+# tsconfig.node.json - REQUIRED for build
+# vite.config.ts - REQUIRED for build
 vitest.config.ts

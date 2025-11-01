@@ -1,11 +1,4 @@
-import {
-  IsString,
-  IsNotEmpty,
-  IsOptional,
-  IsInt,
-  Min,
-  IsIn,
-} from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class CreateCourseDto {
@@ -16,30 +9,15 @@ export class CreateCourseDto {
   )
   title: string;
 
-  @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   @Transform(({ value }: { value: unknown }) =>
     typeof value === 'string' ? value.trim() : value,
   )
-  description: string;
+  description?: string;
 
   @IsString()
   @IsOptional()
-  content?: string;
-
-  @IsString()
-  @IsOptional()
-  image?: string;
-
-  @IsInt()
-  @IsOptional()
-  @Min(0)
-  duration?: number;
-
-  @IsString()
-  @IsOptional()
-  @IsIn(['beginner', 'intermediate', 'advanced'])
-  difficulty?: string;
+  thumbnail?: string;
 
   constructor(partial: Partial<CreateCourseDto> = {}) {
     Object.assign(this, partial);

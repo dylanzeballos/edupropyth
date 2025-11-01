@@ -59,25 +59,10 @@ export const MicrosoftLoginButton = () => {
         try {
           const response = await authService.microsoftLogin(event.data.code);
 
-          const user = {
-            id: response.user.id.toString(),
-            email: response.user.email,
-            firstName: response.user.first_name,
-            lastName: response.user.last_name,
-            userType: (response.user.profile_role === 'instructor'
-              ? 'Profesor'
-              : response.user.profile_role === 'admin'
-              ? 'Admin'
-              : 'Estudiante') as 'Estudiante' | 'Profesor' | 'Admin',
-            isActive: true,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          };
-
-          setAuth(user, response.access_token, response.refresh_token);
+          setAuth(response.user, response.accessToken, response.refreshToken);
 
           toast.success('¡Autenticación exitosa!', {
-            description: `Bienvenido ${user.firstName} ${user.lastName}`,
+            description: `Bienvenido ${response.user.firstName} ${response.user.lastName}`,
           });
 
           navigate('/dashboard');
