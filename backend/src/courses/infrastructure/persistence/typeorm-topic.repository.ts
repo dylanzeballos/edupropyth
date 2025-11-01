@@ -68,6 +68,17 @@ export class TypeOrmTopicRepository implements ITopicRepository {
     await this.topicRepository.update({ id }, { order });
   }
 
+  async reorder(
+    courseId: string,
+    orders: Array<{ id: string; order: number }>,
+  ): Promise<void> {
+    await this.topicRepository.manager.transaction(async (manager) => {
+      for (const { id, order } of orders) {
+        await manager.update(Topic, { id, courseId }, { order });
+      }
+    });
+  }
+
   async delete(id: string): Promise<void> {
     const topic = await this.findById(id);
 
