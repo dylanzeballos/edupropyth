@@ -164,26 +164,6 @@ class ApiClient {
     }
   }
 
-  private formatError(error: AxiosError): Error {
-    if (error.response) {
-      const data = error.response.data as { message?: string; error?: string };
-      const message =
-        data?.message || data?.error || 'Ha ocurrido un error en el servidor';
-
-      const formattedError = new Error(message);
-      (formattedError as { status?: number }).status = error.response.status;
-      (formattedError as { data?: unknown }).data = error.response.data;
-
-      return formattedError;
-    } else if (error.request) {
-      return new Error(
-        'No se pudo conectar con el servidor. Por favor, verifica tu conexión a internet.',
-      );
-    } else {
-      return new Error(error.message || 'Ha ocurrido un error inesperado');
-    }
-  }
-
   get instance(): AxiosInstance {
     return this.client;
   }
