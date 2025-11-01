@@ -13,6 +13,10 @@ export interface ITopicRepository {
   create(topicData: Partial<Topic>): Promise<Topic>;
   update(id: string, topicData: Partial<Topic>): Promise<Topic>;
   updateOrder(id: string, order: number): Promise<void>;
+  reorder(
+    courseId: string,
+    orders: Array<{ id: string; order: number }>,
+  ): Promise<void>;
   delete(id: string): Promise<void>;
   countByCourseId(courseId: string): Promise<number>;
 }
