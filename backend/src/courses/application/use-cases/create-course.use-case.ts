@@ -1,9 +1,10 @@
-import { Injectable, Inject, ConflictException } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { COURSE_REPOSITORY } from '../../domain/interfaces/course-repository.interface';
 import type { ICourseRepository } from '../../domain/interfaces/course-repository.interface';
 import { IUserContext } from '../../domain/interfaces/user-context.interface';
 import { CreateCourseDto } from '../../presentation/dto/create-course.dto';
 import { CourseResponseDto } from '../../presentation/dto/course-response.dto';
+import { CourseStatus } from '../../domain/enums/course-status.enum';
 
 @Injectable()
 export class CreateCourseUseCase {
@@ -14,20 +15,15 @@ export class CreateCourseUseCase {
 
   async execute(
     createCourseDto: CreateCourseDto,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _user: IUserContext,
+    user: IUserContext,
   ): Promise<CourseResponseDto> {
-    const existingCourse = await this.courseRepository.exists();
-    if (existingCourse) {
-      throw new ConflictException(
-        'Ya existe un curso en el sistema. Solo puede haber un curso único.',
-      );
-    }
-
     const course = await this.courseRepository.create({
-      ...createCourseDto,
-      duration: createCourseDto.duration || 0,
-      difficulty: createCourseDto.difficulty || 'beginner',
+      title: createCourseDto.title,
+      description: createCourseDto.description,
+      thumbnail: createCourseDto.thumbnail,
+      instructorId: user.id,
+      status: CourseStatus.DRAFT,
+      isActive: true,
     });
 
     return CourseResponseDto.fromCourse(course);

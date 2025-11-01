@@ -13,11 +13,12 @@ export class UpdateCourseUseCase {
   ) {}
 
   async execute(
+    id: string,
     updateCourseDto: UpdateCourseDto,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _user: IUserContext,
   ): Promise<CourseResponseDto> {
-    const course = await this.courseRepository.update(updateCourseDto);
+    const course = await this.courseRepository.update(id, updateCourseDto);
     return CourseResponseDto.fromCourse(course);
   }
 }

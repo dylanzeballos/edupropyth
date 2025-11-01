@@ -10,13 +10,18 @@ export class GetCourseUseCase {
     private readonly courseRepository: ICourseRepository,
   ) {}
 
-  async execute(): Promise<CourseResponseDto> {
-    const course = await this.courseRepository.findOneWithTopics();
+  async execute(id: string): Promise<CourseResponseDto> {
+    const course = await this.courseRepository.findOneWithTopics(id);
 
     if (!course) {
-      throw new NotFoundException('No se ha encontrado ningún curso aún');
+      throw new NotFoundException(`Course with ID ${id} not found`);
     }
 
     return CourseResponseDto.fromCourse(course);
+  }
+
+  async executeAll(): Promise<CourseResponseDto[]> {
+    const courses = await this.courseRepository.findAll();
+    return courses.map((course) => CourseResponseDto.fromCourse(course));
   }
 }
