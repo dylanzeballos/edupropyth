@@ -7,18 +7,30 @@ import type {
 } from '../types/course.types';
 
 export const COURSE_QUERY_KEYS = {
-  course: ['course'] as const,
+  all: ['courses'] as const,
+  course: (id: string) => ['courses', id] as const,
 };
 
 /**
- * Hook para obtener el curso
+ * Hook para obtener todos los cursos
  */
-export const useCourse = () => {
+export const useCourses = () => {
   return useQuery({
-    queryKey: COURSE_QUERY_KEYS.course,
-    queryFn: courseService.getCourse,
+    queryKey: COURSE_QUERY_KEYS.all,
+    queryFn: courseService.getCourses,
+  });
+};
+
+/**
+ * Hook para obtener un curso específico
+ */
+export const useCourse = (id?: string) => {
+  return useQuery({
+    queryKey: id ? COURSE_QUERY_KEYS.course(id) : ['courses', 'none'],
+    queryFn: id ? () => courseService.getCourse(id) : undefined,
+    enabled: !!id,
     retry: (failureCount, error: unknown) => {
-      // No reintentar si es 404 (curso no creado aún)
+      // No reintentar si es 404 (curso no encontrado)
       if (
         error &&
         typeof error === 'object' &&
@@ -36,7 +48,7 @@ export const useCourse = () => {
 };
 
 /**
- * Hook para crear el curso
+ * Hook para crear un curso
  */
 export const useCreateCourse = () => {
   const queryClient = useQueryClient();
@@ -45,7 +57,7 @@ export const useCreateCourse = () => {
     mutationFn: (data: CreateCourseRequest) =>
       courseService.createCourse(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: COURSE_QUERY_KEYS.course });
+      queryClient.invalidateQueries({ queryKey: COURSE_QUERY_KEYS.all });
       toast.success('Curso creado exitosamente');
     },
     onError: (error: unknown) => {
@@ -68,16 +80,17 @@ export const useCreateCourse = () => {
 };
 
 /**
- * Hook para actualizar el curso
+ * Hook para actualizar un curso
  */
 export const useUpdateCourse = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: UpdateCourseRequest) =>
-      courseService.updateCourse(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: COURSE_QUERY_KEYS.course });
+    mutationFn: ({ id, data }: { id: string; data: UpdateCourseRequest }) =>
+      courseService.updateCourse(id, data),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: COURSE_QUERY_KEYS.all });
+      queryClient.invalidateQueries({ queryKey: COURSE_QUERY_KEYS.course(variables.id) });
       toast.success('Curso actualizado exitosamente');
     },
     onError: (error: unknown) => {

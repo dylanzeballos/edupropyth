@@ -2,16 +2,21 @@
 export type * from './types/course.types';
 
 // Hooks
-export { useCourse, useCreateCourse, useUpdateCourse } from './hooks/useCourse';
+export { useCourse, useCourses, useCreateCourse, useUpdateCourse } from './hooks/useCourse';
 export { useCoursePermissions } from './hooks/useCoursePermissions';
 
 // Components
 export { CourseForm } from './components/CourseForm';
-export { CourseCard } from './components/CourseCard';
 export { EmptyCourse } from './components/EmptyCourse';
+export { CourseHeader } from './components/CourseHeader';
+export { CourseInfo } from './components/CourseInfo';
+export { CourseTopicsList } from './components/CourseTopicsList';
+export { CourseListCard } from './components/CourseListCard';
+export { CourseStatusBadge } from './components/CourseStatusBadge';
 
 // Pages
-export { CoursePage } from './pages/CoursePage';
+export { CoursesListPage } from './pages/CoursesListPage';
+export { CourseDetailPage } from './pages/CourseDetailPage';
 
 // Services
 export { courseService } from './services/course.service';
