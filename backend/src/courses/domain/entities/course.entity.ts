@@ -5,9 +5,12 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 import { CourseStatus } from '../enums/course-status.enum';
 import { Topic } from './topic.entity';
+import { CourseBlueprint } from './course-blueprint.entity';
 
 @Entity('courses')
 export class Course {
@@ -38,6 +41,15 @@ export class Course {
 
   @Column({ type: 'uuid', nullable: true, name: 'cloned_from_id' })
   clonedFromId?: string;
+
+  @Column({ type: 'uuid', nullable: true, name: 'blueprint_id' })
+  blueprintId?: string;
+
+  @ManyToOne(() => CourseBlueprint, (bp) => bp.courses, {
+    onDelete: 'SET NULL',
+  })
+  @JoinColumn({ name: 'blueprint_id' })
+  blueprint?: CourseBlueprint;
 
   @OneToMany(() => Topic, (topic) => topic.course, { cascade: true })
   topics?: Topic[];
