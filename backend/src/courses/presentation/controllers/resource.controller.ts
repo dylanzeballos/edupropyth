@@ -76,7 +76,7 @@ export class ResourceController {
           new MaxFileSizeValidator({ maxSize: 100 * 1024 * 1024 }), // 100MB
           new FileTypeValidator({
             fileType:
-              /(jpg|jpeg|png|gif|pdf|doc|docx|xls|xlsx|ppt|pptx|mp4|mp3|wav|webm)$/,
+              /(image\/jpeg|image\/png|image\/gif|application\/pdf|application\/msword|application\/vnd\.openxmlformats-officedocument\.wordprocessingml\.document|application\/vnd\.ms-excel|application\/vnd\.openxmlformats-officedocument\.spreadsheetml\.sheet|application\/vnd\.ms-powerpoint|application\/vnd\.openxmlformats-officedocument\.presentationml\.presentation|video\/mp4|audio\/mpeg|audio\/mp3|audio\/wav|video\/webm)$/,
           }),
         ],
       }),
