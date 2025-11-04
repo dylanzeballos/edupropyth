@@ -1,183 +1,152 @@
-import { UserRole, User } from '@/features/auth/types/user.type';
+import type { User } from '@/features/auth/types/user.type'
+import { UserRole } from '@/features/auth/types/user.type'
 
-export enum Permission {
+/** Valores de permisos (valor en runtime) */
+export const PERMISSION = {
   // Course permissions
-  VIEW_COURSES = 'view_courses',
-  CREATE_COURSE = 'create_course',
-  EDIT_COURSE = 'edit_course',
-  DELETE_COURSE = 'delete_course',
-  EXECUTE_COURSE = 'execute_course',
+  VIEW_COURSES: 'view_courses',
+  CREATE_COURSE: 'create_course',
+  EDIT_COURSE: 'edit_course',
+  DELETE_COURSE: 'delete_course',
+  EXECUTE_COURSE: 'execute_course',
 
   // User management
-  VIEW_USERS = 'view_users',
-  MANAGE_USERS = 'manage_users',
+  VIEW_USERS: 'view_users',
+  MANAGE_USERS: 'manage_users',
 
   // Content permissions
-  VIEW_TOPICS = 'view_topics',
-  EDIT_TOPICS = 'edit_topics',
+  VIEW_TOPICS: 'view_topics',
+  EDIT_TOPICS: 'edit_topics',
 
   // Progress and stats
-  VIEW_OWN_PROGRESS = 'view_own_progress',
-  VIEW_ALL_PROGRESS = 'view_all_progress',
+  VIEW_OWN_PROGRESS: 'view_own_progress',
+  VIEW_ALL_PROGRESS: 'view_all_progress',
 
   // Settings
-  VIEW_SETTINGS = 'view_settings',
-  EDIT_SYSTEM_SETTINGS = 'edit_system_settings',
-}
+  VIEW_SETTINGS: 'view_settings',
+  EDIT_SYSTEM_SETTINGS: 'edit_system_settings',
+} as const
 
-// Mapa de permisos por rol
+/** Tipo unión de los valores anteriores (tipo en compile-time) */
+export type Permission = typeof PERMISSION[keyof typeof PERMISSION]
+
+/** Mapa de permisos por rol */
 const rolePermissions: Record<UserRole, Permission[]> = {
   [UserRole.ADMIN]: [
-    Permission.VIEW_COURSES,
-    Permission.CREATE_COURSE,
-    Permission.EDIT_COURSE,
-    Permission.DELETE_COURSE,
-    Permission.EXECUTE_COURSE,
-    Permission.VIEW_USERS,
-    Permission.MANAGE_USERS,
-    Permission.VIEW_TOPICS,
-    Permission.EDIT_TOPICS,
-    Permission.VIEW_OWN_PROGRESS,
-    Permission.VIEW_ALL_PROGRESS,
-    Permission.VIEW_SETTINGS,
-    Permission.EDIT_SYSTEM_SETTINGS,
+    PERMISSION.VIEW_COURSES,
+    PERMISSION.CREATE_COURSE,
+    PERMISSION.EDIT_COURSE,
+    PERMISSION.DELETE_COURSE,
+    PERMISSION.EXECUTE_COURSE,
+    PERMISSION.VIEW_USERS,
+    PERMISSION.MANAGE_USERS,
+    PERMISSION.VIEW_TOPICS,
+    PERMISSION.EDIT_TOPICS,
+    PERMISSION.VIEW_OWN_PROGRESS,
+    PERMISSION.VIEW_ALL_PROGRESS,
+    PERMISSION.VIEW_SETTINGS,
+    PERMISSION.EDIT_SYSTEM_SETTINGS,
   ],
   [UserRole.TEACHER_EDITOR]: [
-    Permission.VIEW_COURSES,
-    Permission.CREATE_COURSE,
-    Permission.EDIT_COURSE,
-    Permission.DELETE_COURSE,
-    Permission.EXECUTE_COURSE,
-    Permission.VIEW_TOPICS,
-    Permission.EDIT_TOPICS,
-    Permission.VIEW_OWN_PROGRESS,
-    Permission.VIEW_ALL_PROGRESS,
-    Permission.VIEW_SETTINGS,
+    PERMISSION.VIEW_COURSES,
+    PERMISSION.CREATE_COURSE,
+    PERMISSION.EDIT_COURSE,
+    PERMISSION.DELETE_COURSE,
+    PERMISSION.EXECUTE_COURSE,
+    PERMISSION.VIEW_TOPICS,
+    PERMISSION.EDIT_TOPICS,
+    PERMISSION.VIEW_OWN_PROGRESS,
+    PERMISSION.VIEW_ALL_PROGRESS,
+    PERMISSION.VIEW_SETTINGS,
   ],
   [UserRole.TEACHER_EXECUTOR]: [
-    Permission.VIEW_COURSES,
-    Permission.EXECUTE_COURSE,
-    Permission.VIEW_TOPICS,
-    Permission.VIEW_OWN_PROGRESS,
-    Permission.VIEW_SETTINGS,
+    PERMISSION.VIEW_COURSES,
+    PERMISSION.EXECUTE_COURSE,
+    PERMISSION.VIEW_TOPICS,
+    PERMISSION.VIEW_OWN_PROGRESS,
+    PERMISSION.VIEW_SETTINGS,
   ],
   [UserRole.STUDENT]: [
-    Permission.VIEW_COURSES,
-    Permission.VIEW_TOPICS,
-    Permission.VIEW_OWN_PROGRESS,
-    Permission.VIEW_SETTINGS,
+    PERMISSION.VIEW_COURSES,
+    PERMISSION.VIEW_TOPICS,
+    PERMISSION.VIEW_OWN_PROGRESS,
+    PERMISSION.VIEW_SETTINGS,
   ],
-};
+}
 
-/**
- * Verifica si un usuario tiene un permiso específico
- */
-export const hasPermission = (
-  user: User | null,
-  permission: Permission,
-): boolean => {
-  if (!user) return false;
-  const permissions = rolePermissions[user.role];
-  return permissions.includes(permission);
-};
+/** Permisos efectivos del usuario (seguro) */
+export function getUserPermissions(user: User | null | undefined): Permission[] {
+  if (!user || !user.role) return []
+  return rolePermissions[user.role] ?? []
+}
 
-/**
- * Verifica si un usuario tiene todos los permisos especificados
- */
-export const hasAllPermissions = (
-  user: User | null,
-  permissions: Permission[],
-): boolean => {
-  if (!user) return false;
-  return permissions.every((permission) => hasPermission(user, permission));
-};
+/** ¿Tiene permiso? (permiso opcional = no se requiere) */
+export function hasPermission(
+  user: User | null | undefined,
+  permission?: Permission,
+): boolean {
+  if (!permission) return true
+  return getUserPermissions(user).includes(permission)
+}
 
-/**
- * Verifica si un usuario tiene al menos uno de los permisos especificados
- */
-export const hasAnyPermission = (
-  user: User | null,
-  permissions: Permission[],
-): boolean => {
-  if (!user) return false;
-  return permissions.some((permission) => hasPermission(user, permission));
-};
+/** ¿Tiene todos los permisos? */
+export function hasAllPermissions(
+  user: User | null | undefined,
+  permissions?: Permission[],
+): boolean {
+  const list = Array.isArray(permissions) ? permissions : []
+  if (list.length === 0) return true
+  return list.every((p) => hasPermission(user, p))
+}
 
-/**
- * Verifica si un usuario tiene un rol específico
- */
-export const hasRole = (user: User | null, role: UserRole): boolean => {
-  if (!user) return false;
-  return user.role === role;
-};
+/** ¿Tiene al menos uno de los permisos? */
+export function hasAnyPermission(
+  user: User | null | undefined,
+  permissions?: Permission[],
+): boolean {
+  const list = Array.isArray(permissions) ? permissions : []
+  if (list.length === 0) return true
+  return list.some((p) => hasPermission(user, p))
+}
 
-/**
- * Verifica si un usuario tiene alguno de los roles especificados
- */
-export const hasAnyRole = (user: User | null, roles: UserRole[]): boolean => {
-  if (!user) return false;
-  return roles.includes(user.role);
-};
+/** Roles */
+export function hasRole(user: User | null | undefined, role: UserRole): boolean {
+  return !!user && user.role === role
+}
 
-/**
- * Verifica si un usuario puede editar cursos
- */
-export const canEditCourse = (user: User | null): boolean => {
-  return hasPermission(user, Permission.EDIT_COURSE);
-};
+export function hasAnyRole(
+  user: User | null | undefined,
+  roles?: UserRole[],
+): boolean {
+  const list = Array.isArray(roles) ? roles : []
+  if (!user) return false
+  return list.includes(user.role)
+}
 
-/**
- * Verifica si un usuario puede crear cursos
- */
-export const canCreateCourse = (user: User | null): boolean => {
-  return hasPermission(user, Permission.CREATE_COURSE);
-};
+/** Helpers derivados */
+export const canEditCourse = (user: User | null | undefined) =>
+  hasPermission(user, PERMISSION.EDIT_COURSE)
 
-/**
- * Verifica si un usuario puede eliminar cursos
- */
-export const canDeleteCourse = (user: User | null): boolean => {
-  return hasPermission(user, Permission.DELETE_COURSE);
-};
+export const canCreateCourse = (user: User | null | undefined) =>
+  hasPermission(user, PERMISSION.CREATE_COURSE)
 
-/**
- * Verifica si un usuario puede ejecutar código en cursos
- */
-export const canExecuteCourse = (user: User | null): boolean => {
-  return hasPermission(user, Permission.EXECUTE_COURSE);
-};
+export const canDeleteCourse = (user: User | null | undefined) =>
+  hasPermission(user, PERMISSION.DELETE_COURSE)
 
-/**
- * Verifica si un usuario puede ver todos los progresos
- */
-export const canViewAllProgress = (user: User | null): boolean => {
-  return hasPermission(user, Permission.VIEW_ALL_PROGRESS);
-};
+export const canExecuteCourse = (user: User | null | undefined) =>
+  hasPermission(user, PERMISSION.EXECUTE_COURSE)
 
-/**
- * Verifica si un usuario puede gestionar otros usuarios
- */
-export const canManageUsers = (user: User | null): boolean => {
-  return hasPermission(user, Permission.MANAGE_USERS);
-};
+export const canViewAllProgress = (user: User | null | undefined) =>
+  hasPermission(user, PERMISSION.VIEW_ALL_PROGRESS)
 
-/**
- * Verifica si un usuario es administrador
- */
-export const isAdmin = (user: User | null): boolean => {
-  return hasRole(user, UserRole.ADMIN);
-};
+export const canManageUsers = (user: User | null | undefined) =>
+  hasPermission(user, PERMISSION.MANAGE_USERS)
 
-/**
- * Verifica si un usuario es profesor (cualquier tipo)
- */
-export const isTeacher = (user: User | null): boolean => {
-  return hasAnyRole(user, [UserRole.TEACHER_EDITOR, UserRole.TEACHER_EXECUTOR]);
-};
+export const isAdmin = (user: User | null | undefined) =>
+  hasRole(user, UserRole.ADMIN)
 
-/**
- * Verifica si un usuario es estudiante
- */
-export const isStudent = (user: User | null): boolean => {
-  return hasRole(user, UserRole.STUDENT);
-};
+export const isTeacher = (user: User | null | undefined) =>
+  hasAnyRole(user, [UserRole.TEACHER_EDITOR, UserRole.TEACHER_EXECUTOR])
+
+export const isStudent = (user: User | null | undefined) =>
+  hasRole(user, UserRole.STUDENT)

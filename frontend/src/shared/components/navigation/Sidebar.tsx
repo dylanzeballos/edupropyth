@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
   BookOpen,
   Trophy,
@@ -14,14 +14,15 @@ import {
   Users,
   Edit3,
   FolderOpen,
-} from 'lucide-react';
-import { Link, useLocation, useNavigate } from 'react-router';
-import { ThemeToggle } from '../ui/ThemeToggle';
-import { useAuthStore } from '@/features/auth';
-import { Permission } from '@/shared/utils/permissions';
-import { usePermissions } from '@/features/auth';
-import { getRoleDisplayName } from '@/features/auth/types/user.type';
-import { LucideIcon } from 'lucide-react';
+  type LucideIcon,
+} from 'lucide-react'
+import { Link, useLocation, useNavigate } from 'react-router-dom' // 👈 corregido
+import { ThemeToggle } from '../ui/ThemeToggle'
+import { useAuthStore } from '@/features/auth'
+import { PERMISSION } from '@/shared/utils/permissions'            // 👈 valor (runtime)
+import type { Permission } from '@/shared/utils/permissions'        // 👈 tipo (compile)
+import { usePermissions } from '@/features/auth'
+import { getRoleDisplayName } from '@/features/auth/types/user.type'
 
 interface SidebarItem {
   id: string;
@@ -29,14 +30,15 @@ interface SidebarItem {
   icon: LucideIcon;
   badge?: number;
   path: string;
-  permission?: Permission;
+  permission?: Permission; // <-- ya lo tienes así (bien)
 }
 
+
 interface SidebarProps {
-  isOpen: boolean;
-  onClose: () => void;
-  isCollapsed: boolean;
-  onToggleCollapse: () => void;
+  isOpen: boolean
+  onClose: () => void
+  isCollapsed: boolean
+  onToggleCollapse: () => void
 }
 
 const allMainItems: SidebarItem[] = [
@@ -45,7 +47,7 @@ const allMainItems: SidebarItem[] = [
     label: 'Tablero',
     icon: Home,
     path: '/dashboard',
-    permission: Permission.VIEW_COURSES,
+    permission: PERMISSION.VIEW_COURSES,   // 👈 usar PERMISSION (valor)
   },
   {
     id: 'topics',
@@ -53,30 +55,30 @@ const allMainItems: SidebarItem[] = [
     icon: BookOpen,
     badge: 25,
     path: '/topics',
-    permission: Permission.VIEW_TOPICS,
+    permission: PERMISSION.VIEW_TOPICS,
   },
   {
     id: 'courses',
     label: 'Mis cursos',
     icon: FolderOpen,
     path: '/courses',
-    permission: Permission.VIEW_COURSES,
+    permission: PERMISSION.VIEW_COURSES,
   },
   {
     id: 'editor',
     label: 'Editor de Código',
     icon: Code2,
     path: '/editor',
-    permission: Permission.EXECUTE_COURSE,
+    permission: PERMISSION.EXECUTE_COURSE,
   },
   {
     id: 'progress',
     label: 'Mi Progreso',
     icon: BarChart3,
     path: '/progress',
-    permission: Permission.VIEW_OWN_PROGRESS,
+    permission: PERMISSION.VIEW_OWN_PROGRESS,
   },
-];
+]
 
 const allToolItems: SidebarItem[] = [
   {
@@ -84,44 +86,44 @@ const allToolItems: SidebarItem[] = [
     label: 'Gestión de Cursos',
     icon: Edit3,
     path: '/course-management',
-    permission: Permission.EDIT_COURSE,
+    permission: PERMISSION.EDIT_COURSE,
   },
   {
     id: 'users',
     label: 'Usuarios',
     icon: Users,
     path: '/users',
-    permission: Permission.MANAGE_USERS,
+    permission: PERMISSION.MANAGE_USERS,
   },
   {
     id: 'all-progress',
     label: 'Progreso Global',
     icon: BarChart3,
     path: '/all-progress',
-    permission: Permission.VIEW_ALL_PROGRESS,
+    permission: PERMISSION.VIEW_ALL_PROGRESS,
   },
   {
     id: 'leaderboard',
     label: 'Clasificación',
     icon: Trophy,
     path: '/leaderboard',
-    permission: Permission.VIEW_COURSES,
+    permission: PERMISSION.VIEW_COURSES,
   },
   {
     id: 'documentation',
     label: 'Documentación',
     icon: FileText,
     path: '/documentation',
-    permission: Permission.VIEW_TOPICS,
+    permission: PERMISSION.VIEW_TOPICS,
   },
   {
     id: 'settings',
     label: 'Configuración',
     icon: Settings,
     path: '/settings',
-    permission: Permission.VIEW_SETTINGS,
+    permission: PERMISSION.VIEW_SETTINGS,
   },
-];
+]
 
 export const Sidebar = ({
   isOpen,
@@ -129,67 +131,49 @@ export const Sidebar = ({
   isCollapsed,
   onToggleCollapse,
 }: SidebarProps) => {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const [isMobile, setIsMobile] = useState(false);
-  const { user, clearAuth } = useAuthStore();
-  const { hasPermission } = usePermissions();
+  const location = useLocation()
+  const navigate = useNavigate()
+  const [isMobile, setIsMobile] = useState(false)
+  const { user, clearAuth } = useAuthStore()
+  const { hasPermission } = usePermissions() // nuestra versión tolera undefined
 
-  const mainItems = allMainItems.filter(
-    (item) => !item.permission || hasPermission(item.permission),
-  );
-
-  const toolItems = allToolItems.filter(
-    (item) => !item.permission || hasPermission(item.permission),
-  );
+  const mainItems = allMainItems.filter((item) => hasPermission(item.permission))
+  const toolItems = allToolItems.filter((item) => hasPermission(item.permission))
 
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 1024);
-    };
+    const checkMobile = () => setIsMobile(window.innerWidth < 1024)
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
-  const isActive = (path: string) => location.pathname === path;
-
-  const sidebarWidth = isCollapsed ? 80 : 256;
+  const isActive = (path: string) => location.pathname === path
+  const sidebarWidth = isCollapsed ? 80 : 256
 
   const handleLogout = () => {
-    clearAuth();
-    navigate('/login');
-    if (isMobile) onClose();
-  };
+    clearAuth()
+    navigate('/login')
+    if (isMobile) onClose()
+  }
 
   const getUserInitials = () => {
     if (user?.firstName && user?.lastName) {
-      return `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`;
+      return `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`
     }
-    if (user?.email) {
-      return user.email.slice(0, 2).toUpperCase();
-    }
-    return 'U';
-  };
+    if (user?.email) return user.email.slice(0, 2).toUpperCase()
+    return 'U'
+  }
 
   const getUserDisplayName = () => {
-    if (user?.firstName && user?.lastName) {
-      return `${user.firstName} ${user.lastName}`;
-    }
-    if (user?.email) {
-      return user.email;
-    }
-    return 'Usuario';
-  };
+    if (user?.firstName && user?.lastName) return `${user.firstName} ${user.lastName}`
+    if (user?.email) return user.email
+    return 'Usuario'
+  }
 
   const getUserRole = () => {
-    if (user?.role) {
-      return getRoleDisplayName(user.role);
-    }
-    return 'Usuario';
-  };
+    if (user?.role) return getRoleDisplayName(user.role)
+    return 'Usuario'
+  }
 
   return (
     <>
@@ -213,7 +197,7 @@ export const Sidebar = ({
           width: sidebarWidth,
         }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
-        className={`fixed left-0 top-0 h-screen bg-white/50 dark:bg-gray-900/50 backdrop-blur-xl border-r border-gray-200/50 dark:border-gray-700/30 flex flex-col z-50`}
+        className="fixed left-0 top-0 h-screen bg-white/50 dark:bg-gray-900/50 backdrop-blur-xl border-r border-gray-200/50 dark:border-gray-700/30 flex flex-col z-50"
       >
         <div className="relative p-6 border-b border-gray-200/50 dark:border-gray-700/30">
           <AnimatePresence mode="wait">
@@ -230,12 +214,8 @@ export const Sidebar = ({
                   <Code2 className="w-6 h-6 text-white" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h1 className="text-lg font-bold text-gray-900 dark:text-white">
-                    Python Lab
-                  </h1>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                    Código • Aprende
-                  </p>
+                  <h1 className="text-lg font-bold text-gray-900 dark:text-white">Python Lab</h1>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate">Código • Aprende</p>
                 </div>
               </motion.div>
             ) : (
@@ -279,13 +259,9 @@ export const Sidebar = ({
             )}
             <nav className="space-y-1">
               {mainItems.map((item) => {
-                const isItemActive = isActive(item.path);
+                const isItemActive = isActive(item.path)
                 return (
-                  <Link
-                    key={item.id}
-                    to={item.path}
-                    onClick={() => isMobile && onClose()}
-                  >
+                  <Link key={item.id} to={item.path} onClick={() => isMobile && onClose()}>
                     <motion.div
                       whileHover={{ x: isCollapsed ? 0 : 4, scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
@@ -297,13 +273,13 @@ export const Sidebar = ({
                       title={isCollapsed ? item.label : undefined}
                     >
                       <item.icon
-                        className={`flex-shrink-0 ${isCollapsed ? 'w-6 h-6' : 'w-5 h-5'} ${isItemActive ? 'text-white' : 'text-gray-500 dark:text-gray-400'}`}
+                        className={`flex-shrink-0 ${isCollapsed ? 'w-6 h-6' : 'w-5 h-5'} ${
+                          isItemActive ? 'text-white' : 'text-gray-500 dark:text-gray-400'
+                        }`}
                       />
                       {!isCollapsed && (
                         <>
-                          <span className="font-medium text-sm flex-1 truncate">
-                            {item.label}
-                          </span>
+                          <span className="font-medium text-sm flex-1 truncate">{item.label}</span>
                           {item.badge && (
                             <span
                               className={`px-2 py-1 text-xs font-medium rounded-full ${
@@ -319,7 +295,7 @@ export const Sidebar = ({
                       )}
                     </motion.div>
                   </Link>
-                );
+                )
               })}
             </nav>
           </div>
@@ -332,13 +308,9 @@ export const Sidebar = ({
             )}
             <nav className="space-y-1">
               {toolItems.map((item) => {
-                const isItemActive = isActive(item.path);
+                const isItemActive = isActive(item.path)
                 return (
-                  <Link
-                    key={item.id}
-                    to={item.path}
-                    onClick={() => isMobile && onClose()}
-                  >
+                  <Link key={item.id} to={item.path} onClick={() => isMobile && onClose()}>
                     <motion.div
                       whileHover={{ x: isCollapsed ? 0 : 4, scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
@@ -350,16 +322,14 @@ export const Sidebar = ({
                       title={isCollapsed ? item.label : undefined}
                     >
                       <item.icon
-                        className={`flex-shrink-0 ${isCollapsed ? 'w-6 h-6' : 'w-5 h-5'} ${isItemActive ? 'text-white' : 'text-gray-500 dark:text-gray-400'}`}
+                        className={`flex-shrink-0 ${isCollapsed ? 'w-6 h-6' : 'w-5 h-5'} ${
+                          isItemActive ? 'text-white' : 'text-gray-500 dark:text-gray-400'
+                        }`}
                       />
-                      {!isCollapsed && (
-                        <span className="font-medium text-sm truncate">
-                          {item.label}
-                        </span>
-                      )}
+                      {!isCollapsed && <span className="font-medium text-sm truncate">{item.label}</span>}
                     </motion.div>
                   </Link>
-                );
+                )
               })}
             </nav>
           </div>
@@ -370,17 +340,11 @@ export const Sidebar = ({
             <>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="text-sm font-bold text-white">
-                    {getUserInitials()}
-                  </span>
+                  <span className="text-sm font-bold text-white">{getUserInitials()}</span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                    {getUserDisplayName()}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                    {getUserRole()}
-                  </p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{getUserDisplayName()}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{getUserRole()}</p>
                 </div>
               </div>
 
@@ -402,9 +366,7 @@ export const Sidebar = ({
           ) : (
             <div className="flex flex-col items-center gap-3">
               <div className="w-10 h-10 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center">
-                <span className="text-sm font-bold text-white">
-                  {getUserInitials()}
-                </span>
+                <span className="text-sm font-bold text-white">{getUserInitials()}</span>
               </div>
               <motion.button
                 whileHover={{ scale: 1.1 }}
@@ -421,5 +383,5 @@ export const Sidebar = ({
         </div>
       </motion.aside>
     </>
-  );
-};
+  )
+}
