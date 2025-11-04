@@ -39,6 +39,16 @@ export class TypeOrmCourseRepository implements ICourseRepository {
     });
   }
 
+  async findAllWithTopics(): Promise<Course[]> {
+    return this.courseRepository.find({
+      relations: ['topics'],
+      order: {
+        createdAt: 'DESC',
+        topics: { order: 'ASC' },
+      },
+    });
+  }
+
   async create(courseData: Partial<Course>): Promise<Course> {
     const course = this.courseRepository.create(courseData);
     return await this.courseRepository.save(course);
