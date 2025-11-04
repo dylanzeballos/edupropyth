@@ -6,17 +6,20 @@ import { Course } from './domain/entities/course.entity';
 import { Topic } from './domain/entities/topic.entity';
 import { Resource } from './domain/entities/resource.entity';
 import { Activity } from './domain/entities/activity.entity';
+import { CourseTemplate } from './domain/entities/course-template.entity';
 
 import { COURSE_REPOSITORY } from './domain/interfaces/course-repository.interface';
 import { TOPIC_REPOSITORY } from './domain/interfaces/topic-repository.interface';
 import { RESOURCE_REPOSITORY } from './domain/interfaces/resource-repository.interface';
 import { ACTIVITY_REPOSITORY } from './domain/interfaces/activity-repository.interface';
+import { COURSE_TEMPLATE_REPOSITORY } from './domain/interfaces/course-template-repository.interface';
 import { MEDIA_STORAGE_SERVICE } from './domain/interfaces/media-storage.interface';
 
 import { TypeOrmCourseRepository } from './infrastructure/persistence/typeorm-course.repository';
 import { TypeOrmTopicRepository } from './infrastructure/persistence/typeorm-topic.repository';
 import { TypeOrmResourceRepository } from './infrastructure/persistence/typeorm-resource.repository';
 import { TypeOrmActivityRepository } from './infrastructure/persistence/typeorm-activity.repository';
+import { TypeormCourseTemplateRepository } from './infrastructure/persistence/typeorm-course-template.repository';
 
 import { CloudinaryService } from './infrastructure/services/cloudinary.service';
 
@@ -31,6 +34,13 @@ import { UpdateTopicUseCase } from './application/use-cases/topics/update-topic.
 import { DeleteTopicUseCase } from './application/use-cases/topics/delete-topic.use-case';
 import { ReorderTopicsUseCase } from './application/use-cases/topics/reorder-topics.use-case';
 import { CloneTopicToHistoricUseCase } from './application/use-cases/topics/clone-topic-to-historic.use-case';
+
+// Use Cases - Course Templates
+import { CreateCourseTemplateUseCase } from './application/use-cases/course-templates/create-course-template.use-case';
+import { GetCourseTemplateUseCase } from './application/use-cases/course-templates/get-course-template.use-case';
+import { UpdateCourseTemplateUseCase } from './application/use-cases/course-templates/update-course-template.use-case';
+import { DeleteCourseTemplateUseCase } from './application/use-cases/course-templates/delete-course-template.use-case';
+import { CreateDefaultCourseTemplateUseCase } from './application/use-cases/course-templates/create-default-course-template.use-case';
 
 // Use Cases - Resources
 import { CreateResourceUseCase } from './application/use-cases/resources/create-resource.use-case';
@@ -52,10 +62,17 @@ import { CoursesController } from './presentation/controllers/course.controller'
 import { TopicController } from './presentation/controllers/topic.controller';
 import { ResourceController } from './presentation/controllers/resource.controller';
 import { ActivityController } from './presentation/controllers/activity.controller';
+import { CourseTemplateController } from './presentation/controllers/course-template.controller';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Course, Topic, Resource, Activity]),
+    TypeOrmModule.forFeature([
+      Course,
+      Topic,
+      Resource,
+      Activity,
+      CourseTemplate,
+    ]),
     ConfigModule,
   ],
   controllers: [
@@ -63,6 +80,7 @@ import { ActivityController } from './presentation/controllers/activity.controll
     TopicController,
     ResourceController,
     ActivityController,
+    CourseTemplateController,
   ],
   providers: [
     {
@@ -82,6 +100,10 @@ import { ActivityController } from './presentation/controllers/activity.controll
       useClass: TypeOrmActivityRepository,
     },
     {
+      provide: COURSE_TEMPLATE_REPOSITORY,
+      useClass: TypeormCourseTemplateRepository,
+    },
+    {
       provide: MEDIA_STORAGE_SERVICE,
       useClass: CloudinaryService,
     },
@@ -99,6 +121,13 @@ import { ActivityController } from './presentation/controllers/activity.controll
     DeleteTopicUseCase,
     ReorderTopicsUseCase,
     CloneTopicToHistoricUseCase,
+
+    // Use Cases - Course Templates
+    CreateCourseTemplateUseCase,
+    GetCourseTemplateUseCase,
+    UpdateCourseTemplateUseCase,
+    DeleteCourseTemplateUseCase,
+    CreateDefaultCourseTemplateUseCase,
 
     // Use Cases - Resources
     CreateResourceUseCase,
