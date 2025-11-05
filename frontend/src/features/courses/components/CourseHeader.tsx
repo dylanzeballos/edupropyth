@@ -1,7 +1,8 @@
-import { ArrowLeft, Edit } from 'lucide-react';
+import { ArrowLeft, Edit, Layout } from 'lucide-react';
 import { Button } from '@/shared/components/ui';
 import { CourseStatusBadge } from './CourseStatusBadge';
 import type { Course } from '../types/course.types';
+import { useNavigate } from 'react-router';
 
 interface CourseHeaderProps {
   course: Course;
@@ -10,15 +11,17 @@ interface CourseHeaderProps {
   onEdit: () => void;
 }
 
-export const CourseHeader = ({ course, canEdit, onBack, onEdit }: CourseHeaderProps) => {
+export const CourseHeader = ({
+  course,
+  canEdit,
+  onBack,
+  onEdit,
+}: CourseHeaderProps) => {
+  const navigate = useNavigate();
 
   return (
     <div className="mb-6">
-      <Button
-        variant="ghost"
-        onClick={onBack}
-        className="mb-4"
-      >
+      <Button variant="ghost" onClick={onBack} className="mb-4">
         <ArrowLeft className="w-4 h-4 mr-2" />
         Volver a cursos
       </Button>
@@ -43,8 +46,12 @@ export const CourseHeader = ({ course, canEdit, onBack, onEdit }: CourseHeaderPr
             <Button
               variant="outline"
               size="sm"
-              onClick={onEdit}
+              onClick={() => navigate(`/courses/${course.id}/template`)}
             >
+              <Layout className="w-4 h-4 mr-2" />
+              Configurar Template
+            </Button>
+            <Button variant="outline" size="sm" onClick={onEdit}>
               <Edit className="w-4 h-4 mr-2" />
               Editar
             </Button>
