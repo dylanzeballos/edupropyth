@@ -8,7 +8,10 @@ import { EmptyState } from '@/shared/components/ui';
 import { useModalState } from '@/shared/hooks/useModalState';
 import { CourseForm } from '../components/CourseForm';
 import { CourseListCard } from '../components/CourseListCard';
-import type { CreateCourseFormData, UpdateCourseFormData } from '../validation/course.schema';
+import type {
+  CreateCourseFormData,
+  UpdateCourseFormData,
+} from '../validation/course.schema';
 
 export const CoursesListPage = () => {
   const navigate = useNavigate();
@@ -18,7 +21,9 @@ export const CoursesListPage = () => {
   const createCourseMutation = useCreateCourse();
   const permissions = useCoursePermissions();
 
-  const handleCreateCourse = (data: CreateCourseFormData | UpdateCourseFormData) => {
+  const handleCreateCourse = (
+    data: CreateCourseFormData | UpdateCourseFormData,
+  ) => {
     createCourseMutation.mutate(data as CreateCourseFormData, {
       onSuccess: (newCourse) => {
         createModal.close();
@@ -37,7 +42,9 @@ export const CoursesListPage = () => {
         <div className="flex justify-center items-center h-64">
           <div className="flex flex-col items-center gap-4">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-            <p className="text-gray-600 dark:text-gray-400">Cargando cursos...</p>
+            <p className="text-gray-600 dark:text-gray-400">
+              Cargando cursos...
+            </p>
           </div>
         </div>
       </div>
@@ -66,11 +73,11 @@ export const CoursesListPage = () => {
         <div className="mb-8 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              Cursos
+              Gestión de Cursos
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
               {courses && courses.length > 0
-                ? `Gestiona los ${courses.length} curso${courses.length !== 1 ? 's' : ''} del sistema.`
+                ? `Administra y edita ${courses.length} curso${courses.length !== 1 ? 's' : ''} del sistema.`
                 : 'No hay cursos creados aún.'}
             </p>
           </div>
@@ -110,8 +117,14 @@ export const CoursesListPage = () => {
                   ? 'Comienza creando tu primer curso.'
                   : 'Los cursos aparecerán aquí cuando estén disponibles.'
               }
-              actionLabel={permissions.canCreateCourse ? 'Crear Primer Curso' : undefined}
-              onAction={permissions.canCreateCourse ? () => createModal.open() : undefined}
+              actionLabel={
+                permissions.canCreateCourse ? 'Crear Primer Curso' : undefined
+              }
+              onAction={
+                permissions.canCreateCourse
+                  ? () => createModal.open()
+                  : undefined
+              }
             />
           </div>
         ) : (
