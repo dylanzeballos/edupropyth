@@ -27,13 +27,13 @@ export const CoursesListPage = () => {
     createCourseMutation.mutate(data as CreateCourseFormData, {
       onSuccess: (newCourse) => {
         createModal.close();
-        navigate(`/courses/${newCourse.id}`);
+        navigate(`/courses/${newCourse.id}/management`);
       },
     });
   };
 
   const handleCourseClick = (courseId: string) => {
-    navigate(`/courses/${courseId}`);
+    navigate(`/courses/${courseId}/management`);
   };
 
   if (isLoading) {
