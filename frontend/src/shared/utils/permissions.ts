@@ -7,6 +7,7 @@ export const Permission = {
   EDIT_COURSE: 'edit_course',
   DELETE_COURSE: 'delete_course',
   EXECUTE_COURSE: 'execute_course',
+  MANAGE_COURSE_CONTENT: 'manage_course_content', // Can add resources/activities but not edit course structure
 
   // User management
   VIEW_USERS: 'view_users',
@@ -59,8 +60,10 @@ const rolePermissions: Record<UserRole, Permission[]> = {
   [UserRole.TEACHER_EXECUTOR]: [
     Permission.VIEW_COURSES,
     Permission.EXECUTE_COURSE,
+    Permission.MANAGE_COURSE_CONTENT,
     Permission.VIEW_TOPICS,
     Permission.VIEW_OWN_PROGRESS,
+    Permission.VIEW_ALL_PROGRESS,
     Permission.VIEW_SETTINGS,
   ],
   [UserRole.STUDENT]: [
