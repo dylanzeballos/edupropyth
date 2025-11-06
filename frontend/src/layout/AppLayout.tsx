@@ -16,7 +16,7 @@ export const AppLayout = () => {
   } = useLayoutState();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50/30 dark:from-gray-900 dark:to-blue-900/10 transition-colors duration-300">
+    <div className="h-screen overflow-auto scrollbar-none bg-gradient-to-br from-gray-50 to-blue-50/30 dark:from-gray-900 dark:to-blue-900/10 transition-colors duration-300">
       {/* Sidebar */}
       <Sidebar
         isOpen={isSidebarOpen}
@@ -40,7 +40,7 @@ export const AppLayout = () => {
           marginLeft: isMobile ? 0 : `${sidebarWidth}px`,
           marginTop: `${headerHeight}px`,
         }}
-        className="min-h-[calc(100vh-64px)] p-4 md:p-6 transition-all duration-300"
+        className="relative min-h-[calc(100vh-64px)] transition-all duration-300"
       >
         <Outlet />
       </main>
