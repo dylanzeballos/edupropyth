@@ -117,7 +117,7 @@ export const UserTable = ({
               >
                 <TableCell className="font-medium">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-600 to-cyan-500 flex items-center justify-center text-white font-bold">
                       {user.firstName.charAt(0)}
                       {user.lastName.charAt(0)}
                     </div>

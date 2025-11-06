@@ -8,6 +8,7 @@ import {
   Edit,
   Trash2,
 } from 'lucide-react';
+import { useState } from 'react';
 import { ResourceType } from '@/features/courses/types/course.types';
 import { Button } from '@/shared/components/ui/Button';
 import type { Resource } from '../types/resource.types';
@@ -19,7 +20,10 @@ interface ResourceCardProps {
   isDragging?: boolean;
 }
 
-const resourceTypeIcons: Record<ResourceType, React.ComponentType<{ className?: string }>> = {
+const resourceTypeIcons: Record<
+  ResourceType,
+  React.ComponentType<{ className?: string }>
+> = {
   slide: Presentation,
   video: Video,
   audio: Music,
@@ -29,9 +33,11 @@ const resourceTypeIcons: Record<ResourceType, React.ComponentType<{ className?: 
 
 const resourceTypeColors: Record<ResourceType, string> = {
   slide: 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300',
-  video: 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300',
+  video:
+    'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300',
   audio: 'bg-pink-100 dark:bg-pink-900/30 text-pink-800 dark:text-pink-300',
-  document: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300',
+  document:
+    'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300',
   link: 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300',
 };
 
@@ -42,9 +48,12 @@ export const ResourceCard = ({
   isDragging = false,
 }: ResourceCardProps) => {
   const IconComponent = resourceTypeIcons[resource.type];
+  const [showAudioPlayer, setShowAudioPlayer] = useState(false);
 
   const handleOpenResource = () => {
-    if (resource.url) {
+    if (resource.type === 'audio') {
+      setShowAudioPlayer(!showAudioPlayer);
+    } else if (resource.url) {
       window.open(resource.url, '_blank', 'noopener,noreferrer');
     }
   };
@@ -58,7 +67,9 @@ export const ResourceCard = ({
     >
       <div className="flex items-start justify-between gap-3 mb-3">
         <div className="flex items-center gap-3 flex-1">
-          <div className={`p-2 rounded-lg ${resourceTypeColors[resource.type]}`}>
+          <div
+            className={`p-2 rounded-lg ${resourceTypeColors[resource.type]}`}
+          >
             <IconComponent className="w-5 h-5" />
           </div>
           <div className="flex-1 min-w-0">
@@ -88,6 +99,19 @@ export const ResourceCard = ({
         )}
       </div>
 
+      {resource.type === 'audio' && showAudioPlayer && resource.url && (
+        <div className="mb-3">
+          <audio
+            controls
+            className="w-full"
+            src={resource.url}
+            preload="metadata"
+          >
+            Tu navegador no soporta el elemento de audio.
+          </audio>
+        </div>
+      )}
+
       <div className="flex items-center gap-2 mt-auto">
         <Button
           variant="outline"
@@ -95,15 +119,20 @@ export const ResourceCard = ({
           onClick={handleOpenResource}
           className="flex-1"
         >
-          <ExternalLink className="w-4 h-4 mr-2" />
-          Abrir
+          {resource.type === 'audio' ? (
+            <>
+              <Music className="w-4 h-4 mr-2" />
+              {showAudioPlayer ? 'Ocultar' : 'Reproducir'}
+            </>
+          ) : (
+            <>
+              <ExternalLink className="w-4 h-4 mr-2" />
+              Abrir
+            </>
+          )}
         </Button>
         {onEdit && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onEdit(resource)}
-          >
+          <Button variant="outline" size="sm" onClick={() => onEdit(resource)}>
             <Edit className="w-4 h-4" />
           </Button>
         )}

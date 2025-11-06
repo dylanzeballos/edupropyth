@@ -1,9 +1,5 @@
 import { useCallback } from 'react';
-import {
-  useCreateTopic,
-  useUpdateTopic,
-  useDeleteTopic,
-} from '@/features/topics';
+import { useCreateTopic, useUpdateTopic, useDeleteTopic } from './useTopic';
 import type {
   CreateTopicFormData,
   UpdateTopicFormData,
@@ -34,7 +30,7 @@ export const useTopicActions = ({
         },
       });
     },
-    [createTopicMutation, onCreateSuccess]
+    [createTopicMutation, onCreateSuccess],
   );
 
   const handleUpdate = useCallback(
@@ -45,10 +41,10 @@ export const useTopicActions = ({
           onSuccess: () => {
             onUpdateSuccess?.();
           },
-        }
+        },
       );
     },
-    [updateTopicMutation, onUpdateSuccess]
+    [updateTopicMutation, onUpdateSuccess],
   );
 
   const handleDelete = useCallback(
@@ -59,7 +55,7 @@ export const useTopicActions = ({
         },
       });
     },
-    [deleteTopicMutation, onDeleteSuccess]
+    [deleteTopicMutation, onDeleteSuccess],
   );
 
   return {

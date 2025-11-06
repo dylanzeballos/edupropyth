@@ -1,34 +1,35 @@
-// Types
-export type * from './types/topic.types';
+// Components
+export { TopicCard } from './components/TopicCard';
+export { TopicForm } from './components/TopicForm';
 
 // Hooks
-export {
-  useTopics,
-  useTopic,
-  useCreateTopic,
-  useUpdateTopic,
-  useDeleteTopic,
-  useReorderTopics,
-  useCloneTopicToHistoric,
-  TOPIC_QUERY_KEYS,
-} from './hooks/useTopic';
+export { useTopic, useTopics } from './hooks/useTopic';
 export { useTopicActions } from './hooks/useTopicActions';
+export { useTopicNavigation } from './hooks/useTopicNavigation';
+export { useTopicPermissions } from './hooks/useTopicPermissions';
+export { useDefaultTemplate } from './hooks/useDefaultTemplate';
 
-// Components
-export { TopicForm } from './components/TopicForm';
-export { TopicCard } from './components/TopicCard';
-
-// Services
-export { topicService } from './services/topic.service';
+// Types
+export type {
+  Topic,
+  CreateTopicRequest,
+  UpdateTopicRequest,
+} from './types/topic.types';
+export type {
+  TopicTemplate,
+  ContentBlock,
+  ContentBlockType,
+  LayoutType,
+  ContentBlockData,
+  CreateTemplateRequest,
+  UpdateTemplateRequest,
+} from './types/template.types';
 
 // Validation
-export {
-  createTopicSchema,
-  updateTopicSchema,
-  reorderTopicsSchema,
-} from './validation/topic.schema';
 export type {
   CreateTopicFormData,
   UpdateTopicFormData,
-  ReorderTopicsFormData,
 } from './validation/topic.schema';
+
+// Pages
+export { TopicPublicViewPage } from './pages/TopicPublicViewPage';

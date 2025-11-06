@@ -21,7 +21,7 @@ export class GetCourseUseCase {
   }
 
   async executeAll(): Promise<CourseResponseDto[]> {
-    const courses = await this.courseRepository.findAll();
+    const courses = await this.courseRepository.findAllWithTopics();
     return courses.map((course) => CourseResponseDto.fromCourse(course));
   }
 }
