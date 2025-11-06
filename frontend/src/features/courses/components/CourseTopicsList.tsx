@@ -12,18 +12,20 @@ interface CourseTopicsListProps {
   topics: Topic[];
   courseStatus: CourseStatus;
   canEdit: boolean;
-  onAddTopic: () => void;
-  onEditTopic: (topic: Topic) => void;
-  onDeleteTopic: (topicId: string) => void;
-  onAddResource: (topic: Topic) => void;
-  onEditResource: (resource: Resource) => void;
-  onDeleteResource: (resourceId: string) => void;
+  canManageContent?: boolean;
+  onAddTopic?: () => void;
+  onEditTopic?: (topic: Topic) => void;
+  onDeleteTopic?: (topicId: string) => void;
+  onAddResource?: (topic: Topic) => void;
+  onEditResource?: (resource: Resource) => void;
+  onDeleteResource?: (resourceId: string) => void;
 }
 
 export const CourseTopicsList = ({
   topics,
   courseStatus,
   canEdit,
+  canManageContent = canEdit,
   onAddTopic,
   onEditTopic,
   onDeleteTopic,
@@ -34,7 +36,7 @@ export const CourseTopicsList = ({
   const [expandedTopicId, setExpandedTopicId] = useState<string | null>(null);
 
   const toggleTopicExpansion = (topicId: string) => {
-    setExpandedTopicId(prev => prev === topicId ? null : topicId);
+    setExpandedTopicId((prev) => (prev === topicId ? null : topicId));
   };
 
   return (
@@ -91,11 +93,17 @@ export const CourseTopicsList = ({
                 topic={topic}
                 courseStatus={courseStatus}
                 index={index}
-                onEdit={canEdit ? () => onEditTopic(topic) : undefined}
-                onDelete={canEdit ? () => onDeleteTopic(topic.id) : undefined}
+                onEdit={
+                  canEdit && onEditTopic ? () => onEditTopic(topic) : undefined
+                }
+                onDelete={
+                  canEdit && onDeleteTopic
+                    ? () => onDeleteTopic(topic.id)
+                    : undefined
+                }
                 onClick={() => toggleTopicExpansion(topic.id)}
               />
-              
+
               {expandedTopicId === topic.id && (
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
@@ -107,7 +115,7 @@ export const CourseTopicsList = ({
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                       Recursos
                     </h3>
-                    {canEdit && (
+                    {canManageContent && onAddResource && (
                       <Button
                         size="sm"
                         variant="outline"
@@ -129,8 +137,16 @@ export const CourseTopicsList = ({
                         <ResourceCard
                           key={resource.id}
                           resource={resource}
-                          onEdit={canEdit ? onEditResource : undefined}
-                          onDelete={canEdit ? (id) => onDeleteResource(id) : undefined}
+                          onEdit={
+                            canManageContent && onEditResource
+                              ? onEditResource
+                              : undefined
+                          }
+                          onDelete={
+                            canManageContent && onDeleteResource
+                              ? (id) => onDeleteResource(id)
+                              : undefined
+                          }
                         />
                       ))}
                     </div>

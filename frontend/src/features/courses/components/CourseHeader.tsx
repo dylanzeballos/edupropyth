@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router';
 interface CourseHeaderProps {
   course: Course;
   canEdit: boolean;
+  canConfigureTemplate?: boolean;
   onBack: () => void;
   onEdit: () => void;
 }
@@ -14,6 +15,7 @@ interface CourseHeaderProps {
 export const CourseHeader = ({
   course,
   canEdit,
+  canConfigureTemplate = canEdit,
   onBack,
   onEdit,
 }: CourseHeaderProps) => {
@@ -41,8 +43,8 @@ export const CourseHeader = ({
           )}
         </div>
 
-        {canEdit && (
-          <div className="flex gap-2 ml-4">
+        <div className="flex gap-2 ml-4">
+          {canConfigureTemplate && (
             <Button
               variant="outline"
               size="sm"
@@ -51,12 +53,14 @@ export const CourseHeader = ({
               <Layout className="w-4 h-4 mr-2" />
               Configurar Template
             </Button>
+          )}
+          {canEdit && (
             <Button variant="outline" size="sm" onClick={onEdit}>
               <Edit className="w-4 h-4 mr-2" />
               Editar
             </Button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
