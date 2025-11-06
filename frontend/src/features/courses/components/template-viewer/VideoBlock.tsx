@@ -1,4 +1,7 @@
-import { getVideoEmbedUrl, detectVideoProvider } from '@/shared/utils/media.utils';
+import {
+  getVideoEmbedUrl,
+  detectVideoProvider,
+} from '@/shared/utils/media.utils';
 import type { ContentBlock } from '../../services/course-template.service';
 import type { Resource } from '../../types/course.types';
 
@@ -26,11 +29,11 @@ export const VideoBlock = ({ block, resources = [] }: VideoBlockProps) => {
   return (
     <div className="h-full flex flex-col">
       {block.content.title && (
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+        <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-2">
           {block.content.title}
         </h3>
       )}
-      <div className="flex-1 aspect-video bg-gray-900 rounded-lg overflow-hidden">
+      <div className="flex-1 aspect-video bg-gray-900 rounded-md overflow-hidden">
         {embedUrl ? (
           <iframe
             src={embedUrl}
@@ -40,7 +43,7 @@ export const VideoBlock = ({ block, resources = [] }: VideoBlockProps) => {
             title={block.content.title || 'Video'}
           />
         ) : (
-          <div className="flex items-center justify-center h-full text-gray-400">
+          <div className="flex items-center justify-center h-full text-gray-400 text-sm">
             <p>No hay video disponible</p>
           </div>
         )}
