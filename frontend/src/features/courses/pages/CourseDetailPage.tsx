@@ -2,6 +2,7 @@ import { useParams, useNavigate } from 'react-router';
 import { motion } from 'framer-motion';
 import { useCourse, useUpdateCourse } from '../hooks/useCourse';
 import { useCoursePermissions } from '../hooks/useCoursePermissions';
+import { useCourseNavigation } from '../hooks/useCourseNavigation';
 import { CourseForm } from '../components/CourseForm';
 import { CourseHeader } from '../components/CourseHeader';
 import { CourseInfo } from '../components/CourseInfo';
@@ -35,6 +36,18 @@ export const CourseDetailPage = () => {
   const { data: topics } = useTopics(id || '');
   const updateCourseMutation = useUpdateCourse();
   const permissions = useCoursePermissions();
+  const { navigateToCoursesPage } = useCourseNavigation({ course });
+
+  const {
+    canEditCourse,
+    canConfigureTemplate,
+    canCreateTopics,
+    canEditTopics,
+    canDeleteTopics,
+    canAddResources,
+    canEditResources,
+    canDeleteResources,
+  } = permissions;
 
   const topicActions = useTopicActions({
     courseId: id || '',
@@ -53,15 +66,19 @@ export const CourseDetailPage = () => {
     if (!id) return;
     updateCourseMutation.mutate(
       { id, data },
-      { onSuccess: () => modals.closeModal('editCourse') }
+      { onSuccess: () => modals.closeModal('editCourse') },
     );
   };
 
-  const handleCreateTopic = (data: CreateTopicFormData | UpdateTopicFormData) => {
+  const handleCreateTopic = (
+    data: CreateTopicFormData | UpdateTopicFormData,
+  ) => {
     topicActions.handleCreate(data);
   };
 
-  const handleUpdateTopic = (data: CreateTopicFormData | UpdateTopicFormData) => {
+  const handleUpdateTopic = (
+    data: CreateTopicFormData | UpdateTopicFormData,
+  ) => {
     const topic = modals.getModalData<Topic>('editTopic');
     if (!topic) return;
     topicActions.handleUpdate(topic.id, data);
@@ -73,11 +90,15 @@ export const CourseDetailPage = () => {
     topicActions.handleDelete(topicId);
   };
 
-  const handleSubmitResource = (data: UploadResourceRequest | CreateResourceRequest) => {
+  const handleSubmitResource = (
+    data: UploadResourceRequest | CreateResourceRequest,
+  ) => {
     resourceActions.handleCreate(data);
   };
 
-  const handleUpdateResource = (data: UploadResourceRequest | CreateResourceRequest) => {
+  const handleUpdateResource = (
+    data: UploadResourceRequest | CreateResourceRequest,
+  ) => {
     const resource = modals.getModalData<Resource>('editResource');
     if (!resource) return;
     resourceActions.handleUpdate(resource.id, data);
@@ -95,7 +116,9 @@ export const CourseDetailPage = () => {
         <div className="flex justify-center items-center h-64">
           <div className="flex flex-col items-center gap-4">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-            <p className="text-gray-600 dark:text-gray-400">Cargando curso...</p>
+            <p className="text-gray-600 dark:text-gray-400">
+              Cargando curso...
+            </p>
           </div>
         </div>
       </div>
@@ -125,8 +148,6 @@ export const CourseDetailPage = () => {
     );
   }
 
-  const canEdit = course.status !== 'historic' && permissions.canEditCourse;
-
   return (
     <div className="container mx-auto px-4 py-8">
       <motion.div
@@ -136,8 +157,9 @@ export const CourseDetailPage = () => {
       >
         <CourseHeader
           course={course}
-          canEdit={canEdit}
-          onBack={() => navigate('/course-management')}
+          canEdit={canEditCourse}
+          canConfigureTemplate={canConfigureTemplate}
+          onBack={navigateToCoursesPage}
           onEdit={() => modals.openModal('editCourse')}
         />
 
@@ -154,58 +176,87 @@ export const CourseDetailPage = () => {
         <CourseTopicsList
           topics={topics || []}
           courseStatus={course.status}
-          canEdit={canEdit}
-          onAddTopic={() => modals.openModal('createTopic')}
-          onEditTopic={(topic) => modals.openModal('editTopic', topic)}
-          onDeleteTopic={(topicId) => modals.openModal('deleteTopic', topicId)}
-          onAddResource={(topic) => modals.openModal('createResource', topic)}
-          onEditResource={(resource) => modals.openModal('editResource', resource)}
-          onDeleteResource={(resourceId) => modals.openModal('deleteResource', resourceId)}
+          canEdit={canEditTopics}
+          canManageContent={canAddResources}
+          onAddTopic={
+            canCreateTopics ? () => modals.openModal('createTopic') : undefined
+          }
+          onEditTopic={
+            canEditTopics
+              ? (topic) => modals.openModal('editTopic', topic)
+              : undefined
+          }
+          onDeleteTopic={
+            canDeleteTopics
+              ? (topicId) => modals.openModal('deleteTopic', topicId)
+              : undefined
+          }
+          onAddResource={
+            canAddResources
+              ? (topic) => modals.openModal('createResource', topic)
+              : undefined
+          }
+          onEditResource={
+            canEditResources
+              ? (resource) => modals.openModal('editResource', resource)
+              : undefined
+          }
+          onDeleteResource={
+            canDeleteResources
+              ? (resourceId) => modals.openModal('deleteResource', resourceId)
+              : undefined
+          }
         />
 
         <CourseInfo course={course} topicsCount={topics?.length || 0} />
       </motion.div>
 
-      <Modal
-        isOpen={modals.isModalOpen('editCourse')}
-        onClose={() => modals.closeModal('editCourse')}
-        title="Editar Curso"
-      >
-        <CourseForm
-          course={course}
-          onSubmit={handleUpdateCourse}
-          onCancel={() => modals.closeModal('editCourse')}
-          isSubmitting={updateCourseMutation.isPending}
-        />
-      </Modal>
-
-      <Modal
-        isOpen={modals.isModalOpen('createTopic')}
-        onClose={() => modals.closeModal('createTopic')}
-        title="Crear Nuevo Tópico"
-      >
-        <TopicForm
-          onSubmit={handleCreateTopic}
-          onCancel={() => modals.closeModal('createTopic')}
-          isSubmitting={topicActions.isCreating}
-          nextOrder={topics?.length || 0}
-        />
-      </Modal>
-
-      <Modal
-        isOpen={modals.isModalOpen('editTopic')}
-        onClose={() => modals.closeModal('editTopic')}
-        title="Editar Tópico"
-      >
-        {modals.getModalData<Topic>('editTopic') && (
-          <TopicForm
-            topic={modals.getModalData<Topic>('editTopic')!}
-            onSubmit={handleUpdateTopic}
-            onCancel={() => modals.closeModal('editTopic')}
-            isSubmitting={topicActions.isUpdating}
+      {canEditCourse && (
+        <Modal
+          isOpen={modals.isModalOpen('editCourse')}
+          onClose={() => modals.closeModal('editCourse')}
+          title="Editar Curso"
+        >
+          <CourseForm
+            course={course}
+            onSubmit={handleUpdateCourse}
+            onCancel={() => modals.closeModal('editCourse')}
+            isSubmitting={updateCourseMutation.isPending}
           />
-        )}
-      </Modal>
+        </Modal>
+      )}
+
+      {canCreateTopics && (
+        <Modal
+          isOpen={modals.isModalOpen('createTopic')}
+          onClose={() => modals.closeModal('createTopic')}
+          title="Crear Nuevo Tópico"
+        >
+          <TopicForm
+            onSubmit={handleCreateTopic}
+            onCancel={() => modals.closeModal('createTopic')}
+            isSubmitting={topicActions.isCreating}
+            nextOrder={topics?.length || 0}
+          />
+        </Modal>
+      )}
+
+      {canEditTopics && (
+        <Modal
+          isOpen={modals.isModalOpen('editTopic')}
+          onClose={() => modals.closeModal('editTopic')}
+          title="Editar Tópico"
+        >
+          {modals.getModalData<Topic>('editTopic') && (
+            <TopicForm
+              topic={modals.getModalData<Topic>('editTopic')!}
+              onSubmit={handleUpdateTopic}
+              onCancel={() => modals.closeModal('editTopic')}
+              isSubmitting={topicActions.isUpdating}
+            />
+          )}
+        </Modal>
+      )}
 
       <Modal
         isOpen={modals.isModalOpen('deleteTopic')}
@@ -214,7 +265,9 @@ export const CourseDetailPage = () => {
       >
         <div className="space-y-4">
           <p className="text-gray-600 dark:text-gray-400">
-            ¿Estás seguro de que deseas eliminar este tópico? Esta acción no se puede deshacer y se eliminarán todos los recursos y actividades asociados.
+            ¿Estás seguro de que deseas eliminar este tópico? Esta acción no se
+            puede deshacer y se eliminarán todos los recursos y actividades
+            asociados.
           </p>
           <div className="flex justify-end space-x-3">
             <Button
@@ -243,7 +296,10 @@ export const CourseDetailPage = () => {
         {modals.getModalData<Topic>('createResource') && (
           <ResourceForm
             topicId={modals.getModalData<Topic>('createResource')!.id}
-            order={modals.getModalData<Topic>('createResource')!.resources?.length || 0}
+            order={
+              modals.getModalData<Topic>('createResource')!.resources?.length ||
+              0
+            }
             onSubmit={handleSubmitResource}
             onCancel={() => modals.closeModal('createResource')}
             isLoading={resourceActions.isCreating}
@@ -262,7 +318,8 @@ export const CourseDetailPage = () => {
             order={modals.getModalData<Resource>('editResource')!.order}
             initialData={{
               title: modals.getModalData<Resource>('editResource')!.title,
-              description: modals.getModalData<Resource>('editResource')!.description,
+              description:
+                modals.getModalData<Resource>('editResource')!.description,
               type: modals.getModalData<Resource>('editResource')!.type,
               url: modals.getModalData<Resource>('editResource')!.url,
               order: modals.getModalData<Resource>('editResource')!.order,
@@ -281,7 +338,8 @@ export const CourseDetailPage = () => {
       >
         <div className="space-y-4">
           <p className="text-gray-600 dark:text-gray-400">
-            ¿Estás seguro de que deseas eliminar este recurso? Esta acción no se puede deshacer.
+            ¿Estás seguro de que deseas eliminar este recurso? Esta acción no se
+            puede deshacer.
           </p>
           <div className="flex justify-end space-x-3">
             <Button

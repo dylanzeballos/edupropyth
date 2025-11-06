@@ -70,12 +70,12 @@ export const CourseTemplateViewer = ({
     });
   }, [blocks, resources, activities]);
 
-  const gridStyle = useMemo(() => {
-    if (visibleBlocks.length === 0) return {};
+  const gridHeight = useMemo(() => {
+    if (visibleBlocks.length === 0) return 0;
     const maxY = Math.max(
       ...visibleBlocks.map((b) => (b.position?.y || 0) + (b.position?.h || 4)),
     );
-    return { minHeight: `${maxY * 80}px` };
+    return maxY * 70; // 70px per row unit
   }, [visibleBlocks]);
 
   const renderBlockContent = (block: ContentBlock) => {
@@ -99,7 +99,7 @@ export const CourseTemplateViewer = ({
 
   if (visibleBlocks.length === 0) {
     return (
-      <div className="flex items-center justify-center py-12">
+      <div className="flex items-center justify-center h-full">
         <p className="text-gray-500 dark:text-gray-400">
           No hay contenido disponible
         </p>
@@ -108,29 +108,36 @@ export const CourseTemplateViewer = ({
   }
 
   return (
-    <div className="relative" style={gridStyle}>
-      {visibleBlocks.map((block) => {
-        const pos = block.position || { x: 0, y: 0, w: 12, h: 4 };
-        const colWidth = 100 / 12;
-        const rowHeight = 80;
+    <div className="relative w-full h-full overflow-auto scrollbar-none">
+      <div
+        className="relative w-full origin-top-left"
+        style={{ height: `${gridHeight}px` }}
+      >
+        {visibleBlocks.map((block) => {
+          const pos = block.position || { x: 0, y: 0, w: 12, h: 4 };
+          const colWidth = 100 / 12;
+          const rowHeight = 70;
 
-        return (
-          <div
-            key={block.id}
-            className={cn(
-              'absolute bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 overflow-auto',
-            )}
-            style={{
-              left: `${pos.x * colWidth}%`,
-              top: `${pos.y * rowHeight}px`,
-              width: `${pos.w * colWidth}%`,
-              height: `${pos.h * rowHeight}px`,
-            }}
-          >
-            {renderBlockContent(block)}
-          </div>
-        );
-      })}
+          return (
+            <div
+              key={block.id}
+              className={cn(
+                'absolute bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700',
+                'p-3 md:p-4',
+                'overflow-auto scrollbar-none',
+              )}
+              style={{
+                left: `${pos.x * colWidth}%`,
+                top: `${pos.y * rowHeight}px`,
+                width: `calc(${pos.w * colWidth}% - 8px)`,
+                height: `${pos.h * rowHeight}px`,
+              }}
+            >
+              {renderBlockContent(block)}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };
