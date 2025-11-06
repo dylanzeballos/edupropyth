@@ -52,7 +52,7 @@ export const LoginForm = () => {
           type="email"
           placeholder="ejemplo@correo.com"
           register={register}
-          errors={errors.email}
+          errors={errors}
         />
 
         <InputText
@@ -61,7 +61,7 @@ export const LoginForm = () => {
           type="password"
           placeholder="••••••••"
           register={register}
-          errors={errors.password}
+          errors={errors}
         />
 
         <div className="flex items-center justify-between">

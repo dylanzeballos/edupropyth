@@ -46,11 +46,11 @@ export const Header = ({
 
           {isMobile && (
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-green-400 via-blue-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg">
-                <span className="text-white text-sm font-bold">PL</span>
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-400 via-blue-500 to-cyan-600 rounded-lg flex items-center justify-center shadow-lg">
+                <span className="text-white text-sm font-bold">EDP</span>
               </div>
               <span className="text-sm font-bold text-gray-900 dark:text-white">
-                Python Lab
+                EduProPyth
               </span>
             </div>
           )}

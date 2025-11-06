@@ -9,7 +9,15 @@ import { RoleGuard } from '@/features/auth';
 import MicrosoftCallbackPage from '@/features/auth/pages/MicrosoftCallbackPage';
 import { NotFoundPage } from '@/shared/pages/NotFoundPage';
 import { UsersManagementPage } from '@/features/users';
+import {
+  CoursesListPage,
+  CourseDetailPage,
+  MyCoursesPage,
+  CourseTopicsViewPage,
+} from '@/features/courses';
+import { CourseTemplateEditorPage } from '@/features/courses/pages/CourseTemplateEditorPage';
 import { UserRole } from '@/features/auth/types/user.type';
+import { TopicPublicViewPage } from '@/features/topics';
 
 const AppRouter = createBrowserRouter([
   {
@@ -37,12 +45,26 @@ const AppRouter = createBrowserRouter([
         ),
       },
       {
-        path: 'topics',
-        element: <div>Topics (Por implementar)</div>,
+        path: 'my-courses',
+        element: <MyCoursesPage />,
       },
       {
-        path: 'courses',
-        element: <div>Courses (Por implementar)</div>,
+        path: 'courses/:id/topics',
+        element: <CourseTopicsViewPage />,
+      },
+      {
+        path: 'courses/:id/management',
+        element: (
+          <RoleGuard
+            roles={[
+              UserRole.ADMIN,
+              UserRole.TEACHER_EDITOR,
+              UserRole.TEACHER_EXECUTOR,
+            ]}
+          >
+            <CourseDetailPage />
+          </RoleGuard>
+        ),
       },
       {
         path: 'editor',
@@ -55,15 +77,45 @@ const AppRouter = createBrowserRouter([
       {
         path: 'course-management',
         element: (
-          <RoleGuard roles={[UserRole.ADMIN, UserRole.TEACHER_EDITOR]}>
-            <div>Course Management (Por implementar)</div>
+          <RoleGuard
+            roles={[
+              UserRole.ADMIN,
+              UserRole.TEACHER_EDITOR,
+              UserRole.TEACHER_EXECUTOR,
+            ]}
+          >
+            <CoursesListPage />
           </RoleGuard>
         ),
       },
       {
+        path: 'courses/:courseId/template',
+        element: (
+          <RoleGuard
+            roles={[
+              UserRole.ADMIN,
+              UserRole.TEACHER_EDITOR,
+              UserRole.TEACHER_EXECUTOR,
+            ]}
+          >
+            <CourseTemplateEditorPage />
+          </RoleGuard>
+        ),
+      },
+      {
+        path: 'courses/:courseId/topics/:topicId/view',
+        element: <TopicPublicViewPage />,
+      },
+      {
         path: 'all-progress',
         element: (
-          <RoleGuard roles={[UserRole.ADMIN, UserRole.TEACHER_EDITOR]}>
+          <RoleGuard
+            roles={[
+              UserRole.ADMIN,
+              UserRole.TEACHER_EDITOR,
+              UserRole.TEACHER_EXECUTOR,
+            ]}
+          >
             <div>All Progress (Por implementar)</div>
           </RoleGuard>
         ),

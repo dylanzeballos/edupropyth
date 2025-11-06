@@ -19,6 +19,7 @@ interface InputProps<T extends FieldValues> {
   errors: FieldErrors<T>;
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void;
+  onInput?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   value?: string | number;
   validationRules?: Record<string, unknown>;
   disabled?: boolean;

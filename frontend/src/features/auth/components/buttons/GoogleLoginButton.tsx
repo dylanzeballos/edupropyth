@@ -26,7 +26,7 @@ export const GoogleLoginButton = ({
 
       const result = await authService.googleAuth(response.credential);
       onSuccess?.(result);
-      setAuth(result.user, result.access_token, result.refresh_token);
+      setAuth(result.user, result.accessToken, result.refreshToken);
     } catch (error: unknown) {
       console.error('Google login error:', error);
 

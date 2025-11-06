@@ -29,10 +29,9 @@ export const UsersManagementPage = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center">
             <UsersIcon className="w-6 h-6 text-white" />
           </div>
           <div>
@@ -57,10 +56,8 @@ export const UsersManagementPage = () => {
         </Button>
       </div>
 
-      {/* Stats Cards */}
       <UserStatsCards stats={stats} isLoading={isLoadingStats} />
 
-      {/* Users Table */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

@@ -40,7 +40,7 @@ export const RegisterForm = ({
           type="email"
           placeholder="ejemplo@correo.com"
           register={register}
-          errors={errors.email}
+          errors={errors}
         />
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -50,7 +50,7 @@ export const RegisterForm = ({
             type="text"
             placeholder="Juan"
             register={register}
-            errors={errors.firstName}
+            errors={errors}
           />
 
           <InputText
@@ -59,7 +59,7 @@ export const RegisterForm = ({
             type="text"
             placeholder="Pérez"
             register={register}
-            errors={errors.lastName}
+            errors={errors}
           />
         </div>
 
@@ -69,7 +69,7 @@ export const RegisterForm = ({
           type="password"
           placeholder="••••••••"
           register={register}
-          errors={errors.password}
+          errors={errors}
         />
 
         <InputText
@@ -78,7 +78,7 @@ export const RegisterForm = ({
           type="password"
           placeholder="••••••••"
           register={register}
-          errors={errors.passwordConfirm}
+          errors={errors}
         />
 
         <div className="flex items-start">

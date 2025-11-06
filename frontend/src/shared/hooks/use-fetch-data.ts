@@ -9,7 +9,7 @@ export const useFetchData = <T>(endpoint: string) => {
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await getData<T>(endpoint);
+      const response = (await getData(endpoint)) as T;
       setData(response);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error fetching data');
