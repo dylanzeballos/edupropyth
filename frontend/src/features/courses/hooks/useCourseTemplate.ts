@@ -46,11 +46,8 @@ export const useCreateCourseTemplate = () => {
       });
       toast.success('Template de curso creado exitosamente');
     },
-    onError: (error: any) => {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        'Error al crear el template';
+    onError: (error: Error) => {
+      const message = error.message || 'Error al crear el template';
       toast.error(message);
     },
   });
@@ -76,11 +73,8 @@ export const useUpdateCourseTemplate = () => {
       });
       toast.success('Template actualizado exitosamente');
     },
-    onError: (error: any) => {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        'Error al actualizar el template';
+    onError: (error: Error) => {
+      const message = error.message || 'Error al actualizar el template';
       toast.error(message);
     },
   });
@@ -106,11 +100,8 @@ export const useUpdateCourseTemplateByCourseId = () => {
       });
       toast.success('Template actualizado exitosamente');
     },
-    onError: (error: any) => {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        'Error al actualizar el template';
+    onError: (error: Error) => {
+      const message = error.message || 'Error al actualizar el template';
       toast.error(message);
     },
   });
@@ -128,11 +119,8 @@ export const useDeleteCourseTemplate = () => {
       });
       toast.success('Template eliminado exitosamente');
     },
-    onError: (error: any) => {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        'Error al eliminar el template';
+    onError: (error: Error) => {
+      const message = error.message || 'Error al eliminar el template';
       toast.error(message);
     },
   });
@@ -150,11 +138,8 @@ export const useDeleteCourseTemplateByCourseId = () => {
       });
       toast.success('Template eliminado exitosamente');
     },
-    onError: (error: any) => {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        'Error al eliminar el template';
+    onError: (error: Error) => {
+      const message = error.message || 'Error al eliminar el template';
       toast.error(message);
     },
   });
