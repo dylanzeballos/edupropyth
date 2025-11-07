@@ -41,10 +41,14 @@ export class TypeOrmCourseRepository implements ICourseRepository {
 
   async findAllWithTopics(): Promise<Course[]> {
     return this.courseRepository.find({
-      relations: ['topics'],
+      relations: ['topics', 'topics.resources', 'topics.activities'],
       order: {
         createdAt: 'DESC',
-        topics: { order: 'ASC' },
+        topics: {
+          order: 'ASC',
+          resources: { order: 'ASC' },
+          activities: { order: 'ASC' },
+        },
       },
     });
   }
