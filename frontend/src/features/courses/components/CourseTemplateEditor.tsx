@@ -141,33 +141,45 @@ export const CourseTemplateEditor = ({
 
   return (
     <div className="h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex-shrink-0">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-4 flex-shrink-0">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex-1 min-w-0">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white truncate">
               Editor de Template de Curso
             </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1 hidden sm:block">
               Arrastra y redimensiona los bloques para organizar el contenido
             </p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-2 sm:gap-3 sm:flex-nowrap">
             <Button
               variant="outline"
               onClick={() => setShowAddBlockModal(true)}
               icon1={Plus}
+              size="sm"
+              className="flex-1 sm:flex-initial"
             >
-              Agregar Bloque
+              <span className="hidden sm:inline">Agregar Bloque</span>
+              <span className="sm:hidden">Agregar</span>
             </Button>
-            <Button variant="outline" onClick={onCancel} disabled={isSaving}>
+            <Button
+              variant="outline"
+              onClick={onCancel}
+              disabled={isSaving}
+              size="sm"
+              className="flex-1 sm:flex-initial"
+            >
               Cancelar
             </Button>
             <Button
               onClick={() => onSave(blocks)}
               loading={isSaving}
               icon1={Save}
+              size="sm"
+              className="flex-1 sm:flex-initial"
             >
-              Guardar Template
+              <span className="hidden sm:inline">Guardar Template</span>
+              <span className="sm:hidden">Guardar</span>
             </Button>
           </div>
         </div>
