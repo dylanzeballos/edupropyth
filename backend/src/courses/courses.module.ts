@@ -150,6 +150,8 @@ import { CourseTemplateController } from './presentation/controllers/course-temp
     {
       provide: ENROLLMENT_REPOSITORY,
       useClass: TypeOrmEnrollmentRepository,
+    },
+    {
       provide: COURSE_TEMPLATE_REPOSITORY,
       useClass: TypeormCourseTemplateRepository,
     },
