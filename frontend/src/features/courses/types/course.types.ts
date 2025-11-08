@@ -1,8 +1,8 @@
+import type { Activity as ActivityType } from '@/features/activities';
+
 export type CourseStatus = 'draft' | 'active' | 'historic';
 
 export type ResourceType = 'slide' | 'video' | 'audio' | 'document' | 'link';
-
-export type ActivityType = 'quiz' | 'assignment' | 'discussion' | 'exercise';
 
 export interface Resource {
   id: string;
@@ -19,21 +19,7 @@ export interface Resource {
   updatedAt: string;
 }
 
-export interface Activity {
-  id: string;
-  topicId: string;
-  title: string;
-  description: string;
-  type: ActivityType;
-  content: Record<string, unknown>;
-  dueDate?: string;
-  maxScore?: number;
-  order: number;
-  isRequired: boolean;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
+export type Activity = ActivityType;
 
 export interface Topic {
   id: string;

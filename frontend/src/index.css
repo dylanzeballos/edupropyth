@@ -119,6 +119,16 @@ body {
   @apply bg-gray-400 dark:bg-gray-600;
 }
 
+/* Hide scrollbar but keep scroll functionality */
+.scrollbar-none {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
 html.dark {
   color-scheme: dark;
 }

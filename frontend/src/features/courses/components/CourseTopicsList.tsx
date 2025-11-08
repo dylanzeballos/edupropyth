@@ -4,37 +4,47 @@ import { Plus } from 'lucide-react';
 import { Button } from '@/shared/components/ui';
 import { TopicCard } from '@/features/topics';
 import { ResourceCard } from '@/features/resources';
+import { ActivityList } from '@/features/activities';
 import type { Topic } from '@/features/topics';
 import type { Resource } from '@/features/resources';
+import type { Activity } from '@/features/activities';
 import type { CourseStatus } from '../types/course.types';
 
 interface CourseTopicsListProps {
   topics: Topic[];
   courseStatus: CourseStatus;
   canEdit: boolean;
-  onAddTopic: () => void;
-  onEditTopic: (topic: Topic) => void;
-  onDeleteTopic: (topicId: string) => void;
-  onAddResource: (topic: Topic) => void;
-  onEditResource: (resource: Resource) => void;
-  onDeleteResource: (resourceId: string) => void;
+  canManageContent?: boolean;
+  onAddTopic?: () => void;
+  onEditTopic?: (topic: Topic) => void;
+  onDeleteTopic?: (topicId: string) => void;
+  onAddResource?: (topic: Topic) => void;
+  onEditResource?: (resource: Resource) => void;
+  onDeleteResource?: (resourceId: string) => void;
+  onAddActivity?: (topic: Topic) => void;
+  onEditActivity?: (activity: Activity) => void;
+  onDeleteActivity?: (activityId: string) => void;
 }
 
 export const CourseTopicsList = ({
   topics,
   courseStatus,
   canEdit,
+  canManageContent = canEdit,
   onAddTopic,
   onEditTopic,
   onDeleteTopic,
   onAddResource,
   onEditResource,
   onDeleteResource,
+  onAddActivity,
+  onEditActivity,
+  onDeleteActivity,
 }: CourseTopicsListProps) => {
   const [expandedTopicId, setExpandedTopicId] = useState<string | null>(null);
 
   const toggleTopicExpansion = (topicId: string) => {
-    setExpandedTopicId(prev => prev === topicId ? null : topicId);
+    setExpandedTopicId((prev) => (prev === topicId ? null : topicId));
   };
 
   return (
@@ -91,11 +101,17 @@ export const CourseTopicsList = ({
                 topic={topic}
                 courseStatus={courseStatus}
                 index={index}
-                onEdit={canEdit ? () => onEditTopic(topic) : undefined}
-                onDelete={canEdit ? () => onDeleteTopic(topic.id) : undefined}
+                onEdit={
+                  canEdit && onEditTopic ? () => onEditTopic(topic) : undefined
+                }
+                onDelete={
+                  canEdit && onDeleteTopic
+                    ? () => onDeleteTopic(topic.id)
+                    : undefined
+                }
                 onClick={() => toggleTopicExpansion(topic.id)}
               />
-              
+
               {expandedTopicId === topic.id && (
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
@@ -103,38 +119,70 @@ export const CourseTopicsList = ({
                   exit={{ opacity: 0, height: 0 }}
                   className="ml-8 pl-4 border-l-2 border-gray-200 dark:border-gray-600 space-y-3"
                 >
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                      Recursos
-                    </h3>
-                    {canEdit && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => onAddResource(topic)}
-                      >
-                        <Plus className="w-4 h-4 mr-2" />
-                        Agregar Recurso
-                      </Button>
+                  <div className="mb-6">
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-base font-semibold text-gray-700 dark:text-gray-300">
+                        Recursos ({topic.resources?.length || 0})
+                      </h3>
+                      {canManageContent && onAddResource && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => onAddResource(topic)}
+                        >
+                          <Plus className="w-4 h-4 mr-2" />
+                          Agregar Recurso
+                        </Button>
+                      )}
+                    </div>
+
+                    {!topic.resources || topic.resources.length === 0 ? (
+                      <p className="text-sm text-gray-500 dark:text-gray-400 py-4 text-center bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+                        No hay recursos en este tópico aún.
+                      </p>
+                    ) : (
+                      <div className="space-y-2">
+                        {topic.resources.map((resource: Resource) => (
+                          <ResourceCard
+                            key={resource.id}
+                            resource={resource}
+                            onEdit={
+                              canManageContent && onEditResource
+                                ? onEditResource
+                                : undefined
+                            }
+                            onDelete={
+                              canManageContent && onDeleteResource
+                                ? (id) => onDeleteResource(id)
+                                : undefined
+                            }
+                          />
+                        ))}
+                      </div>
                     )}
                   </div>
 
-                  {!topic.resources || topic.resources.length === 0 ? (
-                    <p className="text-sm text-gray-500 dark:text-gray-400 py-4">
-                      No hay recursos en este tópico aún.
-                    </p>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {topic.resources.map((resource: Resource) => (
-                        <ResourceCard
-                          key={resource.id}
-                          resource={resource}
-                          onEdit={canEdit ? onEditResource : undefined}
-                          onDelete={canEdit ? (id) => onDeleteResource(id) : undefined}
-                        />
-                      ))}
-                    </div>
-                  )}
+                  <div>
+                    <ActivityList
+                      activities={topic.activities || []}
+                      canEdit={canManageContent}
+                      onAddActivity={
+                        canManageContent && onAddActivity
+                          ? () => onAddActivity(topic)
+                          : undefined
+                      }
+                      onEditActivity={
+                        canManageContent && onEditActivity
+                          ? onEditActivity
+                          : undefined
+                      }
+                      onDeleteActivity={
+                        canManageContent && onDeleteActivity
+                          ? onDeleteActivity
+                          : undefined
+                      }
+                    />
+                  </div>
                 </motion.div>
               )}
             </div>

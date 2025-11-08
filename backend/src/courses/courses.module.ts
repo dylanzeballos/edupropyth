@@ -9,6 +9,7 @@ import { Activity } from './domain/entities/activity.entity';
 import { CourseBlueprint } from './domain/entities/course-blueprint.entity';
 import { Group } from './domain/entities/group.entity';
 import { GroupEnrollment } from './domain/entities/group-enrollment.entity';
+import { CourseTemplate } from './domain/entities/course-template.entity';
 
 import { COURSE_REPOSITORY } from './domain/interfaces/course-repository.interface';
 import { TOPIC_REPOSITORY } from './domain/interfaces/topic-repository.interface';
@@ -17,6 +18,7 @@ import { ACTIVITY_REPOSITORY } from './domain/interfaces/activity-repository.int
 import { COURSE_BLUEPRINT_REPOSITORY } from './domain/interfaces/course-blueprint-repository.interface';
 import { GROUP_REPOSITORY } from './domain/interfaces/group-repository.interface';
 import { ENROLLMENT_REPOSITORY } from './domain/interfaces/enrollment-repository.interface';
+import { COURSE_TEMPLATE_REPOSITORY } from './domain/interfaces/course-template-repository.interface';
 import { MEDIA_STORAGE_SERVICE } from './domain/interfaces/media-storage.interface';
 
 import { TypeOrmCourseRepository } from './infrastructure/persistence/typeorm-course.repository';
@@ -26,6 +28,7 @@ import { TypeOrmActivityRepository } from './infrastructure/persistence/typeorm-
 import { TypeOrmCourseBlueprintRepository } from './infrastructure/persistence/typeorm-course-blueprint.repository';
 import { TypeOrmGroupRepository } from './infrastructure/persistence/typeorm-group.repository';
 import { TypeOrmEnrollmentRepository } from './infrastructure/persistence/typeorm-enrollment.repository';
+import { TypeormCourseTemplateRepository } from './infrastructure/persistence/typeorm-course-template.repository';
 
 import { CloudinaryService } from './infrastructure/services/cloudinary.service';
 
@@ -40,6 +43,13 @@ import { UpdateTopicUseCase } from './application/use-cases/topics/update-topic.
 import { DeleteTopicUseCase } from './application/use-cases/topics/delete-topic.use-case';
 import { ReorderTopicsUseCase } from './application/use-cases/topics/reorder-topics.use-case';
 import { CloneTopicToHistoricUseCase } from './application/use-cases/topics/clone-topic-to-historic.use-case';
+
+// Use Cases - Course Templates
+import { CreateCourseTemplateUseCase } from './application/use-cases/course-templates/create-course-template.use-case';
+import { GetCourseTemplateUseCase } from './application/use-cases/course-templates/get-course-template.use-case';
+import { UpdateCourseTemplateUseCase } from './application/use-cases/course-templates/update-course-template.use-case';
+import { DeleteCourseTemplateUseCase } from './application/use-cases/course-templates/delete-course-template.use-case';
+import { CreateDefaultCourseTemplateUseCase } from './application/use-cases/course-templates/create-default-course-template.use-case';
 
 // Use Cases - Resources
 import { CreateResourceUseCase } from './application/use-cases/resources/create-resource.use-case';
@@ -86,6 +96,7 @@ import { ActivityController } from './presentation/controllers/activity.controll
 import { BlueprintsController } from './presentation/controllers/blueprint.controller';
 import { EditionsController } from './presentation/controllers/edition.controller';
 import { GroupsController } from './presentation/controllers/group.controller';
+import { CourseTemplateController } from './presentation/controllers/course-template.controller';
 
 @Module({
   imports: [
@@ -97,6 +108,7 @@ import { GroupsController } from './presentation/controllers/group.controller';
       CourseBlueprint,
       Group,
       GroupEnrollment,
+      CourseTemplate,
     ]),
     ConfigModule,
   ],
@@ -108,6 +120,7 @@ import { GroupsController } from './presentation/controllers/group.controller';
     BlueprintsController,
     EditionsController,
     GroupsController,
+    CourseTemplateController,
   ],
   providers: [
     {
@@ -137,6 +150,8 @@ import { GroupsController } from './presentation/controllers/group.controller';
     {
       provide: ENROLLMENT_REPOSITORY,
       useClass: TypeOrmEnrollmentRepository,
+      provide: COURSE_TEMPLATE_REPOSITORY,
+      useClass: TypeormCourseTemplateRepository,
     },
     {
       provide: MEDIA_STORAGE_SERVICE,
@@ -162,6 +177,12 @@ import { GroupsController } from './presentation/controllers/group.controller';
     UpdateBlueprintUseCase,
     GetBlueprintUseCase,
     ListBlueprintsUseCase,
+    // Use Cases - Course Templates
+    CreateCourseTemplateUseCase,
+    GetCourseTemplateUseCase,
+    UpdateCourseTemplateUseCase,
+    DeleteCourseTemplateUseCase,
+    CreateDefaultCourseTemplateUseCase,
 
     // Use Cases - Resources
     CreateResourceUseCase,
