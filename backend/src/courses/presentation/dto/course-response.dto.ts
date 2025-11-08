@@ -28,6 +28,9 @@ export class CourseResponseDto {
   @ApiProperty({ required: false })
   clonedFromId?: string;
 
+  @ApiProperty({ required: false })
+  blueprintId?: string;
+
   @ApiProperty({ type: [TopicResponseDto], required: false })
   topics?: TopicResponseDto[];
 
@@ -46,6 +49,7 @@ export class CourseResponseDto {
     this.instructorId = course.instructorId;
     this.isActive = course.isActive;
     this.clonedFromId = course.clonedFromId;
+    this.blueprintId = course.blueprintId;
     this.createdAt = course.createdAt;
     this.updatedAt = course.updatedAt;
 
