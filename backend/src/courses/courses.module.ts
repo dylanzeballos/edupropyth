@@ -88,6 +88,9 @@ import { AssignGroupInstructorUseCase } from './application/use-cases/groups/ass
 import { EnrollStudentsUseCase } from './application/use-cases/groups/enroll-students.use-case';
 import { RemoveEnrollmentUseCase } from './application/use-cases/groups/remove-enrollment.use-case';
 import { GetGroupUseCase } from './application/use-cases/groups/get-group.use-case';
+import { EnrollStudentWithKeyUseCase } from './application/use-cases/groups/enroll-student-with-key.use-case';
+import { EnrollStudentWithCodeUseCase } from './application/use-cases/groups/enroll-student-with-code.use-case';
+import { GetMyEnrollmentsUseCase } from './application/use-cases/groups/get-my-enrollments.use-case';
 
 import { CoursesController } from './presentation/controllers/course.controller';
 import { TopicController } from './presentation/controllers/topic.controller';
@@ -97,6 +100,7 @@ import { BlueprintsController } from './presentation/controllers/blueprint.contr
 import { EditionsController } from './presentation/controllers/edition.controller';
 import { GroupsController } from './presentation/controllers/group.controller';
 import { CourseTemplateController } from './presentation/controllers/course-template.controller';
+import { EnrollmentController } from './presentation/controllers/enrollment.controller';
 
 @Module({
   imports: [
@@ -109,6 +113,7 @@ import { CourseTemplateController } from './presentation/controllers/course-temp
       Group,
       GroupEnrollment,
       CourseTemplate,
+      GroupEnrollment,
     ]),
     ConfigModule,
   ],
@@ -121,6 +126,7 @@ import { CourseTemplateController } from './presentation/controllers/course-temp
     EditionsController,
     GroupsController,
     CourseTemplateController,
+    EnrollmentController,
   ],
   providers: [
     {
@@ -217,6 +223,10 @@ import { CourseTemplateController } from './presentation/controllers/course-temp
     EnrollStudentsUseCase,
     RemoveEnrollmentUseCase,
     GetGroupUseCase,
+
+    EnrollStudentWithKeyUseCase,
+    EnrollStudentWithCodeUseCase,
+    GetMyEnrollmentsUseCase,
   ],
   exports: [
     CreateCourseUseCase,
