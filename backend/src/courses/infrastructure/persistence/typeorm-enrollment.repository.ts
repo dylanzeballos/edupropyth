@@ -19,6 +19,13 @@ export class TypeOrmEnrollmentRepository implements IEnrollmentRepository {
     return this.repo.find({ where: { groupId, isActive: true } });
   }
 
+  async findByUserId(userId: string): Promise<GroupEnrollment[]> {
+    return this.repo.find({
+      where: { userId, isActive: true },
+      relations: ['group', 'group.course'],
+    });
+  }
+
   async findByUserInCourse(
     userId: string,
     courseId: string,
