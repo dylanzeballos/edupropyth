@@ -17,13 +17,20 @@ import { useCourseHandlers } from '@/features/courses/hooks/useCourseHandlers';
 import { useTopics, useTopicActions, type Topic } from '@/features/topics';
 import { useResourceActions, type Resource } from '@/features/resources';
 import { useActivityActions, type Activity } from '@/features/activities';
+import { useEdition, useUpdateEdition } from '@/features/editions';
 import {
-  useEdition,
-  useUpdateEdition,
-} from '@/features/editions';
+  useGroups,
+  useCreateGroup,
+  useUpdateGroup,
+  useDeleteGroup,
+  GroupCard,
+  type Group,
+} from '@/features/groups';
+import type { GroupFormData } from '@/features/groups/validation/group.schema';
 import type { UpdateCourseFormData } from '@/features/courses/validation/course.schema';
 import type { Course } from '@/features/courses/types/course.types';
-import { Modal } from '@/shared/components/ui';
+import { Modal, EmptyState, Button } from '@/shared/components/ui';
+import { GroupForm } from '@/features/groups';
 
 export const EditionDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -32,7 +39,15 @@ export const EditionDetailPage = () => {
 
   const { data: edition, isLoading, error } = useEdition(id);
   const { data: topics } = useTopics(id || '');
+  const {
+    data: groups,
+    isLoading: isLoadingGroups,
+    error: groupsError,
+  } = useGroups(id);
   const updateEditionMutation = useUpdateEdition();
+  const createGroupMutation = useCreateGroup(id);
+  const updateGroupMutation = useUpdateGroup(id);
+  const deleteGroupMutation = useDeleteGroup(id);
   const permissions = useCoursePermissions();
   const courseLike = edition as Course | undefined;
   const { navigateToCoursesPage } = useCourseNavigation({ course: courseLike });
@@ -45,6 +60,7 @@ export const EditionDetailPage = () => {
     canAddResources,
     canEditResources,
     canDeleteResources,
+    canManageGroups,
   } = permissions;
 
   const topicActions = useTopicActions({
@@ -128,6 +144,48 @@ export const EditionDetailPage = () => {
 
   const modalActions = createModalHandlers(modals.openModal);
 
+  const handleCreateGroup = (data: GroupFormData) => {
+    createGroupMutation.mutate(
+      {
+        name: data.name,
+        instructorId: data.instructorId?.trim()
+          ? data.instructorId
+          : undefined,
+      },
+      {
+        onSuccess: () => modals.closeModal('createGroup'),
+      },
+    );
+  };
+
+  const handleUpdateGroupForm = (data: GroupFormData) => {
+    const group = modals.getModalData<Group>('editGroup');
+    if (!group) return;
+    updateGroupMutation.mutate(
+      {
+        groupId: group.id,
+        data: {
+          name: data.name,
+          isActive: data.isActive,
+          instructorId: data.instructorId?.trim()
+            ? data.instructorId
+            : undefined,
+        },
+      },
+      {
+        onSuccess: () => modals.closeModal('editGroup'),
+      },
+    );
+  };
+
+  const handleDeleteGroup = () => {
+    const group = modals.getModalData<Group>('deleteGroup');
+    if (!group) return;
+    deleteGroupMutation.mutate(group.id, {
+      onSuccess: () => modals.closeModal('deleteGroup'),
+    });
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       <motion.div
@@ -170,6 +228,68 @@ export const EditionDetailPage = () => {
         />
 
         <CourseInfo course={courseLike} count={topics?.length || 0} />
+
+        <section className="mt-8 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-sm">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                Grupos
+              </h2>
+              <p className="text-gray-600 dark:text-gray-400">
+                Organiza a los estudiantes por grupo y asigna instructores.
+              </p>
+            </div>
+            {canManageGroups && (
+              <Button
+                onClick={() => modals.openModal('createGroup')}
+                className="w-full md:w-auto ml-auto"
+              >
+                Crear grupo
+              </Button>
+            )}
+          </div>
+
+          {isLoadingGroups ? (
+            <div className="flex justify-center items-center py-12 text-gray-500 dark:text-gray-400">
+              <div className="flex flex-col items-center gap-2">
+                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600" />
+                Cargando grupos...
+              </div>
+            </div>
+          ) : groupsError ? (
+            <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-xl p-6 text-red-700 dark:text-red-200">
+              No se pudieron cargar los grupos.
+            </div>
+          ) : !groups || groups.length === 0 ? (
+            <EmptyState
+              title="Aún no tienes grupos"
+              description="Crea un grupo para comenzar a asignar estudiantes."
+              actionLabel={canManageGroups ? 'Crear grupo' : undefined}
+              onAction={
+                canManageGroups ? () => modals.openModal('createGroup') : undefined
+              }
+            />
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {groups.map((group) => (
+                <GroupCard
+                  key={group.id}
+                  group={group}
+                  onEdit={
+                    canManageGroups
+                      ? (selected) => modals.openModal('editGroup', selected)
+                      : undefined
+                  }
+                  onDelete={
+                    canManageGroups
+                      ? (selected) => modals.openModal('deleteGroup', selected)
+                      : undefined
+                  }
+                />
+              ))}
+            </div>
+          )}
+        </section>
       </motion.div>
 
       {canEditCourse && (
@@ -242,6 +362,62 @@ export const EditionDetailPage = () => {
           isUpdating={activityActions.isUpdating}
           isDeleting={activityActions.isDeleting}
         />
+      )}
+
+      {canManageGroups && (
+        <>
+          <Modal
+            isOpen={modals.isModalOpen('createGroup')}
+            onClose={() => modals.closeModal('createGroup')}
+            title="Crear grupo"
+          >
+            <GroupForm
+              onSubmit={handleCreateGroup}
+              onCancel={() => modals.closeModal('createGroup')}
+              isSubmitting={createGroupMutation.isPending}
+            />
+          </Modal>
+
+          <Modal
+            isOpen={modals.isModalOpen('editGroup')}
+            onClose={() => modals.closeModal('editGroup')}
+            title="Editar grupo"
+          >
+            <GroupForm
+              defaultValues={modals.getModalData<Group>('editGroup') ?? undefined}
+              onSubmit={handleUpdateGroupForm}
+              onCancel={() => modals.closeModal('editGroup')}
+              isSubmitting={updateGroupMutation.isPending}
+              showStatusToggle
+            />
+          </Modal>
+
+          <Modal
+            isOpen={modals.isModalOpen('deleteGroup')}
+            onClose={() => modals.closeModal('deleteGroup')}
+            title="Eliminar grupo"
+          >
+            <p className="text-gray-600 dark:text-gray-300 mb-6">
+              ¿Seguro que deseas eliminar este grupo? Esta acción no se puede deshacer.
+            </p>
+            <div className="flex justify-end gap-3">
+              <Button
+                variant="outline"
+                onClick={() => modals.closeModal('deleteGroup')}
+                disabled={deleteGroupMutation.isPending}
+              >
+                Cancelar
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleDeleteGroup}
+                disabled={deleteGroupMutation.isPending}
+              >
+                Eliminar
+              </Button>
+            </div>
+          </Modal>
+        </>
       )}
     </div>
   );

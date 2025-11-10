@@ -15,6 +15,8 @@ export const useCoursePermissions = () => {
   // EXECUTOR can add content (resources/activities) but not edit structure
   const canManageContent = isAdmin || isTeacherEditor || isTeacherExecutor;
 
+  const canManageGroups = isAdmin || isTeacherEditor;
+
   return {
     // Permisos de estructura del curso
     canCreateCourse: isAdmin || isTeacherEditor,
@@ -36,6 +38,9 @@ export const useCoursePermissions = () => {
     // Permisos de visualización
     canViewProgress: isAdmin || isTeacher,
     canViewCourseManagement: canManageContent,
+
+    // Grupos
+    canManageGroups,
 
     // Estados de usuario
     isAdmin,
