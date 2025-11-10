@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router';
 import { motion } from 'framer-motion';
 import { Plus } from 'lucide-react';
-import { useCourses, useCreateCourse } from '../hooks/useCourse';
+import { useBlueprints, useCreateBlueprint, blueprintToCourseLike } from '@/features/blueprints';
 import { useCoursePermissions } from '../hooks/useCoursePermissions';
 import { Modal } from '@/shared/components/ui/Modal';
 import { EmptyState } from '@/shared/components/ui';
@@ -17,17 +17,17 @@ export const CoursesListPage = () => {
   const navigate = useNavigate();
   const createModal = useModalState();
 
-  const { data: courses, isLoading, error } = useCourses();
-  const createCourseMutation = useCreateCourse();
+  const { data: blueprints, isLoading, error } = useBlueprints();
+  const createBlueprintMutation = useCreateBlueprint();
   const permissions = useCoursePermissions();
 
   const handleCreateCourse = (
     data: CreateCourseFormData | UpdateCourseFormData,
   ) => {
-    createCourseMutation.mutate(data as CreateCourseFormData, {
-      onSuccess: (newCourse) => {
+    createBlueprintMutation.mutate(data as CreateCourseFormData, {
+      onSuccess: (newBlueprint) => {
         createModal.close();
-        navigate(`/courses/${newCourse.id}/management`);
+        navigate(`/courses/${newBlueprint.id}/management`);
       },
     });
   };
@@ -76,8 +76,8 @@ export const CoursesListPage = () => {
               Gestión de Cursos
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
-              {courses && courses.length > 0
-                ? `Administra y edita ${courses.length} curso${courses.length !== 1 ? 's' : ''} del sistema.`
+              {blueprints && blueprints.length > 0
+                ? `Administra y edita ${blueprints.length} curso${blueprints.length !== 1 ? 's' : ''} del sistema.`
                 : 'No hay cursos creados aún.'}
             </p>
           </div>
@@ -93,7 +93,7 @@ export const CoursesListPage = () => {
           )}
         </div>
 
-        {!courses || courses.length === 0 ? (
+        {!blueprints || blueprints.length === 0 ? (
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-12">
             <EmptyState
               icon={
@@ -129,13 +129,16 @@ export const CoursesListPage = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {courses.map((course) => (
-              <CourseListCard
-                key={course.id}
-                course={course}
-                onClick={() => handleCourseClick(course.id)}
-              />
-            ))}
+            {blueprints.map((blueprint) => {
+              const courseLike = blueprintToCourseLike(blueprint);
+              return (
+                <CourseListCard
+                  key={blueprint.id}
+                  course={courseLike}
+                  onClick={() => handleCourseClick(blueprint.id)}
+                />
+              );
+            })}
           </div>
         )}
       </motion.div>
@@ -148,7 +151,7 @@ export const CoursesListPage = () => {
         <CourseForm
           onSubmit={handleCreateCourse}
           onCancel={createModal.close}
-          isSubmitting={createCourseMutation.isPending}
+          isSubmitting={createBlueprintMutation.isPending}
         />
       </Modal>
     </div>
