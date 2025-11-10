@@ -19,7 +19,10 @@
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+
+    /*Vitest y React como tipos globales */
+    "types": ["vitest/globals", "react"]
   },
   "include": ["vite.config.ts"]
 }
