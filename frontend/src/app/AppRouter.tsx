@@ -18,6 +18,7 @@ import {
 import { CourseTemplateEditorPage } from '@/features/courses/pages/CourseTemplateEditorPage';
 import { UserRole } from '@/features/auth/types/user.type';
 import { TopicPublicViewPage } from '@/features/topics';
+import { EditionDetailPage } from '@/features/editions';
 
 const AppRouter = createBrowserRouter([
   {
@@ -105,6 +106,20 @@ const AppRouter = createBrowserRouter([
       {
         path: 'courses/:courseId/topics/:topicId/view',
         element: <TopicPublicViewPage />,
+      },
+      {
+        path: 'editions/:id',
+        element: (
+          <RoleGuard
+            roles={[
+              UserRole.ADMIN,
+              UserRole.TEACHER_EDITOR,
+              UserRole.TEACHER_EXECUTOR,
+            ]}
+          >
+            <EditionDetailPage />
+          </RoleGuard>
+        ),
       },
       {
         path: 'all-progress',

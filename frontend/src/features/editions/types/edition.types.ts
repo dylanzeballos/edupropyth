@@ -1,18 +1,7 @@
-import type { CourseStatus, Topic } from '@/features/courses/types/course.types';
+import type { Course } from '@/features/courses/types/course.types';
 
-export interface Edition {
-  id: string;
-  title: string;
-  description?: string;
-  thumbnail?: string;
-  status: CourseStatus;
-  instructorId?: string;
-  isActive: boolean;
-  clonedFromId?: string;
+export interface Edition extends Course {
   blueprintId?: string;
-  topics?: Topic[];
-  createdAt: string;
-  updatedAt: string;
 }
 
 export interface CreateEditionRequest {
