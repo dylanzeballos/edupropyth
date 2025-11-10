@@ -1,8 +1,8 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { vi, describe, it, expect } from 'vitest';
 import React from 'react';
-import { useForm, FormProvider, FieldError, RegisterOptions } from 'react-hook-form';  // Importamos solo lo necesario
-import { InputText } from '../Input';  // Asegúrate de que la ruta sea correcta
+import { useForm, FormProvider, UseFormRegister, FieldValues, FieldError, RegisterOptions } from 'react-hook-form'; // Asegúrate de importar UseFormRegister y FieldValues
+import { InputText } from '../Input';
 
 describe('InputText Component', () => {
   // Wrapper para envolver el formulario
@@ -11,26 +11,23 @@ describe('InputText Component', () => {
     return <FormProvider {...methods}><form>{children}<button type="submit">Enviar</button></form></FormProvider>;
   };
 
+  // Renderizamos el componente InputText con las propiedades por defecto y las personalizadas
   const renderInput = (props: Partial<React.ComponentProps<typeof InputText>> = {}) => {
     const defaultProps = {
       label: 'Test Label',
       name: 'testInput',
       placeholder: 'Escribe aquí',
-      register: vi.fn((name: string) => ({
-        name,
-        onChange: vi.fn(),
-        onBlur: vi.fn(),
-      })),
-      errors: {} as Record<string, FieldError>,  // Usamos el tipo FieldError correctamente
-      validationRules: {} as RegisterOptions,  // Usamos RegisterOptions de react-hook-form
+      register: vi.fn() as UseFormRegister<FieldValues>, // Tipado correcto para register
+      errors: {} as Record<string, FieldError>, // Errores tipados correctamente
+      validationRules: {} as RegisterOptions, // Tipamos validationRules correctamente
       isRequired: false,
     };
 
     render(
       <Wrapper>
         <InputText
-          {...defaultProps}
-          {...props}
+          {...defaultProps}  // Propiedades por defecto
+          {...props}          // Propiedades personalizadas
         />
       </Wrapper>
     );
