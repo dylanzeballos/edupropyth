@@ -8,7 +8,13 @@ import { Group } from '../../../domain/entities/group.entity';
 interface CreateGroupDto {
   courseId: string;
   name: string;
+  schedule?: string;
   instructorId?: string;
+  maxStudents?: number;
+  enrollmentKey?: string;
+  isEnrollmentOpen?: boolean;
+  enrollmentStartDate?: string;
+  enrollmentEndDate?: string;
 }
 
 @Injectable()
@@ -27,6 +33,15 @@ export class CreateGroupUseCase {
       name: dto.name,
       instructorId: dto.instructorId,
       isActive: true,
+      maxStudents: dto.maxStudents,
+      enrollmentKey: dto.enrollmentKey,
+      isEnrollmentOpen: dto.isEnrollmentOpen ?? true,
+      enrollmentStartDate: dto.enrollmentStartDate
+        ? new Date(dto.enrollmentStartDate)
+        : undefined,
+      enrollmentEndDate: dto.enrollmentEndDate
+        ? new Date(dto.enrollmentEndDate)
+        : undefined,
     });
   }
 }

@@ -1,14 +1,85 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
+import {
+  IsBoolean,
+  IsDateString,
+  IsInt,
+  IsOptional,
+  IsString,
+  IsUUID,
+  MaxLength,
+  Min,
+} from 'class-validator';
 
 export class CreateGroupDto {
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Group name',
+    example: 'Grupo A - Turno Mañana',
+  })
   @IsString()
   @MaxLength(50)
   name: string;
 
-  @ApiProperty({ required: false })
+  @ApiProperty({
+    description: 'Group schedule',
+    example: 'Lunes, Miércoles y Viernes 08:00-10:00',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  schedule?: string;
+
+  @ApiProperty({
+    description: 'Instructor ID for the group',
+    required: false,
+  })
   @IsOptional()
   @IsUUID()
   instructorId?: string;
+
+  @ApiProperty({
+    description: 'Maximum number of students allowed',
+    example: 30,
+    required: false,
+  })
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  maxStudents?: number;
+
+  @ApiProperty({
+    description: 'Enrollment key/code for students to self-enroll',
+    example: 'MATH2024A',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(50)
+  enrollmentKey?: string;
+
+  @ApiProperty({
+    description: 'Whether enrollment is currently open',
+    default: true,
+    required: false,
+  })
+  @IsOptional()
+  @IsBoolean()
+  isEnrollmentOpen?: boolean;
+
+  @ApiProperty({
+    description: 'Date when enrollment period starts',
+    example: '2024-02-01T00:00:00.000Z',
+    required: false,
+  })
+  @IsOptional()
+  @IsDateString()
+  enrollmentStartDate?: string;
+
+  @ApiProperty({
+    description: 'Date when enrollment period ends',
+    example: '2024-03-15T23:59:59.000Z',
+    required: false,
+  })
+  @IsOptional()
+  @IsDateString()
+  enrollmentEndDate?: string;
 }
