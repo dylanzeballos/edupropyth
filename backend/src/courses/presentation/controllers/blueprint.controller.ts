@@ -64,7 +64,15 @@ export class BlueprintsController {
   @ApiResponse({ status: 200, type: [BlueprintResponseDto] })
   async findAll(): Promise<BlueprintResponseDto[]> {
     const results = await this.listBlueprintsUseCase.execute();
-    return results.map((bp) => BlueprintResponseDto.fromBlueprint(bp));
+    return results.map((bp) =>
+      BlueprintResponseDto.fromBlueprint(
+        bp,
+        bp.editionsCount,
+        bp.draftEditionsCount,
+        bp.activeEditionsCount,
+        bp.historicEditionsCount,
+      ),
+    );
   }
 
   @Get(':id')

@@ -11,6 +11,7 @@ import {
 import { CourseStatus } from '../enums/course-status.enum';
 import { Topic } from './topic.entity';
 import { CourseBlueprint } from './course-blueprint.entity';
+import { Group } from './group.entity';
 
 @Entity('courses')
 export class Course {
@@ -53,6 +54,9 @@ export class Course {
 
   @OneToMany(() => Topic, (topic) => topic.course, { cascade: true })
   topics?: Topic[];
+
+  @OneToMany(() => Group, (group) => group.course)
+  groups?: Group[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

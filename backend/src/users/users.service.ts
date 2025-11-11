@@ -93,4 +93,15 @@ export class UsersService {
 
     return stats as { role: string; count: string }[];
   }
+
+  async findTeachers(): Promise<UserResponseDto[]> {
+    const teachers = await this.userRepository.find({
+      where: [
+        { role: UserRole.TEACHER_EDITOR, isActive: true },
+        { role: UserRole.TEACHER_EXECUTOR, isActive: true },
+      ],
+      order: { firstName: 'ASC' },
+    });
+    return teachers.map((user) => UserResponseDto.fromUser(user));
+  }
 }
