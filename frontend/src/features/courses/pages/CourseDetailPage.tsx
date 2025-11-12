@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Plus } from 'lucide-react';
 import { useCoursePermissions } from '../hooks/useCoursePermissions';
 import { useCourseNavigation } from '../hooks/useCourseNavigation';
+import { useCourseDetailHandlers } from '../hooks/useCourseDetailHandlers';
 import { CourseForm } from '../components/CourseForm';
 import { CourseHeader } from '../components/CourseHeader';
 import { CourseInfo } from '../components/CourseInfo';
@@ -13,16 +14,11 @@ import {
   EditionCard,
   EditionForm,
   useEditionsByBlueprint,
-  useCreateEdition,
 } from '@/features/editions';
 import {
   useBlueprint,
-  useUpdateBlueprint,
   blueprintToCourseLike,
 } from '@/features/blueprints';
-import type { UpdateBlueprintRequest } from '@/features/blueprints';
-import type { CreateEditionFormData } from '@/features/editions/validation/edition.schema';
-import type { UpdateCourseFormData } from '../validation/course.schema';
 
 export const CourseDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -35,16 +31,20 @@ export const CourseDetailPage = () => {
     isLoading: isLoadingEditions,
     error: editionsError,
   } = useEditionsByBlueprint(id);
-  const updateBlueprintMutation = useUpdateBlueprint();
-  const createEditionMutation = useCreateEdition();
   const permissions = useCoursePermissions();
   const courseLike = blueprint ? blueprintToCourseLike(blueprint) : undefined;
   const { navigateToCoursesPage } = useCourseNavigation({ course: courseLike });
-
+  
   const {
-    canEditCourse,
-    canConfigureTemplate,
-  } = permissions;
+    handleUpdateCourse,
+    handleCreateEdition,
+    handleManageEdition,
+    handleChangeEditionStatus,
+    isUpdatingBlueprint,
+    isCreatingEdition,
+  } = useCourseDetailHandlers({ blueprintId: id });
+
+  const { canEditCourse } = permissions;
 
   const loadingState = CourseLoadingState({
     isLoading,
@@ -54,34 +54,6 @@ export const CourseDetailPage = () => {
 
   if (loadingState) return loadingState;
   if (!courseLike) return null;
-
-  const handleUpdateCourse = (data: UpdateCourseFormData) => {
-    if (!id) return;
-    updateBlueprintMutation.mutate(
-      { id, data: data as UpdateBlueprintRequest },
-      { onSuccess: () => modals.closeModal('editCourse') },
-    );
-  };
-
-  const handleCreateEdition = (data: CreateEditionFormData) => {
-    if (!id) return;
-    createEditionMutation.mutate(
-      {
-        blueprintId: id,
-        title: data.title,
-        description: data.description?.trim() ? data.description : undefined,
-        thumbnail: data.thumbnail?.trim() ? data.thumbnail : undefined,
-        sourceCourseId: data.sourceCourseId || undefined,
-      },
-      {
-        onSuccess: () => modals.closeModal('createEdition'),
-      },
-    );
-  };
-
-  const handleManageEdition = (editionId: string) => {
-    navigate(`/editions/${editionId}`);
-  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -93,7 +65,7 @@ export const CourseDetailPage = () => {
         <CourseHeader
           course={courseLike}
           canEdit={canEditCourse}
-          canConfigureTemplate={canConfigureTemplate}
+          canConfigureTemplate={false}
           onBack={navigateToCoursesPage}
           onEdit={() => modals.openModal('editCourse')}
         />
@@ -156,6 +128,8 @@ export const CourseDetailPage = () => {
                   key={edition.id}
                   edition={edition}
                   onManage={() => handleManageEdition(edition.id)}
+                  onChangeStatus={handleChangeEditionStatus}
+                  canEdit={canEditCourse}
                 />
               ))}
             </div>
@@ -179,7 +153,7 @@ export const CourseDetailPage = () => {
             course={courseLike}
             onSubmit={handleUpdateCourse}
             onCancel={() => modals.closeModal('editCourse')}
-            isSubmitting={updateBlueprintMutation.isPending}
+            isSubmitting={isUpdatingBlueprint}
           />
         </Modal>
       )}
@@ -194,7 +168,7 @@ export const CourseDetailPage = () => {
             editions={editions || []}
             onSubmit={handleCreateEdition}
             onCancel={() => modals.closeModal('createEdition')}
-            isSubmitting={createEditionMutation.isPending}
+            isSubmitting={isCreatingEdition}
           />
         </Modal>
       )}
