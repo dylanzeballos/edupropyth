@@ -1,0 +1,8 @@
+export enum HistoryAction {
+  CREATE = 'CREATE',
+  UPDATE = 'UPDATE',
+  DELETE = 'DELETE',
+  RESTORE = 'RESTORE',
+  PUBLISH = 'PUBLISH',
+  UNPUBLISH = 'UNPUBLISH',
+}
