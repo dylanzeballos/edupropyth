@@ -44,6 +44,48 @@ export class CreateTopicSnapshotUseCase {
     resourceHistories: ResourceHistory[];
     activityHistories: ActivityHistory[];
   }> {
-    throw new Error('Method not implemented.');
+    const { topic, user, action, topicChanges, previousTopicData } = command;
+
+    const topicHistory = await this.topicHistoryService.createSnapshot(
+      topic,
+      user,
+      action,
+      topicChanges,
+      previousTopicData,
+    );
+
+    const resourceHistories: ResourceHistory[] = [];
+    if (command.resourceChanges?.length) {
+      for (const change of command.resourceChanges) {
+        const history = await this.resourceHistoryService.createSnapshot(
+          change.resource,
+          user,
+          action,
+          change.changes,
+          change.previousData,
+        );
+        resourceHistories.push(history);
+      }
+    }
+
+    const activityHistories: ActivityHistory[] = [];
+    if (command.activityChanges?.length) {
+      for (const change of command.activityChanges) {
+        const history = await this.activityHistoryService.createSnapshot(
+          change.activity,
+          user,
+          action,
+          change.changes,
+          change.previousData,
+        );
+        activityHistories.push(history);
+      }
+    }
+
+    return {
+      topicHistory,
+      resourceHistories,
+      activityHistories,
+    };
   }
 }
