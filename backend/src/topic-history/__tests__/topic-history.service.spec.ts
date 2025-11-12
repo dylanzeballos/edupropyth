@@ -1,83 +1,87 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { TopicHistoryService } from '../application/services/topic-history.service';
 import { TopicHistory } from '../domain/entities/topic-history.entity';
-import { ResourceHistory } from '../domain/entities/resource-history.entity';
-import { ActivityHistory } from '../domain/entities/activity-history.entity';
 import { User, UserRole } from '../../auth/domain/entities/user.entity';
 import { Topic } from '../../courses/domain/entities/topic.entity';
 import { HistoryAction } from '../domain/enums/history-action.enum';
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
+
+type TopicHistoryRepositoryMock = jest.Mocked<
+  Pick<Repository<TopicHistory>, 'create' | 'save' | 'find' | 'findOne'>
+>;
+
+const createTopicHistoryRepositoryMock = (): TopicHistoryRepositoryMock => ({
+  create: jest.fn(),
+  save: jest.fn(),
+  find: jest.fn(),
+  findOne: jest.fn(),
+});
+
+const buildUser = (): User => {
+  const user = new User();
+  user.id = 'user-1';
+  user.firstName = 'John';
+  user.lastName = 'Doe';
+  user.email = 'john@example.com';
+  user.password = 'hashed';
+  user.role = UserRole.TEACHER_EDITOR;
+  user.isActive = true;
+  user.createdAt = new Date();
+  user.updatedAt = new Date();
+  return user;
+};
+
+const buildTopic = (): Topic => {
+  const topic = new Topic();
+  topic.id = 'topic-1';
+  topic.courseId = 'course-1';
+  topic.title = 'Test Topic';
+  topic.description = 'Test Description';
+  topic.order = 1;
+  topic.isActive = true;
+  topic.createdAt = new Date();
+  topic.updatedAt = new Date();
+  return topic;
+};
+
+const buildTopicHistory = (overrides?: Partial<TopicHistory>): TopicHistory => {
+  const history = new TopicHistory();
+  history.id = 'history-1';
+  history.topicId = 'topic-1';
+  history.version = 1;
+  history.action = HistoryAction.UPDATE;
+  history.changes = { title: 'Updated Title' };
+  history.previousData = { title: 'Old Title' };
+  history.currentData = { title: 'Updated Title' };
+  history.editedBy = buildUser();
+  history.editedById = history.editedBy.id;
+  history.editedAt = new Date();
+  return Object.assign(history, overrides);
+};
 
 describe('TopicHistoryService', () => {
   let service: TopicHistoryService;
-  let topicHistoryRepository: Repository<TopicHistory>;
-  let resourceHistoryRepository: Repository<ResourceHistory>;
-  let activityHistoryRepository: Repository<ActivityHistory>;
+  let topicHistoryRepository: TopicHistoryRepositoryMock;
 
-  const mockUser: User = {
-    id: 'user-1',
-    firstName: 'John',
-    lastName: 'Doe',
-    email: 'john@example.com',
-    role: UserRole.TEACHER_EDITOR,
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  } as User;
-
-  const mockTopic: Topic = {
-    id: 'topic-1',
-    title: 'Test Topic',
-    description: 'Test Description',
-    order: 1,
-    isPublished: true,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  } as Topic;
-
-  const mockTopicHistory: TopicHistory = {
-    id: 'history-1',
-    topicId: 'topic-1',
-    version: 1,
-    action: HistoryAction.UPDATE,
-    changes: { title: 'Updated Title' },
-    previousData: { title: 'Old Title' },
-    currentData: { title: 'Updated Title' },
-    editedBy: mockUser,
-    editedAt: new Date(),
-  } as TopicHistory;
+  const mockUser = buildUser();
+  const mockTopic = buildTopic();
 
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
+    topicHistoryRepository = createTopicHistoryRepositoryMock();
+
+    const moduleRef: TestingModule = await Test.createTestingModule({
       providers: [
         TopicHistoryService,
         {
           provide: getRepositoryToken(TopicHistory),
-          useClass: Repository,
-        },
-        {
-          provide: getRepositoryToken(ResourceHistory),
-          useClass: Repository,
-        },
-        {
-          provide: getRepositoryToken(ActivityHistory),
-          useClass: Repository,
+          useValue: topicHistoryRepository,
         },
       ],
     }).compile();
 
-    service = module.get<TopicHistoryService>(TopicHistoryService);
-    topicHistoryRepository = module.get<Repository<TopicHistory>>(
-      getRepositoryToken(TopicHistory),
-    );
-    resourceHistoryRepository = module.get<Repository<ResourceHistory>>(
-      getRepositoryToken(ResourceHistory),
-    );
-    activityHistoryRepository = module.get<Repository<ActivityHistory>>(
-      getRepositoryToken(ActivityHistory),
-    );
+    service = moduleRef.get<TopicHistoryService>(TopicHistoryService);
   });
 
   it('should be defined', () => {
@@ -86,13 +90,12 @@ describe('TopicHistoryService', () => {
 
   describe('createSnapshot', () => {
     it('should create a topic snapshot successfully', async () => {
-      jest
-        .spyOn(topicHistoryRepository, 'create')
-        .mockReturnValue(mockTopicHistory);
-      jest
-        .spyOn(topicHistoryRepository, 'save')
-        .mockResolvedValue(mockTopicHistory);
-      jest.spyOn(service, 'getNextVersion').mockResolvedValue(2);
+      const historyEntry = buildTopicHistory({ version: 2 });
+      topicHistoryRepository.create.mockReturnValue(historyEntry);
+      topicHistoryRepository.save.mockResolvedValue(historyEntry);
+      topicHistoryRepository.findOne.mockResolvedValueOnce(
+        buildTopicHistory({ version: 1 }),
+      );
 
       const result = await service.createSnapshot(
         mockTopic,
@@ -101,9 +104,18 @@ describe('TopicHistoryService', () => {
         { title: 'New Title' },
       );
 
-      expect(topicHistoryRepository.create).toHaveBeenCalled();
-      expect(topicHistoryRepository.save).toHaveBeenCalled();
-      expect(result).toEqual(mockTopicHistory);
+      expect(topicHistoryRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          topicId: mockTopic.id,
+          action: HistoryAction.UPDATE,
+          changes: { title: 'New Title' },
+          editedBy: mockUser,
+          editedById: mockUser.id,
+          version: 2,
+        }),
+      );
+      expect(topicHistoryRepository.save).toHaveBeenCalledWith(historyEntry);
+      expect(result).toEqual(historyEntry);
     });
 
     it('should throw ForbiddenException for non-teacher-editor users', async () => {
@@ -122,34 +134,32 @@ describe('TopicHistoryService', () => {
 
   describe('getTopicHistory', () => {
     it('should return topic history for valid user', async () => {
-      jest
-        .spyOn(topicHistoryRepository, 'find')
-        .mockResolvedValue([mockTopicHistory]);
+      const historyEntry = buildTopicHistory();
+      topicHistoryRepository.find.mockResolvedValue([historyEntry]);
 
-      const result = await service.getTopicHistory('topic-1', mockUser);
+      const result = await service.getTopicHistory(mockTopic.id, mockUser);
 
       expect(topicHistoryRepository.find).toHaveBeenCalledWith({
-        where: { topicId: 'topic-1' },
+        where: { topicId: mockTopic.id },
         relations: ['editedBy'],
         order: { version: 'DESC' },
       });
-      expect(result).toEqual([mockTopicHistory]);
+      expect(result).toEqual([historyEntry]);
     });
 
     it('should throw ForbiddenException for unauthorized users', async () => {
       const studentUser = { ...mockUser, role: UserRole.STUDENT };
 
       await expect(
-        service.getTopicHistory('topic-1', studentUser),
+        service.getTopicHistory(mockTopic.id, studentUser),
       ).rejects.toThrow(ForbiddenException);
     });
   });
 
   describe('getVersionById', () => {
     it('should return specific version', async () => {
-      jest
-        .spyOn(topicHistoryRepository, 'findOne')
-        .mockResolvedValue(mockTopicHistory);
+      const historyEntry = buildTopicHistory();
+      topicHistoryRepository.findOne.mockResolvedValue(historyEntry);
 
       const result = await service.getVersionById('history-1', mockUser);
 
@@ -157,11 +167,11 @@ describe('TopicHistoryService', () => {
         where: { id: 'history-1' },
         relations: ['editedBy'],
       });
-      expect(result).toEqual(mockTopicHistory);
+      expect(result).toEqual(historyEntry);
     });
 
     it('should throw NotFoundException for non-existent version', async () => {
-      jest.spyOn(topicHistoryRepository, 'findOne').mockResolvedValue(null);
+      topicHistoryRepository.findOne.mockResolvedValue(null);
 
       await expect(
         service.getVersionById('non-existent', mockUser),
@@ -171,47 +181,43 @@ describe('TopicHistoryService', () => {
 
   describe('compareVersions', () => {
     it('should compare two versions successfully', async () => {
-      const version1 = {
-        ...mockTopicHistory,
-        version: 1,
-        currentData: { title: 'Title 1' },
-      };
-      const version2 = {
-        ...mockTopicHistory,
+      const version1 = buildTopicHistory({ version: 1 });
+      const version2 = buildTopicHistory({
+        id: 'history-2',
         version: 2,
         currentData: { title: 'Title 2' },
-      };
+      });
 
-      jest
-        .spyOn(topicHistoryRepository, 'findOne')
+      topicHistoryRepository.findOne
         .mockResolvedValueOnce(version1)
         .mockResolvedValueOnce(version2);
 
-      const result = await service.compareVersions('topic-1', 1, 2, mockUser);
+      const result = await service.compareVersions(
+        mockTopic.id,
+        1,
+        2,
+        mockUser,
+      );
 
       expect(result).toHaveProperty('differences');
-      expect(result).toHaveProperty('version1');
-      expect(result).toHaveProperty('version2');
+      expect(result).toHaveProperty('version1', version1);
+      expect(result).toHaveProperty('version2', version2);
     });
   });
 
   describe('getNextVersion', () => {
     it('should return correct next version number', async () => {
-      jest.spyOn(topicHistoryRepository, 'findOne').mockResolvedValue({
-        version: 5,
-      } as TopicHistory);
+      topicHistoryRepository.findOne.mockResolvedValue(
+        buildTopicHistory({ version: 5 }),
+      );
 
-      const result = await service.getNextVersion('topic-1');
-
-      expect(result).toBe(6);
+      await expect(service.getNextVersion(mockTopic.id)).resolves.toBe(6);
     });
 
     it('should return 1 for topics with no history', async () => {
-      jest.spyOn(topicHistoryRepository, 'findOne').mockResolvedValue(null);
+      topicHistoryRepository.findOne.mockResolvedValue(null);
 
-      const result = await service.getNextVersion('topic-1');
-
-      expect(result).toBe(1);
+      await expect(service.getNextVersion(mockTopic.id)).resolves.toBe(1);
     });
   });
 });
