@@ -62,21 +62,11 @@ export const courseTemplateService = {
 
   getTemplateByCourseId: async (
     courseId: string,
-  ): Promise<CourseTemplate | null> => {
-    try {
-      const response = await apiClient.get<CourseTemplate>(
-        `/course-templates/course/${courseId}`,
-      );
-      return response.data;
-    } catch (error) {
-      if (error && typeof error === 'object' && 'response' in error) {
-        const axiosError = error as { response?: { status?: number } };
-        if (axiosError.response?.status === 404) {
-          return null;
-        }
-      }
-      throw error;
-    }
+  ): Promise<CourseTemplate> => {
+    const response = await apiClient.get<CourseTemplate>(
+      `/course-templates/course/${courseId}`,
+    );
+    return response.data;
   },
 
   createTemplate: async (

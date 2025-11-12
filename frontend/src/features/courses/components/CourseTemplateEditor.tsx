@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Responsive, WidthProvider, Layout } from 'react-grid-layout';
 import { Plus, Save } from 'lucide-react';
 import { Button } from '@/shared/components/ui';
@@ -19,7 +19,7 @@ import 'react-resizable/css/styles.css';
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
 interface CourseTemplateEditorProps {
-  template: CourseTemplate | null;
+  template: CourseTemplate;
   courseId: string;
   resources?: Resource[];
   activities?: Activity[];
@@ -45,10 +45,14 @@ export const CourseTemplateEditor = ({
   onCancel,
   isSaving = false,
 }: CourseTemplateEditorProps) => {
-  const [blocks, setBlocks] = useState<ContentBlock[]>(template?.blocks || []);
+  const [blocks, setBlocks] = useState<ContentBlock[]>(template.blocks || []);
   const [showAddBlockModal, setShowAddBlockModal] = useState(false);
   const [showEditBlockModal, setShowEditBlockModal] = useState(false);
   const [editingBlock, setEditingBlock] = useState<ContentBlock | null>(null);
+
+  useEffect(() => {
+    setBlocks(template.blocks || []);
+  }, [template]);
 
   const layouts = useMemo(() => {
     const gridLayout: Layout[] = blocks.map((block) => ({

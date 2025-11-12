@@ -19,6 +19,7 @@ import {
   RolesGuard,
   PermissionsGuard,
 } from '../../../auth/infrastructure/guards';
+import { GroupEditorGuard } from '../../infrastructure/guards/group-editor.guard';
 import {
   Roles,
   RequirePermissions,
@@ -84,8 +85,7 @@ export class GroupsController {
   }
 
   @Patch(':groupId')
-  @Roles(UserRole.ADMIN, UserRole.TEACHER_EDITOR)
-  @RequirePermissions(Permission.MANAGE_GROUPS)
+  @UseGuards(GroupEditorGuard)
   @ApiOperation({ summary: 'Update group' })
   @ApiResponse({ status: 200, type: GroupResponseDto })
   async update(

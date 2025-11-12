@@ -23,7 +23,25 @@ export class BlueprintResponseDto {
   @ApiProperty()
   updatedAt: Date;
 
-  constructor(blueprint: CourseBlueprint) {
+  @ApiProperty({ required: false })
+  editionsCount?: number;
+
+  @ApiProperty({ required: false })
+  draftEditionsCount?: number;
+
+  @ApiProperty({ required: false })
+  activeEditionsCount?: number;
+
+  @ApiProperty({ required: false })
+  historicEditionsCount?: number;
+
+  constructor(
+    blueprint: CourseBlueprint,
+    editionsCount?: number,
+    draftEditionsCount?: number,
+    activeEditionsCount?: number,
+    historicEditionsCount?: number,
+  ) {
     this.id = blueprint.id;
     this.title = blueprint.title;
     this.description = blueprint.description;
@@ -31,9 +49,25 @@ export class BlueprintResponseDto {
     this.isActive = blueprint.isActive;
     this.createdAt = blueprint.createdAt;
     this.updatedAt = blueprint.updatedAt;
+    this.editionsCount = editionsCount;
+    this.draftEditionsCount = draftEditionsCount;
+    this.activeEditionsCount = activeEditionsCount;
+    this.historicEditionsCount = historicEditionsCount;
   }
 
-  static fromBlueprint(blueprint: CourseBlueprint): BlueprintResponseDto {
-    return new BlueprintResponseDto(blueprint);
+  static fromBlueprint(
+    blueprint: CourseBlueprint,
+    editionsCount?: number,
+    draftEditionsCount?: number,
+    activeEditionsCount?: number,
+    historicEditionsCount?: number,
+  ): BlueprintResponseDto {
+    return new BlueprintResponseDto(
+      blueprint,
+      editionsCount,
+      draftEditionsCount,
+      activeEditionsCount,
+      historicEditionsCount,
+    );
   }
 }

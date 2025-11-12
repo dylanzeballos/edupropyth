@@ -6,6 +6,7 @@ export interface ICourseRepository {
   findOneWithTopics(id: string): Promise<Course | null>;
   findAll(): Promise<Course[]>;
   findAllWithTopics(): Promise<Course[]>;
+  findAllEditionsWithDetails(): Promise<Course[]>;
   create(courseData: Partial<Course>): Promise<Course>;
   update(id: string, courseData: Partial<Course>): Promise<Course>;
   delete(id: string): Promise<void>;

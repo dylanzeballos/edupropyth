@@ -27,7 +27,8 @@ export const useCourseTemplateById = (courseId?: string) => {
     queryKey: COURSE_TEMPLATE_QUERY_KEYS.byCourse(courseId!),
     queryFn: () => courseTemplateService.getTemplateByCourseId(courseId!),
     enabled: !!courseId,
-    staleTime: 1000 * 60 * 5,
+    staleTime: 0,
+    gcTime: 0, 
   });
 };
 
@@ -48,6 +49,28 @@ export const useCreateCourseTemplate = () => {
     },
     onError: (error: Error) => {
       const message = error.message || 'Error al crear el template';
+      toast.error(message);
+    },
+  });
+};
+
+export const useCreateDefaultCourseTemplate = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (courseId: string) =>
+      courseTemplateService.createDefaultTemplate(courseId),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: COURSE_TEMPLATE_QUERY_KEYS.all,
+      });
+      queryClient.invalidateQueries({
+        queryKey: COURSE_TEMPLATE_QUERY_KEYS.byCourse(data.courseId),
+      });
+      toast.success('Template por defecto creado exitosamente');
+    },
+    onError: (error: Error) => {
+      const message = error.message || 'Error al crear el template por defecto';
       toast.error(message);
     },
   });

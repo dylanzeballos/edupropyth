@@ -29,10 +29,11 @@ export const useTopicPermissions = ({
 
     const isAdmin = user.role === UserRole.ADMIN;
     const isInstructor = course.instructorId === user.id;
+    const isHistoric = course.status === 'historic';
 
     return {
-      canEditTemplate: isAdmin || isInstructor,
-      canManageTopics: isAdmin || isInstructor,
+      canEditTemplate: !isHistoric && (isAdmin || isInstructor),
+      canManageTopics: !isHistoric && (isAdmin || isInstructor),
       canViewTopics: true,
     };
   }, [user, course]);

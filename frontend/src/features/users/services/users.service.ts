@@ -11,6 +11,10 @@ export const usersService = {
     return (await getData('/users')) as UserAdmin[];
   },
 
+  async getTeachers(): Promise<UserAdmin[]> {
+    return (await getData('/users/teachers')) as UserAdmin[];
+  },
+
   async getUserById(id: string): Promise<UserAdmin> {
     return (await getData(`/users/${id}`)) as UserAdmin;
   },

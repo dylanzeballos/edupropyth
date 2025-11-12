@@ -3,6 +3,7 @@ import { GroupEnrollment } from '../entities/group-enrollment.entity';
 export interface IEnrollmentRepository {
   findById(id: string): Promise<GroupEnrollment | null>;
   findByGroupId(groupId: string): Promise<GroupEnrollment[]>;
+  findByUserId(userId: string): Promise<GroupEnrollment[]>;
   findByUserInCourse(
     userId: string,
     courseId: string,

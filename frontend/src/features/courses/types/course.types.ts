@@ -46,6 +46,10 @@ export interface Course {
   topics?: Topic[];
   createdAt: string;
   updatedAt: string;
+  editionsCount?: number;
+  draftEditionsCount?: number;
+  activeEditionsCount?: number;
+  historicEditionsCount?: number;
 }
 
 export interface CreateCourseRequest {

@@ -50,7 +50,7 @@ export const allToolItems: SidebarItem[] = [
     label: 'Gestión de Cursos',
     icon: Layout,
     path: '/course-management',
-    matchPaths: ['/template', '/management'],
+    matchPaths: ['/template', '/management', '/editions'],
     permissions: [Permission.EDIT_COURSE, Permission.MANAGE_COURSE_CONTENT],
   },
   {

@@ -32,6 +32,12 @@ export class UsersController {
     return this.usersService.getRoleStatistics();
   }
 
+  @Get('teachers')
+  @Roles(UserRole.ADMIN, UserRole.TEACHER_EDITOR, UserRole.TEACHER_EXECUTOR)
+  async getTeachers(): Promise<UserResponseDto[]> {
+    return this.usersService.findTeachers();
+  }
+
   @Get(':id')
   @Roles(UserRole.ADMIN)
   @RequirePermissions(Permission.VIEW_ALL_USERS)
