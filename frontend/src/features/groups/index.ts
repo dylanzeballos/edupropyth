@@ -4,3 +4,7 @@ export * from './services/group.service';
 export * from './hooks/useGroups';
 export * from './components/GroupForm';
 export * from './components/GroupCard';
+export * from './components/GroupModals';
+export * from './components/GroupsSection';
+export * from './components/TeacherSelect';
+export * from './utils/enrollment-key.utils';

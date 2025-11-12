@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const createEditionSchema = z.object({
   title: z
-    .string({ required_error: 'El título es obligatorio' })
+    .string('El título es obligatorio')
     .min(1, 'El título es obligatorio')
     .max(255, 'El título no puede superar 255 caracteres'),
   description: z

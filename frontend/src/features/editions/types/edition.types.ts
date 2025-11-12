@@ -1,7 +1,9 @@
 import type { Course } from '@/features/courses/types/course.types';
+import type { Group } from '@/features/groups/types/group.types';
 
 export interface Edition extends Course {
   blueprintId?: string;
+  groups?: Group[];
 }
 
 export interface CreateEditionRequest {
@@ -22,5 +24,5 @@ export interface UpdateEditionRequest {
 }
 
 export interface ChangeEditionStatusRequest {
-  status: 'draft' | 'active';
+  status: 'draft' | 'active' | 'historic';
 }
