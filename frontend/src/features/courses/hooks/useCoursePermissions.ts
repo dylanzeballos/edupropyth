@@ -1,52 +1,53 @@
 import { useAuthStore } from '../../auth/stores/auth.store';
 import { UserRole } from '@/features/auth/types/user.type';
+import type { CourseStatus } from '../types/course.types';
 
-export const useCoursePermissions = () => {
+interface UseCoursePermissionsOptions {
+  courseStatus?: CourseStatus;
+}
+
+export const useCoursePermissions = (
+  options?: UseCoursePermissionsOptions,
+) => {
   const { user } = useAuthStore();
+  const courseStatus = options?.courseStatus;
 
   const isAdmin = user?.role === UserRole.ADMIN;
   const isTeacherEditor = user?.role === UserRole.TEACHER_EDITOR;
   const isTeacherExecutor = user?.role === UserRole.TEACHER_EXECUTOR;
   const isTeacher = isTeacherEditor || isTeacherExecutor;
 
-  // EDITOR can edit course structure
-  const canEditCourseStructure = isAdmin || isTeacherEditor;
+  const isHistoric = courseStatus === 'historic';
 
-  // EXECUTOR can add content (resources/activities) but not edit structure
-  const canManageContent = isAdmin || isTeacherEditor || isTeacherExecutor;
+  const canEditCourseStructure = !isHistoric && (isAdmin || isTeacherEditor);
 
-  const canManageGroups = isAdmin || isTeacherEditor;
+  const canManageContent =
+    !isHistoric && (isAdmin || isTeacherEditor || isTeacherExecutor);
+
+  const canManageGroups = !isHistoric && (isAdmin || isTeacherEditor);
 
   return {
-    // Permisos de estructura del curso
     canCreateCourse: isAdmin || isTeacherEditor,
     canDeleteCourse: isAdmin,
     canEditCourse: canEditCourseStructure,
     canConfigureTemplate: canEditCourseStructure,
-
-    // Permisos de contenido
     canCreateTopics: canEditCourseStructure,
     canEditTopics: canEditCourseStructure,
     canDeleteTopics: canEditCourseStructure,
-    canAddResources: canManageContent, // EXECUTOR can add resources
+    canAddResources: canManageContent, 
     canEditResources: canManageContent,
     canDeleteResources: canManageContent,
-    canAddActivities: canManageContent, // EXECUTOR can add activities
+    canAddActivities: canManageContent,
     canEditActivities: canManageContent,
     canDeleteActivities: canManageContent,
-
-    // Permisos de visualización
     canViewProgress: isAdmin || isTeacher,
     canViewCourseManagement: canManageContent,
-
-    // Grupos
     canManageGroups,
-
-    // Estados de usuario
     isAdmin,
     isTeacherEditor,
     isTeacherExecutor,
     isTeacher,
     canEdit: canEditCourseStructure,
+    isHistoric,
   };
 };

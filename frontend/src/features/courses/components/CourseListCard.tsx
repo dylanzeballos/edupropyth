@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { CourseStatusBadge } from './CourseStatusBadge';
+import { FileEdit, BookCheck, Archive } from 'lucide-react';
 import type { Course } from '../types/course.types';
 
 interface CourseListCardProps {
@@ -8,6 +9,11 @@ interface CourseListCardProps {
 }
 
 export const CourseListCard = ({ course, onClick }: CourseListCardProps) => {
+  const editionsCount = course.editionsCount || 0;
+  const draftCount = course.draftEditionsCount || 0;
+  const activeCount = course.activeEditionsCount || 0;
+  const historicCount = course.historicEditionsCount || 0;
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
@@ -55,13 +61,51 @@ export const CourseListCard = ({ course, onClick }: CourseListCardProps) => {
             {course.description}
           </p>
         )}
-        <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
-          <span>
-            {course.topics?.length || 0} tópico{course.topics?.length !== 1 ? 's' : ''}
-          </span>
-          <span className="text-blue-600 dark:text-blue-400 hover:underline">
-            Ver detalles →
-          </span>
+        <div className="space-y-2">
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-gray-600 dark:text-gray-400">
+              Total de ediciones:
+            </span>
+            <span className="font-semibold text-gray-900 dark:text-white">
+              {editionsCount}
+            </span>
+          </div>
+          {editionsCount > 0 && (
+            <div className="grid grid-cols-3 gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+              <div className="flex flex-col items-center p-2 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                <FileEdit className="w-4 h-4 text-gray-600 dark:text-gray-400 mb-1" />
+                <span className="text-xs text-gray-500 dark:text-gray-400">
+                  Borrador
+                </span>
+                <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                  {draftCount}
+                </span>
+              </div>
+              <div className="flex flex-col items-center p-2 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                <BookCheck className="w-4 h-4 text-green-600 dark:text-green-400 mb-1" />
+                <span className="text-xs text-green-600 dark:text-green-400">
+                  Activas
+                </span>
+                <span className="text-sm font-semibold text-green-700 dark:text-green-300">
+                  {activeCount}
+                </span>
+              </div>
+              <div className="flex flex-col items-center p-2 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                <Archive className="w-4 h-4 text-purple-600 dark:text-purple-400 mb-1" />
+                <span className="text-xs text-purple-600 dark:text-purple-400">
+                  Históricas
+                </span>
+                <span className="text-sm font-semibold text-purple-700 dark:text-purple-300">
+                  {historicCount}
+                </span>
+              </div>
+            </div>
+          )}
+          <div className="pt-2">
+            <span className="text-blue-600 dark:text-blue-400 hover:underline text-sm">
+              Ver detalles →
+            </span>
+          </div>
         </div>
       </div>
     </motion.div>

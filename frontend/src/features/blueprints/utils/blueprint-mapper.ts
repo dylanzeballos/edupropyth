@@ -13,4 +13,8 @@ export const blueprintToCourseLike = (blueprint: Blueprint): Course => ({
   topics: [],
   createdAt: blueprint.createdAt,
   updatedAt: blueprint.updatedAt,
+  editionsCount: blueprint.editionsCount,
+  draftEditionsCount: blueprint.draftEditionsCount,
+  activeEditionsCount: blueprint.activeEditionsCount,
+  historicEditionsCount: blueprint.historicEditionsCount,
 });

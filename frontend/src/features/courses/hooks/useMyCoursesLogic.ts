@@ -5,6 +5,7 @@ import type { Course } from '../types/course.types';
 
 interface MyCoursesData {
   enrolledCourses: Course[];
+  historicCourses: Course[];
   availableCourses: Course[];
   isLoading: boolean;
   error: Error | null;
@@ -14,9 +15,13 @@ export const useMyCoursesLogic = (): MyCoursesData => {
   const { data: allCourses, isLoading: coursesLoading, error: coursesError } = useCourses();
   const { data: enrollments, isLoading: enrollmentsLoading } = useMyEnrollments();
 
-  const { enrolledCourses, availableCourses } = useMemo(() => {
+  const { enrolledCourses, historicCourses, availableCourses } = useMemo(() => {
     if (!allCourses || !enrollments) {
-      return { enrolledCourses: [], availableCourses: allCourses || [] };
+      return { 
+        enrolledCourses: [], 
+        historicCourses: [],
+        availableCourses: [] 
+      };
     }
 
     const enrolledCourseIds = new Set(
@@ -25,19 +30,35 @@ export const useMyCoursesLogic = (): MyCoursesData => {
         .filter((id): id is string => Boolean(id))
     );
 
-    const enrolled = allCourses.filter((course) =>
-      enrolledCourseIds.has(course.id)
-    );
+    const enrolled: Course[] = [];
+    const historic: Course[] = [];
+    
+    allCourses.forEach((course) => {
+      if (enrolledCourseIds.has(course.id)) {
+        if (course.status === 'historic') {
+          historic.push(course);
+        } else {
+          enrolled.push(course);
+        }
+      }
+    });
 
     const available = allCourses.filter(
-      (course) => !enrolledCourseIds.has(course.id)
+      (course) => 
+        !enrolledCourseIds.has(course.id) && 
+        course.status === 'active'
     );
 
-    return { enrolledCourses: enrolled, availableCourses: available };
+    return { 
+      enrolledCourses: enrolled, 
+      historicCourses: historic,
+      availableCourses: available 
+    };
   }, [allCourses, enrollments]);
 
   return {
     enrolledCourses,
+    historicCourses,
     availableCourses,
     isLoading: coursesLoading || enrollmentsLoading,
     error: coursesError,
