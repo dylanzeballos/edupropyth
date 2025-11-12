@@ -18,6 +18,9 @@ export class ActivityHistory {
   @Column({ name: 'activity_id' })
   activityId: string;
 
+  @Column({ name: 'topic_id' })
+  topicId: string;
+
   @Column({ name: 'topic_history_id' })
   topicHistoryId: string;
 
@@ -27,6 +30,9 @@ export class ActivityHistory {
   )
   @JoinColumn({ name: 'topic_history_id' })
   topicHistory: TopicHistory;
+
+  @Column()
+  version: number;
 
   @Column({
     type: 'enum',

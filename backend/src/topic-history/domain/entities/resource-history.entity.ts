@@ -18,6 +18,9 @@ export class ResourceHistory {
   @Column({ name: 'resource_id' })
   resourceId: string;
 
+  @Column({ name: 'topic_id' })
+  topicId: string;
+
   @Column({ name: 'topic_history_id' })
   topicHistoryId: string;
 
@@ -27,6 +30,9 @@ export class ResourceHistory {
   )
   @JoinColumn({ name: 'topic_history_id' })
   topicHistory: TopicHistory;
+
+  @Column()
+  version: number;
 
   @Column({
     type: 'enum',

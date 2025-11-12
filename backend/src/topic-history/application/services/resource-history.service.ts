@@ -92,7 +92,9 @@ export class ResourceHistoryService {
     });
 
     if (!version1 || !version2) {
-      throw new NotFoundException('Unable to compare resource history versions');
+      throw new NotFoundException(
+        'Unable to compare resource history versions',
+      );
     }
 
     return {

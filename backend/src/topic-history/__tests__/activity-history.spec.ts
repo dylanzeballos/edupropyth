@@ -196,7 +196,10 @@ describe('ActivityHistoryService', () => {
       const historyEntry = buildActivityHistory(mockActivity, mockUser);
       activityHistoryRepository.findOne.mockResolvedValue(historyEntry);
 
-      const result = await service.getVersionById('activity-history-1', mockUser);
+      const result = await service.getVersionById(
+        'activity-history-1',
+        mockUser,
+      );
 
       expect(activityHistoryRepository.findOne).toHaveBeenCalledWith({
         where: { id: 'activity-history-1' },

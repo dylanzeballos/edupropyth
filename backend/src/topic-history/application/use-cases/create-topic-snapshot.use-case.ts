@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/require-await */
 import { Injectable } from '@nestjs/common';
 import { TopicHistoryService } from '../services/topic-history.service';
 import { ResourceHistoryService } from '../services/resource-history.service';

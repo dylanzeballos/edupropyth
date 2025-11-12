@@ -92,7 +92,9 @@ export class ActivityHistoryService {
     });
 
     if (!version1 || !version2) {
-      throw new NotFoundException('Unable to compare activity history versions');
+      throw new NotFoundException(
+        'Unable to compare activity history versions',
+      );
     }
 
     return {
