@@ -53,6 +53,17 @@ export class TypeOrmCourseRepository implements ICourseRepository {
     });
   }
 
+  async findAllEditionsWithDetails(): Promise<Course[]> {
+    const qb = this.courseRepository
+      .createQueryBuilder('course')
+      .leftJoinAndSelect('course.topics', 'topics')
+      .leftJoinAndSelect('course.groups', 'groups')
+      .where('course.blueprint_id IS NOT NULL')
+      .orderBy('course.created_at', 'DESC');
+
+    return qb.getMany();
+  }
+
   async create(courseData: Partial<Course>): Promise<Course> {
     const course = this.courseRepository.create(courseData);
     return await this.courseRepository.save(course);

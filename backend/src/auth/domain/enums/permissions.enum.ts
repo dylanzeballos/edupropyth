@@ -80,6 +80,7 @@ export const ROLE_PERMISSIONS: Record<string, Permission[]> = {
     Permission.VIEW_STUDENT_SUBMISSIONS,
     Permission.GRADE_SUBMISSIONS,
     Permission.PROVIDE_FEEDBACK,
+    Permission.MANAGE_COURSE_EDITIONS,
     Permission.MANAGE_GROUPS,
     Permission.ASSIGN_INSTRUCTORS,
     Permission.ENROLL_STUDENTS,

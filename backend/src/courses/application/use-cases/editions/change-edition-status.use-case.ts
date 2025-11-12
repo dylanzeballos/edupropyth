@@ -20,10 +20,32 @@ export class ChangeEditionStatusUseCase {
     const edition = await this.courseRepo.findById(id);
     if (!edition) throw new NotFoundException('Edition not found');
 
-    if (![CourseStatus.DRAFT, CourseStatus.ACTIVE].includes(status)) {
+    if (
+      ![
+        CourseStatus.DRAFT,
+        CourseStatus.ACTIVE,
+        CourseStatus.HISTORIC,
+      ].includes(status)
+    ) {
       throw new BadRequestException(
-        'Only DRAFT or ACTIVE are allowed for editions',
+        'Only DRAFT, ACTIVE, or HISTORIC are allowed for editions',
       );
+    }
+
+    if (status === CourseStatus.ACTIVE && edition.blueprintId) {
+      const allEditions = await this.courseRepo.findAll();
+      const activeEditionExists = allEditions.some(
+        (e) =>
+          e.blueprintId === edition.blueprintId &&
+          e.id !== id &&
+          e.status === CourseStatus.ACTIVE,
+      );
+
+      if (activeEditionExists) {
+        throw new BadRequestException(
+          'Ya existe una edición activa para este curso. Solo puede haber una edición activa a la vez.',
+        );
+      }
     }
 
     return this.courseRepo.update(id, { status });

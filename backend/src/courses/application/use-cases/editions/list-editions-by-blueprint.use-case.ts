@@ -11,7 +11,7 @@ export class ListEditionsByBlueprintUseCase {
   ) {}
 
   async execute(blueprintId: string): Promise<Course[]> {
-    const all = await this.courseRepo.findAll();
-    return all.filter((course) => course.blueprintId === blueprintId);
+    const allEditions = await this.courseRepo.findAllEditionsWithDetails();
+    return allEditions.filter((course) => course.blueprintId === blueprintId);
   }
 }

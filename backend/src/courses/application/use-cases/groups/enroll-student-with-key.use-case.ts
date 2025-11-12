@@ -9,6 +9,7 @@ import { Repository } from 'typeorm';
 import { Group } from 'src/courses/domain/entities/group.entity';
 import { GroupEnrollment } from 'src/courses/domain/entities/group-enrollment.entity';
 import { EnrollmentStatus } from 'src/courses/domain/enums/enrollment-status.enum';
+import { CourseStatus } from 'src/courses/domain/enums/course-status.enum';
 
 @Injectable()
 export class EnrollStudentWithKeyUseCase {
@@ -31,6 +32,12 @@ export class EnrollStudentWithKeyUseCase {
 
     if (!group) {
       throw new NotFoundException('Group not found');
+    }
+
+    if (!group.course || group.course.status !== CourseStatus.ACTIVE) {
+      throw new ForbiddenException(
+        'Solo puedes inscribirte en cursos activos. Este curso aún no está disponible o ya finalizó.',
+      );
     }
 
     if (!group.isEnrollmentOpen) {

@@ -36,6 +36,7 @@ import { CourseAdminGuard } from './infrastructure/guards/course-admin.guard';
 import { CourseEditorGuard } from './infrastructure/guards/course-editor.guard';
 import { CourseStatusGuard } from './infrastructure/guards/course-status.guard';
 import { TopicEditableGuard } from './infrastructure/guards/topic-editable.guard';
+import { GroupEditorGuard } from './infrastructure/guards/group-editor.guard';
 
 // Use Cases - Topics
 import { CreateTopicUseCase } from './application/use-cases/topics/create-topic.use-case';
@@ -170,6 +171,7 @@ import { EnrollmentController } from './presentation/controllers/enrollment.cont
     TopicEditableGuard,
     CourseAdminGuard,
     CourseEditorGuard,
+    GroupEditorGuard,
 
     CloudinaryService,
 
