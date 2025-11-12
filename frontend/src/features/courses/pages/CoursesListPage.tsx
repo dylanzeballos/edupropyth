@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router';
 import { motion } from 'framer-motion';
-import { Plus } from 'lucide-react';
-import { useCourses, useCreateCourse } from '../hooks/useCourse';
+import { Plus, BookOpen } from 'lucide-react';
+import { useBlueprints, useCreateBlueprint, blueprintToCourseLike } from '@/features/blueprints';
 import { useCoursePermissions } from '../hooks/useCoursePermissions';
 import { Modal } from '@/shared/components/ui/Modal';
 import { EmptyState } from '@/shared/components/ui';
@@ -17,17 +17,17 @@ export const CoursesListPage = () => {
   const navigate = useNavigate();
   const createModal = useModalState();
 
-  const { data: courses, isLoading, error } = useCourses();
-  const createCourseMutation = useCreateCourse();
+  const { data: blueprints, isLoading, error } = useBlueprints();
+  const createBlueprintMutation = useCreateBlueprint();
   const permissions = useCoursePermissions();
 
   const handleCreateCourse = (
     data: CreateCourseFormData | UpdateCourseFormData,
   ) => {
-    createCourseMutation.mutate(data as CreateCourseFormData, {
-      onSuccess: (newCourse) => {
+    createBlueprintMutation.mutate(data as CreateCourseFormData, {
+      onSuccess: (newBlueprint) => {
         createModal.close();
-        navigate(`/courses/${newCourse.id}/management`);
+        navigate(`/courses/${newBlueprint.id}/management`);
       },
     });
   };
@@ -76,49 +76,37 @@ export const CoursesListPage = () => {
               Gestión de Cursos
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
-              {courses && courses.length > 0
-                ? `Administra y edita ${courses.length} curso${courses.length !== 1 ? 's' : ''} del sistema.`
+              {blueprints && blueprints.length > 0
+                ? `Administra y edita ${blueprints.length} curso${blueprints.length !== 1 ? 's' : ''} del sistema.`
                 : 'No hay cursos creados aún.'}
             </p>
           </div>
 
-          {permissions.canCreateCourse && (
+          {permissions.canCreateCourse && (!blueprints || blueprints.length === 0) && (
             <button
               onClick={() => createModal.open()}
               className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
               <Plus className="w-5 h-5" />
-              Nuevo Curso
+              Crear Curso Base
             </button>
           )}
         </div>
 
-        {!courses || courses.length === 0 ? (
+        {!blueprints || blueprints.length === 0 ? (
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-12">
             <EmptyState
               icon={
-                <svg
-                  className="w-10 h-10 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                  />
-                </svg>
+                <BookOpen className="w-10 h-10 text-gray-400" />
               }
               title="No hay cursos disponibles"
               description={
                 permissions.canCreateCourse
-                  ? 'Comienza creando tu primer curso.'
+                  ? 'Comienza creando el curso base del sistema. Este será el template para crear ediciones.'
                   : 'Los cursos aparecerán aquí cuando estén disponibles.'
               }
               actionLabel={
-                permissions.canCreateCourse ? 'Crear Primer Curso' : undefined
+                permissions.canCreateCourse ? 'Crear Curso Base' : undefined
               }
               onAction={
                 permissions.canCreateCourse
@@ -129,13 +117,16 @@ export const CoursesListPage = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {courses.map((course) => (
-              <CourseListCard
-                key={course.id}
-                course={course}
-                onClick={() => handleCourseClick(course.id)}
-              />
-            ))}
+            {blueprints.map((blueprint) => {
+              const courseLike = blueprintToCourseLike(blueprint);
+              return (
+                <CourseListCard
+                  key={blueprint.id}
+                  course={courseLike}
+                  onClick={() => handleCourseClick(blueprint.id)}
+                />
+              );
+            })}
           </div>
         )}
       </motion.div>
@@ -148,7 +139,7 @@ export const CoursesListPage = () => {
         <CourseForm
           onSubmit={handleCreateCourse}
           onCancel={createModal.close}
-          isSubmitting={createCourseMutation.isPending}
+          isSubmitting={createBlueprintMutation.isPending}
         />
       </Modal>
     </div>

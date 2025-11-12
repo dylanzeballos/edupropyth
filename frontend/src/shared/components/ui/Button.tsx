@@ -96,14 +96,14 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       >
         {loading ? (
           <>
-            <Loader2 className="w-4 h-4 animate-spin" />
+            <Loader2 className="w-4 h-4 animate-spin" role="status"/>
             {loadingText || label || children}
           </>
         ) : (
           <>
-            {Icon1 && <Icon1 className="w-5 h-5" />}
+            {Icon1 && <Icon1 className="w-5 h-5" data-testid="icon1"/>}
             {label || children}
-            {Icon2 && <Icon2 className="w-5 h-5" />}
+            {Icon2 && <Icon2 className="w-5 h-5" data-testid="icon2"/>}
           </>
         )}
       </button>

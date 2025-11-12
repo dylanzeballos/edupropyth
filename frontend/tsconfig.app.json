@@ -22,6 +22,10 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
+
+    /* tipos de Vitest y React */
+    "types": ["vitest/globals", "react"],
+
     "baseUrl": "src",
     "paths": {
       "@/*": ["*"]

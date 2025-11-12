@@ -12,6 +12,8 @@ import type { ICourseRepository } from '../../domain/interfaces/course-repositor
 import { COURSE_REPOSITORY } from '../../domain/interfaces/course-repository.interface';
 import type { IResourceRepository } from '../../domain/interfaces/resource-repository.interface';
 import { RESOURCE_REPOSITORY } from '../../domain/interfaces/resource-repository.interface';
+import type { IActivityRepository } from '../../domain/interfaces/activity-repository.interface';
+import { ACTIVITY_REPOSITORY } from '../../domain/interfaces/activity-repository.interface';
 
 @Injectable()
 export class TopicEditableGuard implements CanActivate {
@@ -20,6 +22,8 @@ export class TopicEditableGuard implements CanActivate {
     @Inject(COURSE_REPOSITORY) private courseRepository: ICourseRepository,
     @Inject(RESOURCE_REPOSITORY)
     private resourceRepository: IResourceRepository,
+    @Inject(ACTIVITY_REPOSITORY)
+    private activityRepository: IActivityRepository,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -30,7 +34,6 @@ export class TopicEditableGuard implements CanActivate {
 
     let topicId = request.params.topicId || request.params.id;
 
-    // If this is a resource endpoint, we need to get the resource first to find the topicId
     if (request.url.includes('/resources/') && !request.params.topicId) {
       const resourceId = request.params.id;
 
@@ -45,6 +48,22 @@ export class TopicEditableGuard implements CanActivate {
       }
 
       topicId = resource.topicId;
+    }
+
+    if (request.url.includes('/activities/') && !request.params.topicId) {
+      const activityId = request.params.id;
+
+      if (!activityId) {
+        throw new ForbiddenException('Activity ID is required');
+      }
+
+      const activity = await this.activityRepository.findById(activityId);
+
+      if (!activity) {
+        throw new ForbiddenException('Activity not found');
+      }
+
+      topicId = activity.topicId;
     }
 
     if (!topicId) {

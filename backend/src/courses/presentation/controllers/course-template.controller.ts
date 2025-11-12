@@ -102,20 +102,31 @@ export class CourseTemplateController {
   }
 
   @Get('course/:courseId')
-  @ApiOperation({ summary: 'Get course template by course ID' })
+  @ApiOperation({
+    summary: 'Get course template by course ID (creates default if not exists)',
+  })
   @ApiParam({ name: 'courseId', description: 'Course ID' })
   @ApiResponse({
     status: 200,
-    description: 'Course template found',
+    description: 'Course template found or created',
     type: CourseTemplateResponseDto,
   })
-  @ApiResponse({ status: 404, description: 'Course template not found' })
+  @ApiResponse({ status: 404, description: 'Course not found' })
   async getByCourseId(
     @Param('courseId') courseId: string,
-  ): Promise<CourseTemplateResponseDto | null> {
-    const template =
+    @CurrentUser('id') userId: string,
+  ): Promise<CourseTemplateResponseDto> {
+    let template =
       await this.getCourseTemplateUseCase.executeByCourseId(courseId);
-    return template ? CourseTemplateResponseDto.fromEntity(template) : null;
+
+    if (!template) {
+      template = await this.createDefaultCourseTemplateUseCase.execute(
+        courseId,
+        userId,
+      );
+    }
+
+    return CourseTemplateResponseDto.fromEntity(template);
   }
 
   @Put(':id')

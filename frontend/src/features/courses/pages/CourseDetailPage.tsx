@@ -1,152 +1,59 @@
 import { useParams, useNavigate } from 'react-router';
 import { motion } from 'framer-motion';
-import { useCourse, useUpdateCourse } from '../hooks/useCourse';
+import { Plus } from 'lucide-react';
 import { useCoursePermissions } from '../hooks/useCoursePermissions';
 import { useCourseNavigation } from '../hooks/useCourseNavigation';
+import { useCourseDetailHandlers } from '../hooks/useCourseDetailHandlers';
 import { CourseForm } from '../components/CourseForm';
 import { CourseHeader } from '../components/CourseHeader';
 import { CourseInfo } from '../components/CourseInfo';
-import { CourseTopicsList } from '../components/CourseTopicsList';
-import { Modal } from '@/shared/components/ui/Modal';
-import { Button, EmptyState } from '@/shared/components/ui';
+import { CourseLoadingState } from '../components/CourseLoadingState';
+import { Modal, EmptyState, Button } from '@/shared/components/ui';
 import { useModals } from '@/shared/hooks/useModalState';
-import type { UpdateCourseFormData } from '../validation/course.schema';
 import {
-  useTopics,
-  useTopicActions,
-  TopicForm,
-  type Topic,
-  type CreateTopicFormData,
-  type UpdateTopicFormData,
-} from '@/features/topics';
+  EditionCard,
+  EditionForm,
+  useEditionsByBlueprint,
+} from '@/features/editions';
 import {
-  useResourceActions,
-  ResourceForm,
-  type Resource,
-  type UploadResourceRequest,
-  type CreateResourceRequest,
-} from '@/features/resources';
+  useBlueprint,
+  blueprintToCourseLike,
+} from '@/features/blueprints';
 
 export const CourseDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const modals = useModals();
 
-  const { data: course, isLoading, error } = useCourse(id);
-  const { data: topics } = useTopics(id || '');
-  const updateCourseMutation = useUpdateCourse();
-  const permissions = useCoursePermissions();
-  const { navigateToCoursesPage } = useCourseNavigation({ course });
-
+  const { data: blueprint, isLoading, error } = useBlueprint(id);
   const {
-    canEditCourse,
-    canConfigureTemplate,
-    canCreateTopics,
-    canEditTopics,
-    canDeleteTopics,
-    canAddResources,
-    canEditResources,
-    canDeleteResources,
-  } = permissions;
+    data: editions,
+    isLoading: isLoadingEditions,
+    error: editionsError,
+  } = useEditionsByBlueprint(id);
+  const permissions = useCoursePermissions();
+  const courseLike = blueprint ? blueprintToCourseLike(blueprint) : undefined;
+  const { navigateToCoursesPage } = useCourseNavigation({ course: courseLike });
+  
+  const {
+    handleUpdateCourse,
+    handleCreateEdition,
+    handleManageEdition,
+    handleChangeEditionStatus,
+    isUpdatingBlueprint,
+    isCreatingEdition,
+  } = useCourseDetailHandlers({ blueprintId: id });
 
-  const topicActions = useTopicActions({
-    courseId: id || '',
-    onCreateSuccess: () => modals.closeModal('createTopic'),
-    onUpdateSuccess: () => modals.closeModal('editTopic'),
-    onDeleteSuccess: () => modals.closeModal('deleteTopic'),
+  const { canEditCourse } = permissions;
+
+  const loadingState = CourseLoadingState({
+    isLoading,
+    hasError: !!error || !blueprint,
+    onNavigateBack: () => navigate('/my-courses'),
   });
 
-  const resourceActions = useResourceActions({
-    onCreateSuccess: () => modals.closeModal('createResource'),
-    onUpdateSuccess: () => modals.closeModal('editResource'),
-    onDeleteSuccess: () => modals.closeModal('deleteResource'),
-  });
-
-  const handleUpdateCourse = (data: UpdateCourseFormData) => {
-    if (!id) return;
-    updateCourseMutation.mutate(
-      { id, data },
-      { onSuccess: () => modals.closeModal('editCourse') },
-    );
-  };
-
-  const handleCreateTopic = (
-    data: CreateTopicFormData | UpdateTopicFormData,
-  ) => {
-    topicActions.handleCreate(data);
-  };
-
-  const handleUpdateTopic = (
-    data: CreateTopicFormData | UpdateTopicFormData,
-  ) => {
-    const topic = modals.getModalData<Topic>('editTopic');
-    if (!topic) return;
-    topicActions.handleUpdate(topic.id, data);
-  };
-
-  const handleDeleteTopic = () => {
-    const topicId = modals.getModalData<string>('deleteTopic');
-    if (!topicId) return;
-    topicActions.handleDelete(topicId);
-  };
-
-  const handleSubmitResource = (
-    data: UploadResourceRequest | CreateResourceRequest,
-  ) => {
-    resourceActions.handleCreate(data);
-  };
-
-  const handleUpdateResource = (
-    data: UploadResourceRequest | CreateResourceRequest,
-  ) => {
-    const resource = modals.getModalData<Resource>('editResource');
-    if (!resource) return;
-    resourceActions.handleUpdate(resource.id, data);
-  };
-
-  const handleDeleteResource = () => {
-    const resourceId = modals.getModalData<string>('deleteResource');
-    if (!resourceId) return;
-    resourceActions.handleDelete(resourceId);
-  };
-
-  if (isLoading) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex justify-center items-center h-64">
-          <div className="flex flex-col items-center gap-4">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-            <p className="text-gray-600 dark:text-gray-400">
-              Cargando curso...
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (error || !course) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <Button
-          variant="ghost"
-          onClick={() => navigate('/my-courses')}
-          className="mb-4"
-        >
-          Volver a cursos
-        </Button>
-
-        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-8">
-          <EmptyState
-            title="Curso no encontrado"
-            description="El curso que buscas no existe o fue eliminado."
-            actionLabel="Ver todos los cursos"
-            onAction={() => navigate('/my-courses')}
-          />
-        </div>
-      </div>
-    );
-  }
+  if (loadingState) return loadingState;
+  if (!courseLike) return null;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -156,59 +63,84 @@ export const CourseDetailPage = () => {
         transition={{ duration: 0.5 }}
       >
         <CourseHeader
-          course={course}
+          course={courseLike}
           canEdit={canEditCourse}
-          canConfigureTemplate={canConfigureTemplate}
+          canConfigureTemplate={false}
           onBack={navigateToCoursesPage}
           onEdit={() => modals.openModal('editCourse')}
         />
 
-        {course.thumbnail && (
+        {courseLike.thumbnail && (
           <div className="mb-8 rounded-xl overflow-hidden shadow-lg">
             <img
-              src={course.thumbnail}
-              alt={course.title}
+              src={courseLike.thumbnail}
+              alt={courseLike.title}
               className="w-full h-96 object-cover"
             />
           </div>
         )}
 
-        <CourseTopicsList
-          topics={topics || []}
-          courseStatus={course.status}
-          canEdit={canEditTopics}
-          canManageContent={canAddResources}
-          onAddTopic={
-            canCreateTopics ? () => modals.openModal('createTopic') : undefined
-          }
-          onEditTopic={
-            canEditTopics
-              ? (topic) => modals.openModal('editTopic', topic)
-              : undefined
-          }
-          onDeleteTopic={
-            canDeleteTopics
-              ? (topicId) => modals.openModal('deleteTopic', topicId)
-              : undefined
-          }
-          onAddResource={
-            canAddResources
-              ? (topic) => modals.openModal('createResource', topic)
-              : undefined
-          }
-          onEditResource={
-            canEditResources
-              ? (resource) => modals.openModal('editResource', resource)
-              : undefined
-          }
-          onDeleteResource={
-            canDeleteResources
-              ? (resourceId) => modals.openModal('deleteResource', resourceId)
-              : undefined
-          }
-        />
+        <section className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-sm">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                Ediciones
+              </h2>
+              <p className="text-gray-600 dark:text-gray-400">
+                Gestiona las instancias de este curso y accede a su detalle.
+              </p>
+            </div>
+            {canEditCourse && (
+              <Button
+                onClick={() => modals.openModal('createEdition')}
+                className="ml-auto w-full md:w-auto"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Crear edición
+              </Button>
+            )}
+          </div>
 
-        <CourseInfo course={course} topicsCount={topics?.length || 0} />
+          {isLoadingEditions ? (
+            <div className="flex justify-center items-center py-16">
+              <div className="flex flex-col items-center gap-2 text-gray-500 dark:text-gray-400">
+                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600" />
+                Cargando ediciones...
+              </div>
+            </div>
+          ) : editionsError ? (
+            <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-xl p-6 text-red-700 dark:text-red-200">
+              No se pudieron cargar las ediciones. Intenta nuevamente.
+            </div>
+          ) : !editions || editions.length === 0 ? (
+            <EmptyState
+              title="Aún no tienes ediciones"
+              description="Crea una edición para comenzar a preparar tópicos, recursos y grupos."
+              actionLabel={canEditCourse ? 'Crear edición' : undefined}
+              onAction={
+                canEditCourse ? () => modals.openModal('createEdition') : undefined
+              }
+            />
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              {editions.map((edition) => (
+                <EditionCard
+                  key={edition.id}
+                  edition={edition}
+                  onManage={() => handleManageEdition(edition.id)}
+                  onChangeStatus={handleChangeEditionStatus}
+                  canEdit={canEditCourse}
+                />
+              ))}
+            </div>
+          )}
+        </section>
+
+        <CourseInfo
+          course={courseLike}
+          count={editions?.length || 0}
+          countLabel="Total de Ediciones"
+        />
       </motion.div>
 
       {canEditCourse && (
@@ -218,147 +150,28 @@ export const CourseDetailPage = () => {
           title="Editar Curso"
         >
           <CourseForm
-            course={course}
+            course={courseLike}
             onSubmit={handleUpdateCourse}
             onCancel={() => modals.closeModal('editCourse')}
-            isSubmitting={updateCourseMutation.isPending}
+            isSubmitting={isUpdatingBlueprint}
           />
         </Modal>
       )}
 
-      {canCreateTopics && (
+      {canEditCourse && (
         <Modal
-          isOpen={modals.isModalOpen('createTopic')}
-          onClose={() => modals.closeModal('createTopic')}
-          title="Crear Nuevo Tópico"
+          isOpen={modals.isModalOpen('createEdition')}
+          onClose={() => modals.closeModal('createEdition')}
+          title="Crear nueva edición"
         >
-          <TopicForm
-            onSubmit={handleCreateTopic}
-            onCancel={() => modals.closeModal('createTopic')}
-            isSubmitting={topicActions.isCreating}
-            nextOrder={topics?.length || 0}
+          <EditionForm
+            editions={editions || []}
+            onSubmit={handleCreateEdition}
+            onCancel={() => modals.closeModal('createEdition')}
+            isSubmitting={isCreatingEdition}
           />
         </Modal>
       )}
-
-      {canEditTopics && (
-        <Modal
-          isOpen={modals.isModalOpen('editTopic')}
-          onClose={() => modals.closeModal('editTopic')}
-          title="Editar Tópico"
-        >
-          {modals.getModalData<Topic>('editTopic') && (
-            <TopicForm
-              topic={modals.getModalData<Topic>('editTopic')!}
-              onSubmit={handleUpdateTopic}
-              onCancel={() => modals.closeModal('editTopic')}
-              isSubmitting={topicActions.isUpdating}
-            />
-          )}
-        </Modal>
-      )}
-
-      <Modal
-        isOpen={modals.isModalOpen('deleteTopic')}
-        onClose={() => modals.closeModal('deleteTopic')}
-        title="Eliminar Tópico"
-      >
-        <div className="space-y-4">
-          <p className="text-gray-600 dark:text-gray-400">
-            ¿Estás seguro de que deseas eliminar este tópico? Esta acción no se
-            puede deshacer y se eliminarán todos los recursos y actividades
-            asociados.
-          </p>
-          <div className="flex justify-end space-x-3">
-            <Button
-              variant="outline"
-              onClick={() => modals.closeModal('deleteTopic')}
-              disabled={topicActions.isDeleting}
-            >
-              Cancelar
-            </Button>
-            <Button
-              onClick={handleDeleteTopic}
-              disabled={topicActions.isDeleting}
-              className="bg-red-600 hover:bg-red-700 text-white"
-            >
-              {topicActions.isDeleting ? 'Eliminando...' : 'Eliminar'}
-            </Button>
-          </div>
-        </div>
-      </Modal>
-
-      <Modal
-        isOpen={modals.isModalOpen('createResource')}
-        onClose={() => modals.closeModal('createResource')}
-        title="Agregar Recurso"
-      >
-        {modals.getModalData<Topic>('createResource') && (
-          <ResourceForm
-            topicId={modals.getModalData<Topic>('createResource')!.id}
-            order={
-              modals.getModalData<Topic>('createResource')!.resources?.length ||
-              0
-            }
-            onSubmit={handleSubmitResource}
-            onCancel={() => modals.closeModal('createResource')}
-            isLoading={resourceActions.isCreating}
-          />
-        )}
-      </Modal>
-
-      <Modal
-        isOpen={modals.isModalOpen('editResource')}
-        onClose={() => modals.closeModal('editResource')}
-        title="Editar Recurso"
-      >
-        {modals.getModalData<Resource>('editResource') && (
-          <ResourceForm
-            topicId={modals.getModalData<Resource>('editResource')!.topicId}
-            order={modals.getModalData<Resource>('editResource')!.order}
-            initialData={{
-              title: modals.getModalData<Resource>('editResource')!.title,
-              description:
-                modals.getModalData<Resource>('editResource')!.description,
-              type: modals.getModalData<Resource>('editResource')!.type,
-              url: modals.getModalData<Resource>('editResource')!.url,
-              order: modals.getModalData<Resource>('editResource')!.order,
-            }}
-            onSubmit={handleUpdateResource}
-            onCancel={() => modals.closeModal('editResource')}
-            isLoading={resourceActions.isUpdating}
-          />
-        )}
-      </Modal>
-
-      <Modal
-        isOpen={modals.isModalOpen('deleteResource')}
-        onClose={() => modals.closeModal('deleteResource')}
-        title="Eliminar Recurso"
-      >
-        <div className="space-y-4">
-          <p className="text-gray-600 dark:text-gray-400">
-            ¿Estás seguro de que deseas eliminar este recurso? Esta acción no se
-            puede deshacer.
-          </p>
-          <div className="flex justify-end space-x-3">
-            <Button
-              variant="outline"
-              onClick={() => modals.closeModal('deleteResource')}
-              disabled={resourceActions.isDeleting}
-            >
-              Cancelar
-            </Button>
-            <Button
-              onClick={handleDeleteResource}
-              disabled={resourceActions.isDeleting}
-              className="bg-red-600 hover:bg-red-700 text-white"
-            >
-              {resourceActions.isDeleting ? 'Eliminando...' : 'Eliminar'}
-            </Button>
-          </div>
-        </div>
-      </Modal>
     </div>
   );
 };

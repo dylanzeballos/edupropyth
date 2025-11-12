@@ -39,6 +39,7 @@ export const Modal = ({
     <Fragment>
       {/* Backdrop */}
       <div
+        data-testid="backdrop"  // Test ID agregado para pruebas
         className="fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity"
         onClick={handleBackdropClick}
       />

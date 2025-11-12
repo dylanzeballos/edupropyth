@@ -21,6 +21,12 @@ export enum Permission {
   GRADE_SUBMISSIONS = 'grade_submissions',
   PROVIDE_FEEDBACK = 'provide_feedback',
 
+  //Permisos de gestión de ediciones y grupos
+  MANAGE_COURSE_EDITIONS = 'manage_course_editions',
+  MANAGE_GROUPS = 'manage_groups',
+  ASSIGN_INSTRUCTORS = 'assign_instructors',
+  ENROLL_STUDENTS = 'enroll_students',
+
   //Permisos de Estudiante
   VIEW_ASSIGNED_TOPICS = 'view_assigned_topics',
   VIEW_ASSIGNED_EXERCISES = 'view_assigned_exercises',
@@ -47,6 +53,10 @@ export const ROLE_PERMISSIONS: Record<string, Permission[]> = {
     Permission.VIEW_STUDENT_SUBMISSIONS,
     Permission.GRADE_SUBMISSIONS,
     Permission.PROVIDE_FEEDBACK,
+    Permission.MANAGE_COURSE_EDITIONS,
+    Permission.MANAGE_GROUPS,
+    Permission.ASSIGN_INSTRUCTORS,
+    Permission.ENROLL_STUDENTS,
   ],
   teacher_editor: [
     Permission.CREATE_TOPICS,
@@ -58,6 +68,10 @@ export const ROLE_PERMISSIONS: Record<string, Permission[]> = {
     Permission.VIEW_TOPICS,
     Permission.VIEW_EXERCISES,
     Permission.EXECUTE_CODE,
+    Permission.MANAGE_COURSE_EDITIONS,
+    Permission.MANAGE_GROUPS,
+    Permission.ASSIGN_INSTRUCTORS,
+    Permission.ENROLL_STUDENTS,
   ],
   teacher_executor: [
     Permission.VIEW_TOPICS,
@@ -66,6 +80,10 @@ export const ROLE_PERMISSIONS: Record<string, Permission[]> = {
     Permission.VIEW_STUDENT_SUBMISSIONS,
     Permission.GRADE_SUBMISSIONS,
     Permission.PROVIDE_FEEDBACK,
+    Permission.MANAGE_COURSE_EDITIONS,
+    Permission.MANAGE_GROUPS,
+    Permission.ASSIGN_INSTRUCTORS,
+    Permission.ENROLL_STUDENTS,
   ],
   student: [
     Permission.VIEW_ASSIGNED_TOPICS,

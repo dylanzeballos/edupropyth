@@ -1,5 +1,6 @@
 // Types
 export type * from './types/course.types';
+export type * from './types/enrollment.types';
 
 // Hooks
 export {
@@ -19,6 +20,13 @@ export {
   useDeleteCourseTemplate,
   useDeleteCourseTemplateByCourseId,
 } from './hooks/useCourseTemplate';
+export {
+  useEnrollWithKey,
+  useEnrollWithCode,
+  useMyEnrollments,
+} from './hooks/useEnrollment';
+export { useEnrollmentKeyForm } from './hooks/useEnrollmentKeyForm';
+export { useMyCoursesLogic } from './hooks/useMyCoursesLogic';
 
 // Components
 export { CourseForm } from './components/CourseForm';
@@ -31,6 +39,10 @@ export { CourseStatusBadge } from './components/CourseStatusBadge';
 export { CourseTemplateEditor } from './components/CourseTemplateEditor';
 export { CourseTemplateViewer } from './components/CourseTemplateViewer';
 export { StudentCourseCard } from './components/StudentCourseCard';
+export { EnrollmentKeyInput } from './components/EnrollmentKeyInput';
+export { LoadingState } from './components/LoadingState';
+export { ErrorState } from './components/ErrorState';
+export { CoursesSectionHeader } from './components/CoursesSectionHeader';
 
 // Pages
 export { CoursesListPage } from './pages/CoursesListPage';
@@ -42,6 +54,7 @@ export { CourseTopicsViewPage } from './pages/CourseTopicsViewPage';
 // Services
 export { courseService } from './services/course.service';
 export { courseTemplateService } from './services/course-template.service';
+export { enrollmentService } from './services/enrollment.service';
 export type {
   CourseTemplate,
   ContentBlock,

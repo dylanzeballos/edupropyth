@@ -116,7 +116,7 @@ export const TopicCard = ({
         </div>
 
         {canEdit && (onEdit || onDelete) && (
-          <div className="flex gap-2 ml-4 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="flex gap-1 ml-4 flex-shrink-0 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
             {onEdit && (
               <Button
                 variant="ghost"
@@ -125,6 +125,8 @@ export const TopicCard = ({
                   e.stopPropagation();
                   onEdit();
                 }}
+                className="h-8 px-2"
+                title="Editar"
               >
                 <Edit className="w-4 h-4" />
               </Button>
@@ -137,7 +139,8 @@ export const TopicCard = ({
                   e.stopPropagation();
                   onDelete();
                 }}
-                className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                className="h-8 px-2 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                title="Eliminar"
               >
                 <Trash2 className="w-4 h-4" />
               </Button>

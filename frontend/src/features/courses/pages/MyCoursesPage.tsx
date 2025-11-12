@@ -1,43 +1,34 @@
 import { useNavigate } from 'react-router';
 import { motion } from 'framer-motion';
-import { useCourses } from '../hooks/useCourse';
+import { CheckCircle, BookOpen, Archive } from 'lucide-react';
 import { EmptyState } from '@/shared/components/ui';
 import { StudentCourseCard } from '../components/StudentCourseCard';
+import { EnrollmentKeyInput } from '../components/EnrollmentKeyInput';
+import { LoadingState } from '../components/LoadingState';
+import { ErrorState } from '../components/ErrorState';
+import { CoursesSectionHeader } from '../components/CoursesSectionHeader';
+import { useMyCoursesLogic } from '../hooks/useMyCoursesLogic';
 
 export const MyCoursesPage = () => {
   const navigate = useNavigate();
-
-  const { data: courses, isLoading, error } = useCourses();
+  const { 
+    enrolledCourses, 
+    historicCourses, 
+    availableCourses, 
+    isLoading, 
+    error 
+  } = useMyCoursesLogic();
 
   const handleCourseClick = (courseId: string) => {
     navigate(`/courses/${courseId}/topics`);
   };
 
   if (isLoading) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex justify-center items-center h-64">
-          <div className="flex flex-col items-center gap-4">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-            <p className="text-gray-600 dark:text-gray-400">
-              Cargando cursos...
-            </p>
-          </div>
-        </div>
-      </div>
-    );
+    return <LoadingState />;
   }
 
   if (error) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-          <p className="text-red-800 dark:text-red-200">
-            Error al cargar los cursos. Por favor, intenta nuevamente.
-          </p>
-        </div>
-      </div>
-    );
+    return <ErrorState />;
   }
 
   return (
@@ -52,43 +43,102 @@ export const MyCoursesPage = () => {
             Mis Cursos
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            {courses && courses.length > 0
-              ? `Explora y aprende con ${courses.length} curso${courses.length !== 1 ? 's' : ''} disponible${courses.length !== 1 ? 's' : ''}.`
-              : 'No hay cursos disponibles en este momento.'}
+            {enrolledCourses.length > 0
+              ? `Estás inscrito en ${enrolledCourses.length} curso${enrolledCourses.length !== 1 ? 's' : ''} activo${enrolledCourses.length !== 1 ? 's' : ''}.`
+              : 'Aún no estás inscrito en ningún curso activo.'}
           </p>
         </div>
 
-        {!courses || courses.length === 0 ? (
+        <EnrollmentKeyInput />
+
+        {enrolledCourses.length > 0 && (
+          <div className="mb-12">
+            <CoursesSectionHeader
+              icon={CheckCircle}
+              title="Mis Cursos Activos"
+              count={enrolledCourses.length}
+            />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {enrolledCourses.map((course) => (
+                <StudentCourseCard
+                  key={course.id}
+                  course={course}
+                  onClick={() => handleCourseClick(course.id)}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {historicCourses.length > 0 && (
+          <div className="mb-12">
+            <CoursesSectionHeader
+              icon={Archive}
+              title="Cursos Históricos"
+              count={historicCourses.length}
+              iconClassName="text-purple-600 dark:text-purple-400"
+              badgeClassName="bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300"
+            />
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              Cursos en los que estuviste inscrito y que ya finalizaron. Solo puedes ver el contenido en modo lectura.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {historicCourses.map((course) => (
+                <div
+                  key={course.id}
+                  className="relative"
+                >
+                  <StudentCourseCard
+                    course={course}
+                    onClick={() => handleCourseClick(course.id)}
+                  />
+                  <div className="absolute top-2 right-2 bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300 px-2 py-1 rounded-md text-xs font-medium">
+                    Histórico
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {availableCourses.length > 0 && (
+          <div>
+            <CoursesSectionHeader
+              icon={BookOpen}
+              title="Cursos Disponibles"
+              count={availableCourses.length}
+              iconClassName="text-gray-600 dark:text-gray-400"
+              badgeClassName="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300"
+            />
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              Estos cursos están activos y disponibles para inscripción. Usa un código de matrícula para inscribirte.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {availableCourses.map((course) => (
+                <div
+                  key={course.id}
+                  className="relative opacity-75 hover:opacity-100 transition-opacity"
+                >
+                  <StudentCourseCard
+                    course={course}
+                    onClick={() => handleCourseClick(course.id)}
+                  />
+                  <div className="absolute top-2 right-2 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 px-2 py-1 rounded-md text-xs font-medium">
+                    No inscrito
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {enrolledCourses.length === 0 && availableCourses.length === 0 && historicCourses.length === 0 && (
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-12">
             <EmptyState
-              icon={
-                <svg
-                  className="w-16 h-16 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                  />
-                </svg>
-              }
+              icon={<BookOpen className="w-16 h-16 text-gray-400" />}
               title="No hay cursos disponibles"
-              description="Los cursos aparecerán aquí cuando estén disponibles para ti."
+              description="Los cursos aparecerán aquí cuando estén disponibles. Usa un código de matrícula para inscribirte."
             />
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {courses.map((course) => (
-              <StudentCourseCard
-                key={course.id}
-                course={course}
-                onClick={() => handleCourseClick(course.id)}
-              />
-            ))}
           </div>
         )}
       </motion.div>

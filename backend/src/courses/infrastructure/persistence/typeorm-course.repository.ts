@@ -41,12 +41,27 @@ export class TypeOrmCourseRepository implements ICourseRepository {
 
   async findAllWithTopics(): Promise<Course[]> {
     return this.courseRepository.find({
-      relations: ['topics'],
+      relations: ['topics', 'topics.resources', 'topics.activities'],
       order: {
         createdAt: 'DESC',
-        topics: { order: 'ASC' },
+        topics: {
+          order: 'ASC',
+          resources: { order: 'ASC' },
+          activities: { order: 'ASC' },
+        },
       },
     });
+  }
+
+  async findAllEditionsWithDetails(): Promise<Course[]> {
+    const qb = this.courseRepository
+      .createQueryBuilder('course')
+      .leftJoinAndSelect('course.topics', 'topics')
+      .leftJoinAndSelect('course.groups', 'groups')
+      .where('course.blueprint_id IS NOT NULL')
+      .orderBy('course.created_at', 'DESC');
+
+    return qb.getMany();
   }
 
   async create(courseData: Partial<Course>): Promise<Course> {

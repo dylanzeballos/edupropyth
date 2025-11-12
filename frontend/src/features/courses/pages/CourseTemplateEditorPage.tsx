@@ -51,14 +51,14 @@ export const CourseTemplateEditorPage = () => {
         });
       }
 
-      navigate(`/courses/${courseId}/management`);
+      navigate(`/editions/${courseId}`);
     } catch (error) {
       console.error('Error saving template:', error);
     }
   };
 
   const handleCancel = () => {
-    navigate(`/courses/${courseId}/management`);
+    navigate(`/editions/${courseId}`);
   };
 
   const isLoading = isLoadingCourse || isLoadingTemplate;
@@ -83,8 +83,8 @@ export const CourseTemplateEditorPage = () => {
           <EmptyState
             title="Curso no encontrado"
             description="El curso que buscas no existe o fue eliminado."
-            actionLabel="Volver a cursos"
-            onAction={() => navigate('/courses')}
+            actionLabel="Volver a gestión de cursos"
+            onAction={() => navigate('/my-courses')}
           />
         </div>
       </div>
@@ -98,9 +98,20 @@ export const CourseTemplateEditorPage = () => {
           <EmptyState
             title="Sin permisos"
             description="No tienes permisos para editar el template de este curso."
-            actionLabel="Volver al curso"
-            onAction={() => navigate(`/courses/${courseId}/management`)}
+            actionLabel="Volver a la edición"
+            onAction={() => navigate(`/editions/${courseId}`)}
           />
+        </div>
+      </div>
+    );
+  }
+
+  if (!template || !template.id) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="flex flex-col items-center gap-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <p className="text-gray-600 dark:text-gray-400">Preparando editor...</p>
         </div>
       </div>
     );
@@ -108,7 +119,7 @@ export const CourseTemplateEditorPage = () => {
 
   return (
     <CourseTemplateEditor
-      template={template || null}
+      template={template}
       courseId={courseId || ''}
       resources={course.topics?.flatMap((t) => t.resources || []) || []}
       activities={course.topics?.flatMap((t) => t.activities || []) || []}

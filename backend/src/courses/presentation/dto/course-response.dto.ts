@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Course } from '../../domain/entities/course.entity';
 import { CourseStatus } from '../../domain/enums/course-status.enum';
 import { TopicResponseDto } from './topics/topic-response.dto';
+import { GroupResponseDto } from './groups/group-response.dto';
 
 export class CourseResponseDto {
   @ApiProperty()
@@ -28,8 +29,14 @@ export class CourseResponseDto {
   @ApiProperty({ required: false })
   clonedFromId?: string;
 
+  @ApiProperty({ required: false })
+  blueprintId?: string;
+
   @ApiProperty({ type: [TopicResponseDto], required: false })
   topics?: TopicResponseDto[];
+
+  @ApiProperty({ type: [GroupResponseDto], required: false })
+  groups?: GroupResponseDto[];
 
   @ApiProperty()
   createdAt: Date;
@@ -46,6 +53,7 @@ export class CourseResponseDto {
     this.instructorId = course.instructorId;
     this.isActive = course.isActive;
     this.clonedFromId = course.clonedFromId;
+    this.blueprintId = course.blueprintId;
     this.createdAt = course.createdAt;
     this.updatedAt = course.updatedAt;
 
@@ -53,6 +61,10 @@ export class CourseResponseDto {
       this.topics = course.topics
         .sort((a, b) => a.order - b.order)
         .map((topic) => TopicResponseDto.fromTopic(topic));
+    }
+
+    if (course.groups) {
+      this.groups = course.groups.map((group) => new GroupResponseDto(group));
     }
   }
 
