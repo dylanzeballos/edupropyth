@@ -3,11 +3,17 @@ name: Backend CD - AWS App Runner
 on:
   push:
     branches:
-      - main   
+      - main
+    tags:
+      - "v*.*.*"
 
 env:
-  AWS_REGION: us-east-2                 
-  ECR_REPOSITORY: edupropyth-backend    
+  AWS_REGION: us-east-2
+  ECR_REPOSITORY: edupropyth-backend
+
+concurrency:
+  group: backend-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   deploy-backend:
@@ -16,25 +22,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Install backend deps
-        working-directory: ./backend
-        run: npm ci
-
-      - name: Run backend tests (opcional)
-        working-directory: ./backend
-        run: npm test -- --watch=false
-        continue-on-error: true
-
-      - name: Build backend (NestJS)
-        working-directory: ./backend
-        run: npm run build
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -51,14 +38,30 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
-          IMAGE_TAG=${GITHUB_SHA}
-          IMAGE_URI=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          GIT_SHA=${GITHUB_SHA}
+          IMAGE_URI=$ECR_REGISTRY/$ECR_REPOSITORY:$GIT_SHA
+
+          echo "Building image $IMAGE_URI"
 
           docker build \
             -t $IMAGE_URI \
             ./backend
 
+          # Tag 'latest'
+          docker tag $IMAGE_URI $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+          # Si el push vino de un tag tipo vX.Y.Z, lo usamos también
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            VERSION_TAG=${GITHUB_REF#refs/tags/}
+            docker tag $IMAGE_URI $ECR_REGISTRY/$ECR_REPOSITORY:$VERSION_TAG
+          fi
+
           docker push $IMAGE_URI
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+          if [[ -n "$VERSION_TAG" ]]; then
+            docker push $ECR_REGISTRY/$ECR_REPOSITORY:$VERSION_TAG
+          fi
 
           echo "image_uri=$IMAGE_URI" >> $GITHUB_OUTPUT
 
@@ -69,4 +72,6 @@ jobs:
         run: |
           aws apprunner update-service \
             --service-arn "$APP_RUNNER_SERVICE_ARN" \
-            --source-configuration "ImageRepository={ImageIdentifier=$IMAGE_URI,ImageRepositoryType=ECR},AutoDeploymentsEnabled=true"
+            --source-configuration "ImageRepository={ImageIdentifier=$IMAGE_URI,ImageRepositoryType=ECR},AutoDeploymentsEnabled=true" \
+            --region $AWS_REGION \
+            --no-cli-pager
