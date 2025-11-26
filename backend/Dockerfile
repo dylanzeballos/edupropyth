@@ -1,78 +1,53 @@
-# Base stage
-FROM node:20-alpine AS base
+# =========================
+# Stage 1: Build (NestJS)
+# =========================
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Install dependencies only when needed
-FROM base AS deps
-
-# Copy package files
+# Copiamos solo package.json y lock para cachear instalacion
 COPY package.json package-lock.json ./
 
-# Install dependencies
+# Instalar TODAS las dependencias (incluye dev)
 RUN npm ci
 
-# Development stage
-FROM base AS development
-
-WORKDIR /app
-
-# Copy dependencies from deps stage
-COPY --from=deps /app/node_modules ./node_modules
-
-# Copy source code
+# Copiar el resto del código
 COPY . .
 
-# Expose port
-EXPOSE 3000
-
-# Start development server
-CMD ["npm", "run", "start:dev"]
-
-# Builder stage
-FROM base AS builder
-
-WORKDIR /app
-
-# Copy dependencies and source
-COPY --from=deps /app/node_modules ./node_modules
-COPY . .
-
-# Build the application
+# Compilar NestJS a dist/
 RUN npm run build
 
-# Remove dev dependencies
-RUN npm ci --only=production && npm cache clean --force
-
-# Production stage
-FROM node:20-alpine AS production
-
-# Install curl for healthcheck
-RUN apk add --no-cache curl
+# =========================
+# Stage 2: Runtime (prod)
+# =========================
+FROM node:20-alpine AS runner
 
 WORKDIR /app
 
-# Set NODE_ENV
+# Entorno de producción
 ENV NODE_ENV=production
 
-# Create non-root user
+# Creamos usuario no root (opcional pero buena práctica)
 RUN addgroup -g 1001 -S nodejs && \
     adduser -S nestjs -u 1001
 
-# Copy built application and production dependencies
-COPY --from=builder --chown=nestjs:nodejs /app/dist ./dist
-COPY --from=builder --chown=nestjs:nodejs /app/node_modules ./node_modules
-COPY --from=builder --chown=nestjs:nodejs /app/package.json ./package.json
+# Copiamos solo lo necesario
+COPY package.json package-lock.json ./
+# Instalar SOLO deps de producción
+RUN npm ci --omit=dev && npm cache clean --force
 
-# Switch to non-root user
+# Copiar el build desde el builder
+COPY --from=builder /app/dist ./dist
+
+# Cambiamos a usuario no root
 USER nestjs
 
-# Expose port
+# App Runner espera en el puerto 3000
 EXPOSE 3000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-  CMD curl -f http://localhost:3000/api/health || exit 1
+# (Opcional) healthcheck interno del contenedor, no es obligatorio para App Runner
+# HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+#   CMD wget -qO- http://localhost:3000/api/health || exit 1
 
-# Start production server
-CMD ["node", "dist/main"]
+# Comando de arranque de NestJS
+CMD ["node", "dist/main.js"]
