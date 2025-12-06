@@ -22,6 +22,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -75,3 +76,6 @@ jobs:
             --source-configuration "ImageRepository={ImageIdentifier=$IMAGE_URI,ImageRepositoryType=ECR},AutoDeploymentsEnabled=true" \
             --region $AWS_REGION \
             --no-cli-pager
+          # IMPORTANTE:
+          # Las variables MICROSOFT_CLIENT_ID, MICROSOFT_CLIENT_SECRET y MICROSOFT_REDIRECT_URI
+          # deben estar configuradas como Environment variables en el servicio de App Runner.
