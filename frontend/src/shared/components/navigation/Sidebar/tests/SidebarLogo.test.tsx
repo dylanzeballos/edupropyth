@@ -1,5 +1,4 @@
 // src/shared/components/navigation/Sidebar/tests/SidebarLogo.test.tsx
-import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { SidebarLogo } from '../SidebarLogo';
